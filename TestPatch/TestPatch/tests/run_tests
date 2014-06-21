@@ -1,0 +1,27 @@
+#!/bin/bash
+PATH=$HOME/TestPatch/tests/bin:$PATH
+#echo "path  $PATH"
+#echo "`which llc`"
+for  oclf in *.cl
+do
+#oclf="basic_10.cl"
+fname=`echo "$oclf" | cut -d'.' -f1`
+echo " Compiling $fname "
+clc  --support_all_extension --opencl=1.2 -o results-conformance/$fname.fe.ll $oclf
+echo "FE complete"
+llvm-as  -o results-conformance/$fname.bc results-conformance/$fname.fe.ll
+cp results-conformance/$fname.bc results-conformance/$fname.linked.bc
+llvm-link  -o results-conformance/$fname.linked.bc results-conformance/$fname.bc  $HOME/TestPatch/tests/bin/builtins.bc
+echo "llvm-link completed!"
+llvm-dis  -o results-conformance/$fname.linked.ll results-conformance/$fname.linked.bc
+opt  -O3 -always-inline results-conformance/$fname.linked.bc -o results-conformance/$fname.opt.bc
+echo "opt complete!"
+llvm-dis  -o results-conformance/$fname.opt.ll results-conformance/$fname.opt.bc
+llc  -O2 -march=hsail-64 -o results-conformance/$fname.brig  results-conformance/$fname.opt.bc
+echo "llc complete"
+hsailasm  -disassemble -o results-conformance/$fname.hsail  results-conformance/$fname.brig
+echo "HSAIL generated!"
+echo ""
+#Dev  -int_disassembler -ns -Q -Bonaire -d -brig  results-conformance/$fname.brig 
+done
+

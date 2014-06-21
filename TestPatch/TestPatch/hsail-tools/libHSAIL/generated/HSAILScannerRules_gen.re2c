@@ -1,0 +1,867 @@
+// University of Illinois/NCSA
+// Open Source License
+// 
+// Copyright (c) 2013, Advanced Micro Devices, Inc.
+// All rights reserved.
+// 
+// Developed by:
+// 
+//     HSA Team
+// 
+//     Advanced Micro Devices, Inc
+// 
+//     www.amd.com
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal with
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+// 
+//     * Redistributions of source code must retain the above copyright notice,
+//       this list of conditions and the following disclaimers.
+// 
+//     * Redistributions in binary form must reproduce the above copyright notice,
+//       this list of conditions and the following disclaimers in the
+//       documentation and/or other materials provided with the distribution.
+// 
+//     * Neither the names of the LLVM Team, University of Illinois at
+//       Urbana-Champaign, nor the names of its contributors may be used to
+//       endorse or promote products derived from this Software without specific
+//       prior written permission.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+// CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
+// SOFTWARE.
+/*!re2c
+
+    re2c:define:YYCTYPE  = "char";
+    re2c:define:YYCURSOR = curPos;
+    re2c:define:YYLIMIT  = m_end;
+    re2c:define:YYMARKER = marker;
+    re2c:yyfill:enable   = 1;
+    re2c:yych:conversion = 0;
+
+    SPACE = [ \t];
+    NL    = "\r"? "\n";
+    ANY   = [^];
+
+    WORD  = [a-zA-Z][a-zA-Z0-9]*;
+    ID    = [a-zA-Z_][a-zA-Z0-9_]*;
+
+    DCD   = [0-9];
+    HXD   = [0-9a-fA-F];
+
+    DECIMAL = "0" | [1-9]DCD*;
+    OCTAL   = "0"[0-7]+;
+    HEX     = "0"[xX]HXD+;
+
+    INTEGER = DECIMAL|OCTAL|HEX;
+
+    HLFHEX  = "0"[hH]HXD{4};
+    SGLHEX  = "0"[fF]HXD{8};
+    DBLHEX  = "0"[dD]HXD{16};
+
+    EXP = [Ee][+-]?DCD+;
+    FLOAT1 = DCD+  "."  DCD*   EXP?;
+    FLOAT2 =       "."  DCD+   EXP?;
+    FLOAT3 = DCD+ ("."  DCD*)? EXP;
+    FLOAT = [+-]? (FLOAT1|FLOAT2|FLOAT3);
+
+    C99FLT  = [+-]?"0"[xX]HXD+("."HXD*)?[pP][+-]?DCD+;
+*/
+
+#define YYFILL(n) { readChars(n); }
+
+#include <strstream>
+
+namespace HSAIL_ASM
+{
+
+void Scanner::readSingleStringLiteral(Token &t, std::string& outString)
+{
+    using namespace std;
+    const char * &curPos = t.m_text.end;
+    while(true) {
+        const char *const prevPos = curPos;
+        const char *marker;
+
+/*!re2c
+    re2c:indent:string = "        ";
+
+    "\\" [0-7]{1,3}       {
+        unsigned int v;
+        SRef const s(prevPos+1,curPos);
+        istrstream is(s.begin,s.length());
+        is >> oct >> v;
+        if (is.fail() || v>std::numeric_limits<unsigned char>::max()) {
+            syntaxError(curPos, "Invalid character code");
+        }
+        outString.push_back(static_cast<unsigned char>(v));
+        continue;
+    }
+    "\\" [xX][0-9A-Fa-f]{1,2} {
+        unsigned int v;
+        SRef const s(prevPos+2,curPos);
+        istrstream is(s.begin,s.length());
+        is >> hex >> v;
+        if (is.fail() || v>std::numeric_limits<unsigned char>::max()) {
+            syntaxError(curPos, "Invalid character code");
+        }
+        outString.push_back(static_cast<unsigned char>(v));
+        continue;
+    }
+    "\\\\"         { outString.push_back('\134'); continue; }
+    "\\'"          { outString.push_back('\047'); continue; }
+    "\\\""         { outString.push_back('\042'); continue; }
+    "\\?"          { outString.push_back('\077'); continue; }
+    "\\a"          { outString.push_back('\007'); continue; }
+    "\\b"          { outString.push_back('\010'); continue; }
+    "\\f"          { outString.push_back('\006'); continue; }
+    "\\n"          { outString.push_back('\012'); continue; }
+    "\\r"          { outString.push_back('\015'); continue; }
+    "\\t"          { outString.push_back('\011'); continue; }
+    "\\v"          { outString.push_back('\013'); continue; }
+    "\""           { curPos = prevPos; break; }
+    "\\"           { syntaxError(curPos, "Invalid escape sequence"); }
+    [\r\n]         { syntaxError(prevPos, "Runaway string literal"); }
+    [^\r\n\\\"]+   { outString.insert(outString.end(), prevPos, curPos); continue; }
+*/
+    }
+}
+
+ETokens Scanner::scanModifier(EScanContext ctx, Scanner::Token &t)
+{
+    const char* &curPos = t.m_text.end;
+    int &brigId = t.m_brigId;
+    const char *marker = NULL;
+/*!re2c
+    re2c:indent:string = "    ";
+
+    "_woimg"              { brigId = Brig::BRIG_TYPE_WOIMG;                    return EMType;                 }
+    "_downi_sat"          { brigId = Brig::BRIG_ROUND_INTEGER_MINUS_INFINITY_SAT; return EMRound;                }
+    "_coord"              { brigId = Brig::BRIG_SAMPLER_QUERY_COORD;           return EMSamplerQuery;         }
+    "_ps"                 { brigId = Brig::BRIG_PACK_PS;                       return EMPacking;              }
+    "_near"               { brigId = Brig::BRIG_ROUND_FLOAT_NEAR_EVEN;         return EMRound;                }
+    "_u64"                { brigId = Brig::BRIG_TYPE_U64;                      return EMType;                 }
+    "_ld"                 { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_LD;                     return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_waittimeout_gte"    { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAITTIMEOUT_GTE;        return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_s64x2"              { brigId = Brig::BRIG_TYPE_S64X2;                    return EMType;                 }
+    "_sne"                { brigId = Brig::BRIG_COMPARE_SNE;                   return EMCompare;              }
+    "_zeroi_sat"          { brigId = Brig::BRIG_ROUND_INTEGER_ZERO_SAT;        return EMRound;                }
+    "_cmp"                { brigId = Brig::BRIG_MEMORY_SCOPE_COMPONENT;        return EMMemoryScope;          }
+    "_slt"                { brigId = Brig::BRIG_COMPARE_SLT;                   return EMCompare;              }
+    "_lt"                 { brigId = Brig::BRIG_COMPARE_LT;                    return EMCompare;              }
+    "_pp"                 { brigId = Brig::BRIG_PACK_PP;                       return EMPacking;              }
+    "_gt"                 { brigId = Brig::BRIG_COMPARE_GT;                    return EMCompare;              }
+    "_ss"                 { brigId = Brig::BRIG_PACK_SS;                       return EMPacking;              }
+    "_max"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_MAX;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_global"             { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_GLOBAL;                return EMSegment;             
+	case EInstModifierInstFenceContext: brigId = Brig::BRIG_MEMORY_FENCE_GLOBAL;           return EMMemoryFenceSegments; 
+	default: return EEmpty; } }
+    "_s"                  { brigId = Brig::BRIG_PACK_S;                        return EMPacking;              }
+    "_region"             { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_EXTSPACE0;             return EMSegment;             
+	default: return EEmpty; } }
+    "_f32x4"              { brigId = Brig::BRIG_TYPE_F32X4;                    return EMType;                 }
+    "_b1"                 { brigId = Brig::BRIG_TYPE_B1;                       return EMType;                 }
+    "_u8x8"               { brigId = Brig::BRIG_TYPE_U8X8;                     return EMType;                 }
+    "_u16"                { brigId = Brig::BRIG_TYPE_U16;                      return EMType;                 }
+    "_cas"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_CAS;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_ge"                 { brigId = Brig::BRIG_COMPARE_GE;                    return EMCompare;              }
+    "_sig32"              { brigId = Brig::BRIG_TYPE_SIG32;                    return EMType;                 }
+    "_roimg"              { brigId = Brig::BRIG_TYPE_ROIMG;                    return EMType;                 }
+    "_and"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_AND;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_acq"                { brigId = Brig::BRIG_MEMORY_ORDER_ACQUIRE;          return EMMemoryOrder;          }
+    "_s32x2"              { brigId = Brig::BRIG_TYPE_S32X2;                    return EMType;                 }
+    "_waittimeout_ne"     { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAITTIMEOUT_NE;         return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_wait_ne"            { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAIT_NE;                return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_filter"             { brigId = Brig::BRIG_SAMPLER_QUERY_FILTER;          return EMSamplerQuery;         }
+    "_s16x4"              { brigId = Brig::BRIG_TYPE_S16X4;                    return EMType;                 }
+    "_s8x16"              { brigId = Brig::BRIG_TYPE_S8X16;                    return EMType;                 }
+    "_inc"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_INC;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_b128"               { brigId = Brig::BRIG_TYPE_B128;                     return EMType;                 }
+    "_u8x4"               { brigId = Brig::BRIG_TYPE_U8X4;                     return EMType;                 }
+    "_down"               { brigId = Brig::BRIG_ROUND_FLOAT_MINUS_INFINITY;    return EMRound;                }
+    "_ar"                 { brigId = Brig::BRIG_MEMORY_ORDER_ACQUIRE_RELEASE;  return EMMemoryOrder;          }
+    "_wait_eq"            { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAIT_EQ;                return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_wait_lt"            { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAIT_LT;                return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_u32"                { brigId = Brig::BRIG_TYPE_U32;                      return EMType;                 }
+    "_sgeu"               { brigId = Brig::BRIG_COMPARE_SGEU;                  return EMCompare;              }
+    "_f32x2"              { brigId = Brig::BRIG_TYPE_F32X2;                    return EMType;                 }
+    "_s32x4"              { brigId = Brig::BRIG_TYPE_S32X4;                    return EMType;                 }
+    "_waittimeout_lt"     { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAITTIMEOUT_LT;         return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_neu"                { brigId = Brig::BRIG_COMPARE_NEU;                   return EMCompare;              }
+    "_ltu"                { brigId = Brig::BRIG_COMPARE_LTU;                   return EMCompare;              }
+    "_s8x4"               { brigId = Brig::BRIG_TYPE_S8X4;                     return EMType;                 }
+    "_image"              { switch(ctx) {
+	case EInstModifierInstFenceContext: brigId = Brig::BRIG_MEMORY_FENCE_IMAGE;            return EMMemoryFenceSegments; 
+	default: return EEmpty; } }
+    "_s64"                { brigId = Brig::BRIG_TYPE_S64;                      return EMType;                 }
+    "_snum"               { brigId = Brig::BRIG_COMPARE_SNUM;                  return EMCompare;              }
+    "_sig64"              { brigId = Brig::BRIG_TYPE_SIG64;                    return EMType;                 }
+    "_or"                 { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_OR;                     return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_rwimg"              { brigId = Brig::BRIG_TYPE_RWIMG;                    return EMType;                 }
+    "_pp_sat"             { brigId = Brig::BRIG_PACK_PPSAT;                    return EMPacking;              }
+    "_b8"                 { brigId = Brig::BRIG_TYPE_B8;                       return EMType;                 }
+    "_s16x8"              { brigId = Brig::BRIG_TYPE_S16X8;                    return EMType;                 }
+    "_sequ"               { brigId = Brig::BRIG_COMPARE_SEQU;                  return EMCompare;              }
+    "_wg"                 { brigId = Brig::BRIG_MEMORY_SCOPE_WORKGROUP;        return EMMemoryScope;          }
+    "_le"                 { brigId = Brig::BRIG_COMPARE_LE;                    return EMCompare;              }
+    "_ps_sat"             { brigId = Brig::BRIG_PACK_PSSAT;                    return EMPacking;              }
+    "_st"                 { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_ST;                     return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_up"                 { brigId = Brig::BRIG_ROUND_FLOAT_PLUS_INFINITY;     return EMRound;                }
+    "_u8"                 { brigId = Brig::BRIG_TYPE_U8;                       return EMType;                 }
+    "_equ"                { brigId = Brig::BRIG_COMPARE_EQU;                   return EMCompare;              }
+    "_geu"                { brigId = Brig::BRIG_COMPARE_GEU;                   return EMCompare;              }
+    "_snan"               { brigId = Brig::BRIG_COMPARE_SNAN;                  return EMCompare;              }
+    "_num"                { brigId = Brig::BRIG_COMPARE_NUM;                   return EMCompare;              }
+    "_sltu"               { brigId = Brig::BRIG_COMPARE_SLTU;                  return EMCompare;              }
+    "_ss_sat"             { brigId = Brig::BRIG_PACK_SSSAT;                    return EMPacking;              }
+    "_upi_sat"            { brigId = Brig::BRIG_ROUND_INTEGER_PLUS_INFINITY_SAT; return EMRound;                }
+    "_readonly"           { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_READONLY;              return EMSegment;             
+	default: return EEmpty; } }
+    "_sge"                { brigId = Brig::BRIG_COMPARE_SGE;                   return EMCompare;              }
+    "_exch"               { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_EXCH;                   return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_neari"              { brigId = Brig::BRIG_ROUND_INTEGER_NEAR_EVEN;       return EMRound;                }
+    "_samp"               { brigId = Brig::BRIG_TYPE_SAMP;                     return EMType;                 }
+    "_sgtu"               { brigId = Brig::BRIG_COMPARE_SGTU;                  return EMCompare;              }
+    "_add"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_ADD;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_f16x4"              { brigId = Brig::BRIG_TYPE_F16X4;                    return EMType;                 }
+    "_zeroi"              { brigId = Brig::BRIG_ROUND_INTEGER_ZERO;            return EMRound;                }
+    "_ne"                 { brigId = Brig::BRIG_COMPARE_NE;                    return EMCompare;              }
+    "_wi"                 { brigId = Brig::BRIG_MEMORY_SCOPE_WORKITEM;         return EMMemoryScope;          }
+    "_arg"                { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_ARG;                   return EMSegment;             
+	default: return EEmpty; } }
+    "_group"              { switch(ctx) {
+	case EInstModifierInstFenceContext: brigId = Brig::BRIG_MEMORY_FENCE_GROUP;            return EMMemoryFenceSegments; 
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_GROUP;                 return EMSegment;             
+	default: return EEmpty; } }
+    "_u16x4"              { brigId = Brig::BRIG_TYPE_U16X4;                    return EMType;                 }
+    "_addressing"         { brigId = Brig::BRIG_SAMPLER_QUERY_ADDRESSING;      return EMSamplerQuery;         }
+    "_f16"                { brigId = Brig::BRIG_TYPE_F16;                      return EMType;                 }
+    "_s16"                { brigId = Brig::BRIG_TYPE_S16;                      return EMType;                 }
+    "_seq"                { brigId = Brig::BRIG_COMPARE_SEQ;                   return EMCompare;              }
+    "_dec"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_DEC;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_u16x2"              { brigId = Brig::BRIG_TYPE_U16X2;                    return EMType;                 }
+    "_upi"                { brigId = Brig::BRIG_ROUND_INTEGER_PLUS_INFINITY;   return EMRound;                }
+    "_u8x16"              { brigId = Brig::BRIG_TYPE_U8X16;                    return EMType;                 }
+    "_p_sat"              { brigId = Brig::BRIG_PACK_PSAT;                     return EMPacking;              }
+    "_u32x2"              { brigId = Brig::BRIG_TYPE_U32X2;                    return EMType;                 }
+    "_waittimeout_eq"     { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAITTIMEOUT_EQ;         return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_private"            { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_PRIVATE;               return EMSegment;             
+	default: return EEmpty; } }
+    "_s32"                { brigId = Brig::BRIG_TYPE_S32;                      return EMType;                 }
+    "_sub"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_SUB;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_wv"                 { brigId = Brig::BRIG_MEMORY_SCOPE_WAVEFRONT;        return EMMemoryScope;          }
+    "_f16x8"              { brigId = Brig::BRIG_TYPE_F16X8;                    return EMType;                 }
+    "_nan"                { brigId = Brig::BRIG_COMPARE_NAN;                   return EMCompare;              }
+    "_kernarg"            { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_KERNARG;               return EMSegment;             
+	default: return EEmpty; } }
+    "_zero"               { brigId = Brig::BRIG_ROUND_FLOAT_ZERO;              return EMRound;                }
+    "_b64"                { brigId = Brig::BRIG_TYPE_B64;                      return EMType;                 }
+    "_s16x2"              { brigId = Brig::BRIG_TYPE_S16X2;                    return EMType;                 }
+    "_u64x2"              { brigId = Brig::BRIG_TYPE_U64X2;                    return EMType;                 }
+    "_wait_gte"           { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_WAIT_GTE;               return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_f64x2"              { brigId = Brig::BRIG_TYPE_F64X2;                    return EMType;                 }
+    "_f16x2"              { brigId = Brig::BRIG_TYPE_F16X2;                    return EMType;                 }
+    "_b32"                { brigId = Brig::BRIG_TYPE_B32;                      return EMType;                 }
+    "_sgt"                { brigId = Brig::BRIG_COMPARE_SGT;                   return EMCompare;              }
+    "_p"                  { brigId = Brig::BRIG_PACK_P;                        return EMPacking;              }
+    "_s8x8"               { brigId = Brig::BRIG_TYPE_S8X8;                     return EMType;                 }
+    "_b16"                { brigId = Brig::BRIG_TYPE_B16;                      return EMType;                 }
+    "_sneu"               { brigId = Brig::BRIG_COMPARE_SNEU;                  return EMCompare;              }
+    "_u16x8"              { brigId = Brig::BRIG_TYPE_U16X8;                    return EMType;                 }
+    "_f64"                { brigId = Brig::BRIG_TYPE_F64;                      return EMType;                 }
+    "_downi"              { brigId = Brig::BRIG_ROUND_INTEGER_MINUS_INFINITY;  return EMRound;                }
+    "_min"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_MIN;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_rlx"                { brigId = Brig::BRIG_MEMORY_ORDER_RELAXED;          return EMMemoryOrder;          }
+    "_neari_sat"          { brigId = Brig::BRIG_ROUND_INTEGER_NEAR_EVEN_SAT;   return EMRound;                }
+    "_leu"                { brigId = Brig::BRIG_COMPARE_LEU;                   return EMCompare;              }
+    "_sleu"               { brigId = Brig::BRIG_COMPARE_SLEU;                  return EMCompare;              }
+    "_spill"              { switch(ctx) {
+	case EInstModifierContext: brigId = Brig::BRIG_SEGMENT_SPILL;                 return EMSegment;             
+	default: return EEmpty; } }
+    "_xor"                { switch(ctx) {
+	case EInstModifierInstAtomicContext: brigId = Brig::BRIG_ATOMIC_XOR;                    return EMAtomicOp;            
+	default: return EEmpty; } }
+    "_sys"                { brigId = Brig::BRIG_MEMORY_SCOPE_SYSTEM;           return EMMemoryScope;          }
+    "_rel"                { brigId = Brig::BRIG_MEMORY_ORDER_RELEASE;          return EMMemoryOrder;          }
+    "_sp_sat"             { brigId = Brig::BRIG_PACK_SPSAT;                    return EMPacking;              }
+    "_sle"                { brigId = Brig::BRIG_COMPARE_SLE;                   return EMCompare;              }
+    "_eq"                 { brigId = Brig::BRIG_COMPARE_EQ;                    return EMCompare;              }
+    "_f32"                { brigId = Brig::BRIG_TYPE_F32;                      return EMType;                 }
+    "_gtu"                { brigId = Brig::BRIG_COMPARE_GTU;                   return EMCompare;              }
+    "_s8"                 { brigId = Brig::BRIG_TYPE_S8;                       return EMType;                 }
+    "_s_sat"              { brigId = Brig::BRIG_PACK_SSAT;                     return EMPacking;              }
+    "_sp"                 { brigId = Brig::BRIG_PACK_SP;                       return EMPacking;              }
+    "_u32x4"              { brigId = Brig::BRIG_TYPE_U32X4;                    return EMType;                 }
+
+    "_1d"        { brigId = Brig::BRIG_GEOMETRY_1D;  return EMGeom; }
+    "_1db"       { brigId = Brig::BRIG_GEOMETRY_1DB; return EMGeom; }
+    "_1da"       { brigId = Brig::BRIG_GEOMETRY_1DA; return EMGeom; }
+    "_3d"        { brigId = Brig::BRIG_GEOMETRY_3D;  return EMGeom; }
+    "_2d"        { brigId = Brig::BRIG_GEOMETRY_2D;  return EMGeom; }
+    "_2da"       { brigId = Brig::BRIG_GEOMETRY_2DA; return EMGeom; }
+    "_2ddepth"   { brigId = Brig::BRIG_GEOMETRY_2DDEPTH; return EMGeom; }
+    "_2dadepth"  { brigId = Brig::BRIG_GEOMETRY_2DADEPTH; return EMGeom; }
+
+    "_height"       { brigId = Brig::BRIG_IMAGE_QUERY_HEIGHT;       return EMImageQuery; }
+    "_depth"        { brigId = Brig::BRIG_IMAGE_QUERY_DEPTH;        return EMImageQuery; }
+    "_array"        { brigId = Brig::BRIG_IMAGE_QUERY_ARRAY;        return EMImageQuery; }
+    "_channelorder" { brigId = Brig::BRIG_IMAGE_QUERY_CHANNELORDER; return EMImageQuery; }
+    "_channeltype"  { brigId = Brig::BRIG_IMAGE_QUERY_CHANNELTYPE;  return EMImageQuery; }
+    "_width"        { switch(ctx) {
+                      case EInstModifierInstQueryContext: brigId = Brig::BRIG_IMAGE_QUERY_WIDTH; return EMImageQuery; 
+                      default:                            brigId = 0;                            return EMWidth;
+                      } 
+                    }
+    "_align"     { brigId = 0; return EMAlign;  }
+    "_v2"        { brigId = 2; return EMVector; }
+    "_v3"        { brigId = 3; return EMVector; }
+    "_v4"        { brigId = 4; return EMVector; }
+    "_equiv"     { brigId = 0; return EMEquiv;  }
+    "_ftz"       { brigId = 0; return EMFTZ;    }
+    "_region"    { brigId = Brig::BRIG_SEGMENT_EXTSPACE0; return EMSegment; }
+    "_const"     { brigId = Brig::BRIG_MEMORY_CONST;      return EMConst;   }
+    "_nonull"    { brigId = Brig::BRIG_SEG_CVT_NONULL;    return EMNoNull;  }
+
+    ""           { brigId = 0; return EMNone; }
+*/
+
+// "_" WORD     {  brigId = 0; return EMSkip; } /* TBD just to skip unknown modifiers, remove */
+}
+
+void Scanner::scanEmbeddedText(Scanner::Token &t)
+{
+    const char* &curPos = t.m_text.end;
+    while(true) {
+        const char *const prevPos = curPos;
+/*!re2c
+        re2c:indent:string = "        ";
+        NL       { nextLine(curPos);
+                   continue; }
+        "#" ">"  { break; }
+        "\000"   { curPos = prevPos; syntaxError(curPos, "Premature end of embedded text"); }
+        ANY      { continue; }
+*/
+    };
+}
+
+ETokens Scanner::scanDefault(EScanContext ctx, Scanner::Token &t)
+{
+    const char* &curPos = t.m_text.end;
+    int &brigId = t.m_brigId;
+    const char *marker = NULL;
+/*!re2c
+    re2c:indent:string  = "        ";
+
+    "<" "#"              { scanEmbeddedText(t); return EEmbeddedText; }
+    "{"                  { return ELCurl;  }
+    "}"                  { return ERCurl;  }
+    "("                  { return ELParen; }
+    ")"                  { return ERParen; }
+    "["                  { return ELBrace; }
+    "]"                  { return ERBrace; }
+    "<"                  { return ELAngle; }
+    ">"                  { return ERAngle; }
+    "."                  { return EDot;    }
+    ","                  { return EComma;  }
+    ";"                  { return ESemi;   }
+    ":"                  { return EColon;  }
+    "+"                  { return EPlus;   }
+    "-"                  { return EMinus;  }
+    "="                  { return EEqual;  }
+    "\""                 { return EQuot;   }
+
+    "version"            { return EKWVersion; }
+    "kernel"             { return EKWKernel; }
+    "function"           { return EKWFunction; }
+    "pragma"             { return EKWPragma; }
+    "section"            { return EKWSection; }
+    "rti"                { return EKWRTI; }
+    "loc"                { return EKWLoc; }
+    "extension"          { return EKWExtension; }
+    "labeltargets"       { return EKWLabelTargets; }
+    "signature"          { return EKWSignature; }
+    "all"                { return EKWWidthAll;  }
+    "fbarrier"           { return EKWFbarrier; }
+    "width"              { return EKWImageWidth; }
+    "height"             { return EKWImageHeight; }
+    "depth"              { switch(ctx) {
+                           case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_DEPTH; return EImageOrder; 
+                           default: return EKWImageDepth;
+                           } }
+    "channel_type"       { return EKWImageChannelType; }
+    "channel_order"      { return EKWImageChannelOrder; }
+    "geometry"           { return EKWImageGeometry; }
+    "array"              { return EKWImageArray; }
+    "addressing"         { return EKWSamplerAddressing; }
+    "coord"              { return EKWSamplerCoord; }
+    "filter"             { return EKWSamplerFilter; }
+    "align"              { return EKWAlign; }
+    "const"              { return EKWConst; }
+    "block"              { return EKWBlockStart; }
+    "blocknumeric"       { return EKWBlockNum; }
+    "blockstring"        { return EKWBlockStr; }
+    "endblock"           { return EKWBlockEnd; }
+    "fbar"               { return EKWFBar; }
+
+    "WAVESIZE"           { return EWaveSizeMacro; }
+
+    "nearest"            { brigId = Brig::BRIG_FILTER_NEAREST;    return ESamplerFilter; }
+    "linear"             { brigId = Brig::BRIG_FILTER_LINEAR;     return ESamplerFilter; }
+
+    "global"             { brigId = Brig::BRIG_SEGMENT_GLOBAL;    return ESegment; }
+    "group"              { brigId = Brig::BRIG_SEGMENT_GROUP;     return ESegment; }
+    "private"            { brigId = Brig::BRIG_SEGMENT_PRIVATE;   return ESegment; }
+    "kernarg"            { brigId = Brig::BRIG_SEGMENT_KERNARG;   return ESegment; }
+    "readonly"           { brigId = Brig::BRIG_SEGMENT_READONLY;  return ESegment; }
+    "spill"              { brigId = Brig::BRIG_SEGMENT_SPILL;     return ESegment; }
+    "arg"                { brigId = Brig::BRIG_SEGMENT_ARG;       return ESegment; }
+    "flat"               { brigId = Brig::BRIG_SEGMENT_FLAT;      return ESegment; }
+
+    "extern"             { brigId = Brig::BRIG_LINKAGE_EXTERN;    return EAttribute; }
+    "static"             { brigId = Brig::BRIG_LINKAGE_STATIC;    return EAttribute; }
+
+    "_u8x4"              { brigId = Brig::BRIG_TYPE_U8X4;  return EPackedLiteral; }
+    "_s8x4"              { brigId = Brig::BRIG_TYPE_S8X4;  return EPackedLiteral; }
+    "_u8x8"              { brigId = Brig::BRIG_TYPE_U8X8;  return EPackedLiteral; }
+    "_s8x8"              { brigId = Brig::BRIG_TYPE_S8X8;  return EPackedLiteral; }
+    "_u8x16"             { brigId = Brig::BRIG_TYPE_U8X16; return EPackedLiteral; }
+    "_s8x16"             { brigId = Brig::BRIG_TYPE_S8X16; return EPackedLiteral; }
+    "_u16x2"             { brigId = Brig::BRIG_TYPE_U16X2; return EPackedLiteral; }
+    "_s16x2"             { brigId = Brig::BRIG_TYPE_S16X2; return EPackedLiteral; }
+    "_f16x2"             { brigId = Brig::BRIG_TYPE_F16X2; return EPackedLiteral; }
+    "_u16x4"             { brigId = Brig::BRIG_TYPE_U16X4; return EPackedLiteral; }
+    "_s16x4"             { brigId = Brig::BRIG_TYPE_S16X4; return EPackedLiteral; }
+    "_f16x4"             { brigId = Brig::BRIG_TYPE_F16X4; return EPackedLiteral; }
+    "_u16x8"             { brigId = Brig::BRIG_TYPE_U16X8; return EPackedLiteral; }
+    "_s16x8"             { brigId = Brig::BRIG_TYPE_S16X8; return EPackedLiteral; }
+    "_f16x8"             { brigId = Brig::BRIG_TYPE_F16X8; return EPackedLiteral; }
+    "_u32x2"             { brigId = Brig::BRIG_TYPE_U32X2; return EPackedLiteral; }
+    "_s32x2"             { brigId = Brig::BRIG_TYPE_S32X2; return EPackedLiteral; }
+    "_f32x2"             { brigId = Brig::BRIG_TYPE_F32X2; return EPackedLiteral; }
+    "_u32x4"             { brigId = Brig::BRIG_TYPE_U32X4; return EPackedLiteral; }
+    "_s32x4"             { brigId = Brig::BRIG_TYPE_S32X4; return EPackedLiteral; }
+    "_f32x4"             { brigId = Brig::BRIG_TYPE_F32X4; return EPackedLiteral; }
+    "_u64x2"             { brigId = Brig::BRIG_TYPE_U64X2; return EPackedLiteral; }
+    "_s64x2"             { brigId = Brig::BRIG_TYPE_S64X2; return EPackedLiteral; }
+    "_f64x2"             { brigId = Brig::BRIG_TYPE_F64X2; return EPackedLiteral; }
+
+    "_rwimg"             { brigId = Brig::BRIG_TYPE_RWIMG; return EKWRWImg; }
+    "_roimg"             { brigId = Brig::BRIG_TYPE_ROIMG; return EKWROImg; }
+    "_woimg"             { brigId = Brig::BRIG_TYPE_WOIMG; return EKWWOImg; }
+    "_samp"              { brigId = Brig::BRIG_TYPE_SAMP;  return EKWSamp; }
+
+    "maxflatgridsize"     { brigId = Brig::BRIG_CONTROL_MAXFLATGRIDSIZE;       return EControl;               }
+    "requiredworkgroupsize"  { brigId = Brig::BRIG_CONTROL_REQUIREDWORKGROUPSIZE; return EControl;               }
+    "requestedworkgroupspercu"  { brigId = Brig::BRIG_CONTROL_REQUESTEDWORKGROUPSPERCU; return EControl;               }
+    "requiredgridsize"    { brigId = Brig::BRIG_CONTROL_REQUIREDGRIDSIZE;      return EControl;               }
+    "enablebreakexceptions"  { brigId = Brig::BRIG_CONTROL_ENABLEBREAKEXCEPTIONS; return EControl;               }
+    "enabledetectexceptions"  { brigId = Brig::BRIG_CONTROL_ENABLEDETECTEXCEPTIONS; return EControl;               }
+    "maxflatworkgroupsize"  { brigId = Brig::BRIG_CONTROL_MAXFLATWORKGROUPSIZE;  return EControl;               }
+    "requireddim"         { brigId = Brig::BRIG_CONTROL_REQUIREDDIM;           return EControl;               }
+    "maxdynamicgroupsize"  { brigId = Brig::BRIG_CONTROL_MAXDYNAMICGROUPSIZE;   return EControl;               }
+    "requirenopartialworkgroups"  { brigId = Brig::BRIG_CONTROL_REQUIRENOPARTIALWORKGROUPS; return EControl;               }
+
+    "unsigned_int8"       { brigId = Brig::BRIG_CHANNEL_TYPE_UNSIGNED_INT8;    return EImageFormat;           }
+    "unsigned_int16"      { brigId = Brig::BRIG_CHANNEL_TYPE_UNSIGNED_INT16;   return EImageFormat;           }
+    "half_float"          { brigId = Brig::BRIG_CHANNEL_TYPE_HALF_FLOAT;       return EImageFormat;           }
+    "unsigned_int32"      { brigId = Brig::BRIG_CHANNEL_TYPE_UNSIGNED_INT32;   return EImageFormat;           }
+    "float"               { brigId = Brig::BRIG_CHANNEL_TYPE_FLOAT;            return EImageFormat;           }
+    "unorm_int16"         { brigId = Brig::BRIG_CHANNEL_TYPE_UNORM_INT16;      return EImageFormat;           }
+    "unorm_short_555"     { brigId = Brig::BRIG_CHANNEL_TYPE_UNORM_SHORT_555;  return EImageFormat;           }
+    "unorm_int24"         { brigId = Brig::BRIG_CHANNEL_TYPE_UNORM_INT24;      return EImageFormat;           }
+    "signed_int32"        { brigId = Brig::BRIG_CHANNEL_TYPE_SIGNED_INT32;     return EImageFormat;           }
+    "snorm_int8"          { brigId = Brig::BRIG_CHANNEL_TYPE_SNORM_INT8;       return EImageFormat;           }
+    "signed_int8"         { brigId = Brig::BRIG_CHANNEL_TYPE_SIGNED_INT8;      return EImageFormat;           }
+    "snorm_int16"         { brigId = Brig::BRIG_CHANNEL_TYPE_SNORM_INT16;      return EImageFormat;           }
+    "unorm_short_565"     { brigId = Brig::BRIG_CHANNEL_TYPE_UNORM_SHORT_565;  return EImageFormat;           }
+    "unorm_int8"          { brigId = Brig::BRIG_CHANNEL_TYPE_UNORM_INT8;       return EImageFormat;           }
+    "unorm_short_101010"  { brigId = Brig::BRIG_CHANNEL_TYPE_UNORM_SHORT_101010; return EImageFormat;           }
+    "signed_int16"        { brigId = Brig::BRIG_CHANNEL_TYPE_SIGNED_INT16;     return EImageFormat;           }
+
+    "rgx"                 { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RGX;             return EImageOrder;           
+	default: return EEmpty; } }
+    "rg"                  { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RG;              return EImageOrder;           
+	default: return EEmpty; } }
+    "depth_stencil"       { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_DEPTH_STENCIL;   return EImageOrder;           
+	default: return EEmpty; } }
+    "rgbx"                { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RGBX;            return EImageOrder;           
+	default: return EEmpty; } }
+    "argb"                { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_ARGB;            return EImageOrder;           
+	default: return EEmpty; } }
+    "depth"               { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_DEPTH;           return EImageOrder;           
+	default: return EEmpty; } }
+    "srgbx"               { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_SRGBX;           return EImageOrder;           
+	default: return EEmpty; } }
+    "rx"                  { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RX;              return EImageOrder;           
+	default: return EEmpty; } }
+    "srgb"                { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_SRGB;            return EImageOrder;           
+	default: return EEmpty; } }
+    "a"                   { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_A;               return EImageOrder;           
+	default: return EEmpty; } }
+    "sbgra"               { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_SBGRA;           return EImageOrder;           
+	default: return EEmpty; } }
+    "srgba"               { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_SRGBA;           return EImageOrder;           
+	default: return EEmpty; } }
+    "intensity"           { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_INTENSITY;       return EImageOrder;           
+	default: return EEmpty; } }
+    "abgr"                { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_ABGR;            return EImageOrder;           
+	default: return EEmpty; } }
+    "rgb"                 { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RGB;             return EImageOrder;           
+	default: return EEmpty; } }
+    "luminance"           { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_LUMINANCE;       return EImageOrder;           
+	default: return EEmpty; } }
+    "ra"                  { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RA;              return EImageOrder;           
+	default: return EEmpty; } }
+    "bgra"                { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_BGRA;            return EImageOrder;           
+	default: return EEmpty; } }
+    "rgba"                { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_RGBA;            return EImageOrder;           
+	default: return EEmpty; } }
+    "r"                   { switch(ctx) {
+	case EImageOrderContext: brigId = Brig::BRIG_CHANNEL_ORDER_R;               return EImageOrder;           
+	default: return EEmpty; } }
+
+    "1db"                 { brigId = Brig::BRIG_GEOMETRY_1DB;                  return EImageGeometry;         }
+    "2da"                 { brigId = Brig::BRIG_GEOMETRY_2DA;                  return EImageGeometry;         }
+    "2dadepth"            { brigId = Brig::BRIG_GEOMETRY_2DADEPTH;             return EImageGeometry;         }
+    "1d"                  { brigId = Brig::BRIG_GEOMETRY_1D;                   return EImageGeometry;         }
+    "2ddepth"             { brigId = Brig::BRIG_GEOMETRY_2DDEPTH;              return EImageGeometry;         }
+    "1da"                 { brigId = Brig::BRIG_GEOMETRY_1DA;                  return EImageGeometry;         }
+    "3d"                  { brigId = Brig::BRIG_GEOMETRY_3D;                   return EImageGeometry;         }
+    "2d"                  { brigId = Brig::BRIG_GEOMETRY_2D;                   return EImageGeometry;         }
+
+    "mirrored_repeat"     { brigId = Brig::BRIG_ADDRESSING_MIRRORED_REPEAT;    return ESamplerAddressingMode;  }
+    "undefined"           { brigId = Brig::BRIG_ADDRESSING_UNDEFINED;          return ESamplerAddressingMode;  }
+    "repeat"              { brigId = Brig::BRIG_ADDRESSING_REPEAT;             return ESamplerAddressingMode;  }
+    "clamp_to_edge"       { brigId = Brig::BRIG_ADDRESSING_CLAMP_TO_EDGE;      return ESamplerAddressingMode;  }
+    "clamp_to_border"     { brigId = Brig::BRIG_ADDRESSING_CLAMP_TO_BORDER;    return ESamplerAddressingMode;  }
+
+    "normalized"          { brigId = Brig::BRIG_COORD_NORMALIZED;              return ESamplerCoord;          }
+    "unnormalized"        { brigId = Brig::BRIG_COORD_UNNORMALIZED;            return ESamplerCoord;          }
+
+    "unpackcvt"           { brigId = Brig::BRIG_OPCODE_UNPACKCVT;              return EInstruction;           }
+    "firstbit"            { brigId = Brig::BRIG_OPCODE_FIRSTBIT;               return EInstruction;           }
+    "bytealign"           { brigId = Brig::BRIG_OPCODE_BYTEALIGN;              return EInstruction;           }
+    "workgroupid"         { brigId = Brig::BRIG_OPCODE_WORKGROUPID;            return EInstruction;           }
+    "atomic"              { brigId = Brig::BRIG_OPCODE_ATOMIC;                 return EInstruction;           }
+    "or"                  { brigId = Brig::BRIG_OPCODE_OR;                     return EInstruction;           }
+    "bitextract"          { brigId = Brig::BRIG_OPCODE_BITEXTRACT;             return EInstruction;           }
+    "call"                { brigId = Brig::BRIG_OPCODE_CALL;                   return EInstruction;           }
+    "stimage"             { brigId = Brig::BRIG_OPCODE_STIMAGE;                return EInstruction_Vx;        }
+    "ncos"                { brigId = Brig::BRIG_OPCODE_NCOS;                   return EInstruction;           }
+    "ldqueuereadindex"    { brigId = Brig::BRIG_OPCODE_LDQUEUEREADINDEX;       return EInstruction;           }
+    "initfbar"            { brigId = Brig::BRIG_OPCODE_INITFBAR;               return EInstruction;           }
+    "stqueuereadindex"    { brigId = Brig::BRIG_OPCODE_STQUEUEREADINDEX;       return EInstruction;           }
+    "dim"                 { brigId = Brig::BRIG_OPCODE_DIM;                    return EInstruction;           }
+    "bitselect"           { brigId = Brig::BRIG_OPCODE_BITSELECT;              return EInstruction;           }
+    "ld"                  { brigId = Brig::BRIG_OPCODE_LD;                     return EInstruction_Vx;        }
+    "bitinsert"           { brigId = Brig::BRIG_OPCODE_BITINSERT;              return EInstruction;           }
+    "queueid"             { brigId = Brig::BRIG_OPCODE_QUEUEID;                return EInstruction;           }
+    "workitemflatabsid"   { brigId = Brig::BRIG_OPCODE_WORKITEMFLATABSID;      return EInstruction;           }
+    "add"                 { brigId = Brig::BRIG_OPCODE_ADD;                    return EInstruction;           }
+    "bitalign"            { brigId = Brig::BRIG_OPCODE_BITALIGN;               return EInstruction;           }
+    "xor"                 { brigId = Brig::BRIG_OPCODE_XOR;                    return EInstruction;           }
+    "gcn_frexp_mant"      { brigId = Brig::BRIG_OPCODE_GCNFREXP_MANT;          return EInstruction;           }
+    "sub"                 { brigId = Brig::BRIG_OPCODE_SUB;                    return EInstruction;           }
+    "mul"                 { brigId = Brig::BRIG_OPCODE_MUL;                    return EInstruction;           }
+    "gcn_atomic_append"   { brigId = Brig::BRIG_OPCODE_GCNAPPEND;              return EInstruction;           }
+    "ldqueuewriteindex"   { brigId = Brig::BRIG_OPCODE_LDQUEUEWRITEINDEX;      return EInstruction;           }
+    "cuid"                { brigId = Brig::BRIG_OPCODE_CUID;                   return EInstruction;           }
+    "gcn_min3"            { brigId = Brig::BRIG_OPCODE_GCNMIN3;                return EInstruction;           }
+    "workgroupsize"       { brigId = Brig::BRIG_OPCODE_WORKGROUPSIZE;          return EInstruction;           }
+    "nop"                 { brigId = Brig::BRIG_OPCODE_NOP;                    return EInstruction;           }
+    "addqueuewriteindex"  { brigId = Brig::BRIG_OPCODE_ADDQUEUEWRITEINDEX;     return EInstruction;           }
+    "fma"                 { brigId = Brig::BRIG_OPCODE_FMA;                    return EInstruction;           }
+    "gcn_med3"            { brigId = Brig::BRIG_OPCODE_GCNMED3;                return EInstruction;           }
+    "shuffle"             { brigId = Brig::BRIG_OPCODE_SHUFFLE;                return EInstruction;           }
+    "signalnoret"         { brigId = Brig::BRIG_OPCODE_SIGNALNORET;            return EInstruction;           }
+    "abs"                 { brigId = Brig::BRIG_OPCODE_ABS;                    return EInstruction;           }
+    "lastbit"             { brigId = Brig::BRIG_OPCODE_LASTBIT;                return EInstruction;           }
+    "rdimage"             { brigId = Brig::BRIG_OPCODE_RDIMAGE;                return EInstruction_Vx;        }
+    "cvt"                 { brigId = Brig::BRIG_OPCODE_CVT;                    return EInstruction;           }
+    "wavebarrier"         { brigId = Brig::BRIG_OPCODE_WAVEBARRIER;            return EInstruction;           }
+    "neg"                 { brigId = Brig::BRIG_OPCODE_NEG;                    return EInstruction;           }
+    "unpacklo"            { brigId = Brig::BRIG_OPCODE_UNPACKLO;               return EInstruction;           }
+    "floor"               { brigId = Brig::BRIG_OPCODE_FLOOR;                  return EInstruction;           }
+    "unpackhi"            { brigId = Brig::BRIG_OPCODE_UNPACKHI;               return EInstruction;           }
+    "ftos"                { brigId = Brig::BRIG_OPCODE_FTOS;                   return EInstruction;           }
+    "gcn_mqsad4"          { brigId = Brig::BRIG_OPCODE_GCNMQSAD4;              return EInstruction;           }
+    "waveid"              { brigId = Brig::BRIG_OPCODE_WAVEID;                 return EInstruction;           }
+    "nexp2"               { brigId = Brig::BRIG_OPCODE_NEXP2;                  return EInstruction;           }
+    "gcn_b4xchg"          { brigId = Brig::BRIG_OPCODE_GCNB4XCHG;              return EInstruction;           }
+    "clock"               { brigId = Brig::BRIG_OPCODE_CLOCK;                  return EInstruction;           }
+    "gcn_sleep"           { brigId = Brig::BRIG_OPCODE_GCNSLEEP;               return EInstruction;           }
+    "debugtrap"           { brigId = Brig::BRIG_OPCODE_DEBUGTRAP;              return EInstruction;           }
+    "shl"                 { brigId = Brig::BRIG_OPCODE_SHL;                    return EInstruction;           }
+    "alloca"              { brigId = Brig::BRIG_OPCODE_ALLOCA;                 return EInstruction;           }
+    "shr"                 { brigId = Brig::BRIG_OPCODE_SHR;                    return EInstruction;           }
+    "laneid"              { brigId = Brig::BRIG_OPCODE_LANEID;                 return EInstruction;           }
+    "gcn_atomic_consume"  { brigId = Brig::BRIG_OPCODE_GCNCONSUME;             return EInstruction;           }
+    "setdetectexcept"     { brigId = Brig::BRIG_OPCODE_SETDETECTEXCEPT;        return EInstruction;           }
+    "queueptr"            { brigId = Brig::BRIG_OPCODE_QUEUEPTR;               return EInstruction;           }
+    "cleardetectexcept"   { brigId = Brig::BRIG_OPCODE_CLEARDETECTEXCEPT;      return EInstruction;           }
+    "activelanecount"     { brigId = Brig::BRIG_OPCODE_ACTIVELANECOUNT;        return EInstruction;           }
+    "cmov"                { brigId = Brig::BRIG_OPCODE_CMOV;                   return EInstruction;           }
+    "borrow"              { brigId = Brig::BRIG_OPCODE_BORROW;                 return EInstruction;           }
+    "bitrev"              { brigId = Brig::BRIG_OPCODE_BITREV;                 return EInstruction;           }
+    "lda"                 { brigId = Brig::BRIG_OPCODE_LDA;                    return EInstruction;           }
+    "stqueuewriteindex"   { brigId = Brig::BRIG_OPCODE_STQUEUEWRITEINDEX;      return EInstruction;           }
+    "cbr"                 { brigId = Brig::BRIG_OPCODE_CBR;                    return EInstruction;           }
+    "sadhi"               { brigId = Brig::BRIG_OPCODE_SADHI;                  return EInstruction;           }
+    "gcn_ld"              { brigId = Brig::BRIG_OPCODE_GCNLD;                  return EInstruction_Vx;        }
+    "carry"               { brigId = Brig::BRIG_OPCODE_CARRY;                  return EInstruction;           }
+    "nrsqrt"              { brigId = Brig::BRIG_OPCODE_NRSQRT;                 return EInstruction;           }
+    "gcn_frexp_exp"       { brigId = Brig::BRIG_OPCODE_GCNFREXP_EXP;           return EInstruction;           }
+    "nsqrt"               { brigId = Brig::BRIG_OPCODE_NSQRT;                  return EInstruction;           }
+    "copysign"            { brigId = Brig::BRIG_OPCODE_COPYSIGN;               return EInstruction;           }
+    "servicequeueptr"     { brigId = Brig::BRIG_OPCODE_SERVICEQUEUEPTR;        return EInstruction;           }
+    "barrier"             { brigId = Brig::BRIG_OPCODE_BARRIER;                return EInstruction;           }
+    "queryimage"          { brigId = Brig::BRIG_OPCODE_QUERYIMAGE;             return EInstruction;           }
+    "gcn_region_alloc"    { brigId = Brig::BRIG_OPCODE_GCNREGIONALLOC;         return EInstruction;           }
+    "gcn_max3"            { brigId = Brig::BRIG_OPCODE_GCNMAX3;                return EInstruction;           }
+    "max"                 { brigId = Brig::BRIG_OPCODE_MAX;                    return EInstruction;           }
+    "activelanemask"      { brigId = Brig::BRIG_OPCODE_ACTIVELANEMASK;         return EInstruction_Vx;        }
+    "ldimage"             { brigId = Brig::BRIG_OPCODE_LDIMAGE;                return EInstruction_Vx;        }
+    "cmp"                 { brigId = Brig::BRIG_OPCODE_CMP;                    return EInstruction;           }
+    "combine"             { brigId = Brig::BRIG_OPCODE_COMBINE;                return EInstruction_Vx;        }
+    "mad24"               { brigId = Brig::BRIG_OPCODE_MAD24;                  return EInstruction;           }
+    "sqrt"                { brigId = Brig::BRIG_OPCODE_SQRT;                   return EInstruction;           }
+    "mov"                 { brigId = Brig::BRIG_OPCODE_MOV;                    return EInstruction;           }
+    "activelaneshuffle"   { brigId = Brig::BRIG_OPCODE_ACTIVELANESHUFFLE;      return EInstruction;           }
+    "nullptr"             { brigId = Brig::BRIG_OPCODE_NULLPTR;                return EInstruction;           }
+    "arrivefbar"          { brigId = Brig::BRIG_OPCODE_ARRIVEFBAR;             return EInstruction;           }
+    "gcn_mads"            { brigId = Brig::BRIG_OPCODE_GCNMADS;                return EInstruction;           }
+    "gcn_fldexp"          { brigId = Brig::BRIG_OPCODE_GCNFLDEXP;              return EInstruction;           }
+    "workitemflatid"      { brigId = Brig::BRIG_OPCODE_WORKITEMFLATID;         return EInstruction;           }
+    "gcn_atomicNoRet"     { brigId = Brig::BRIG_OPCODE_GCNATOMICNORET;         return EInstruction;           }
+    "lerp"                { brigId = Brig::BRIG_OPCODE_LERP;                   return EInstruction;           }
+    "currentworkgroupsize"  { brigId = Brig::BRIG_OPCODE_CURRENTWORKGROUPSIZE;   return EInstruction;           }
+    "gcn_b32xchg"         { brigId = Brig::BRIG_OPCODE_GCNB32XCHG;             return EInstruction;           }
+    "codeblockend"        { brigId = Brig::BRIG_OPCODE_CODEBLOCKEND;           return EInstruction;           }
+    "ldc"                 { brigId = Brig::BRIG_OPCODE_LDC;                    return EInstruction;           }
+    "ldf"                 { brigId = Brig::BRIG_OPCODE_LDF;                    return EInstruction;           }
+    "min"                 { brigId = Brig::BRIG_OPCODE_MIN;                    return EInstruction;           }
+    "gcn_bfm"             { brigId = Brig::BRIG_OPCODE_GCNBFM;                 return EInstruction;           }
+    "mulhi"               { brigId = Brig::BRIG_OPCODE_MULHI;                  return EInstruction;           }
+    "workitemabsid"       { brigId = Brig::BRIG_OPCODE_WORKITEMABSID;          return EInstruction;           }
+    "gcn_st"              { brigId = Brig::BRIG_OPCODE_GCNST;                  return EInstruction_Vx;        }
+    "waitfbar"            { brigId = Brig::BRIG_OPCODE_WAITFBAR;               return EInstruction;           }
+    "pack"                { brigId = Brig::BRIG_OPCODE_PACK;                   return EInstruction;           }
+    "gcn_priority"        { brigId = Brig::BRIG_OPCODE_GCNPRIORITY;            return EInstruction;           }
+    "mul24"               { brigId = Brig::BRIG_OPCODE_MUL24;                  return EInstruction;           }
+    "gcn_sadd"            { brigId = Brig::BRIG_OPCODE_GCNSADD;                return EInstruction;           }
+    "bitmask"             { brigId = Brig::BRIG_OPCODE_BITMASK;                return EInstruction;           }
+    "nsin"                { brigId = Brig::BRIG_OPCODE_NSIN;                   return EInstruction;           }
+    "gcn_qsad"            { brigId = Brig::BRIG_OPCODE_GCNQSAD;                return EInstruction;           }
+    "mad24hi"             { brigId = Brig::BRIG_OPCODE_MAD24HI;                return EInstruction;           }
+    "signal"              { brigId = Brig::BRIG_OPCODE_SIGNAL;                 return EInstruction;           }
+    "releasefbar"         { brigId = Brig::BRIG_OPCODE_RELEASEFBAR;            return EInstruction;           }
+    "unpack"              { brigId = Brig::BRIG_OPCODE_UNPACK;                 return EInstruction;           }
+    "ret"                 { brigId = Brig::BRIG_OPCODE_RET;                    return EInstruction;           }
+    "sad"                 { brigId = Brig::BRIG_OPCODE_SAD;                    return EInstruction;           }
+    "memfence"            { brigId = Brig::BRIG_OPCODE_MEMFENCE;               return EInstruction;           }
+    "gcn_msad"            { brigId = Brig::BRIG_OPCODE_GCNMSAD;                return EInstruction;           }
+    "packetid"            { brigId = Brig::BRIG_OPCODE_PACKETID;               return EInstruction;           }
+    "class"               { brigId = Brig::BRIG_OPCODE_CLASS;                  return EInstruction;           }
+    "maxcuid"             { brigId = Brig::BRIG_OPCODE_MAXCUID;                return EInstruction;           }
+    "nlog2"               { brigId = Brig::BRIG_OPCODE_NLOG2;                  return EInstruction;           }
+    "rem"                 { brigId = Brig::BRIG_OPCODE_REM;                    return EInstruction;           }
+    "div"                 { brigId = Brig::BRIG_OPCODE_DIV;                    return EInstruction;           }
+    "atomicnoret"         { brigId = Brig::BRIG_OPCODE_ATOMICNORET;            return EInstruction;           }
+    "querysampler"        { brigId = Brig::BRIG_OPCODE_QUERYSAMPLER;           return EInstruction;           }
+    "expand"              { brigId = Brig::BRIG_OPCODE_EXPAND;                 return EInstruction_Vx;        }
+    "trunc"               { brigId = Brig::BRIG_OPCODE_TRUNC;                  return EInstruction;           }
+    "rint"                { brigId = Brig::BRIG_OPCODE_RINT;                   return EInstruction;           }
+    "leavefbar"           { brigId = Brig::BRIG_OPCODE_LEAVEFBAR;              return EInstruction;           }
+    "gridgroups"          { brigId = Brig::BRIG_OPCODE_GRIDGROUPS;             return EInstruction;           }
+    "and"                 { brigId = Brig::BRIG_OPCODE_AND;                    return EInstruction;           }
+    "maxwaveid"           { brigId = Brig::BRIG_OPCODE_MAXWAVEID;              return EInstruction;           }
+    "nfma"                { brigId = Brig::BRIG_OPCODE_NFMA;                   return EInstruction;           }
+    "packetcompletionsig"  { brigId = Brig::BRIG_OPCODE_PACKETCOMPLETIONSIG;    return EInstruction;           }
+    "ceil"                { brigId = Brig::BRIG_OPCODE_CEIL;                   return EInstruction;           }
+    "segmentp"            { brigId = Brig::BRIG_OPCODE_SEGMENTP;               return EInstruction;           }
+    "activelaneid"        { brigId = Brig::BRIG_OPCODE_ACTIVELANEID;           return EInstruction;           }
+    "brn"                 { brigId = Brig::BRIG_OPCODE_BRN;                    return EInstruction;           }
+    "stof"                { brigId = Brig::BRIG_OPCODE_STOF;                   return EInstruction;           }
+    "not"                 { brigId = Brig::BRIG_OPCODE_NOT;                    return EInstruction;           }
+    "gcn_mqsad"           { brigId = Brig::BRIG_OPCODE_GCNMQSAD;               return EInstruction;           }
+    "gcn_trig_preop"      { brigId = Brig::BRIG_OPCODE_GCNTRIG_PREOP;          return EInstruction;           }
+    "casqueuewriteindex"  { brigId = Brig::BRIG_OPCODE_CASQUEUEWRITEINDEX;     return EInstruction;           }
+    "packcvt"             { brigId = Brig::BRIG_OPCODE_PACKCVT;                return EInstruction;           }
+    "fract"               { brigId = Brig::BRIG_OPCODE_FRACT;                  return EInstruction;           }
+    "nrcp"                { brigId = Brig::BRIG_OPCODE_NRCP;                   return EInstruction;           }
+    "gcn_min"             { brigId = Brig::BRIG_OPCODE_GCNMIN;                 return EInstruction;           }
+    "getdetectexcept"     { brigId = Brig::BRIG_OPCODE_GETDETECTEXCEPT;        return EInstruction;           }
+    "gridsize"            { brigId = Brig::BRIG_OPCODE_GRIDSIZE;               return EInstruction;           }
+    "popcount"            { brigId = Brig::BRIG_OPCODE_POPCOUNT;               return EInstruction;           }
+    "st"                  { brigId = Brig::BRIG_OPCODE_ST;                     return EInstruction_Vx;        }
+    "mul24hi"             { brigId = Brig::BRIG_OPCODE_MUL24HI;                return EInstruction;           }
+    "joinfbar"            { brigId = Brig::BRIG_OPCODE_JOINFBAR;               return EInstruction;           }
+    "gcn_sadw"            { brigId = Brig::BRIG_OPCODE_GCNSADW;                return EInstruction;           }
+    "workitemid"          { brigId = Brig::BRIG_OPCODE_WORKITEMID;             return EInstruction;           }
+    "gcn_madu"            { brigId = Brig::BRIG_OPCODE_GCNMADU;                return EInstruction;           }
+    "gcn_max"             { brigId = Brig::BRIG_OPCODE_GCNMAX;                 return EInstruction;           }
+    "mad"                 { brigId = Brig::BRIG_OPCODE_MAD;                    return EInstruction;           }
+    "gcn_atomic"          { brigId = Brig::BRIG_OPCODE_GCNATOMIC;              return EInstruction;           }
+
+    "$small"              { brigId = Brig::BRIG_MACHINE_SMALL;                 return ETargetMachine;         }
+    "$large"              { brigId = Brig::BRIG_MACHINE_LARGE;                 return ETargetMachine;         }
+
+    "$base"               { brigId = Brig::BRIG_PROFILE_BASE;                  return ETargetProfile;         }
+    "$full"               { brigId = Brig::BRIG_PROFILE_FULL;                  return ETargetProfile;         }
+
+    "@" ID               { return ELabel;    }
+    "&" ID               { return EIDStatic; }
+    "%" ID               { return EIDLocal;  }
+    "$" [csdq] DECIMAL   { return ERegister; }
+
+    DECIMAL              { return EDecimalNumber; }
+    OCTAL                { return EOctalNumber; }
+    HEX                  { return EHexNumber; }
+
+    FLOAT [hH]           { return EHlfNumber; }
+    FLOAT [fF]           { return ESglNumber; }
+    FLOAT [dD]?          { return EDblNumber; }
+
+    HLFHEX               { return EHlfHexNumber; }
+    SGLHEX               { return ESglHexNumber; }
+    DBLHEX               { return EDblHexNumber; }
+
+    C99FLT [hH]          { return EHlfC99Number; }
+    C99FLT [fF]          { return ESglC99Number; }
+    C99FLT [lL]?         { return EDblC99Number; }
+
+    "\000"               { --curPos; return EEndOfSource; }
+
+    ""                   { syntaxError(curPos, "Syntax error"); }
+*/
+}
+
+void Scanner::skipWhitespaces(Scanner::Token& t)
+{
+    const char *curPos = t.m_text.begin;
+    while(true) {
+        const char *const prevPos = curPos;
+        const char *marker;
+/*!re2c
+        re2c:indent:string  = "        ";
+        SPACE           { continue; }
+        NL              { nextLine(curPos); continue; }
+        "/" "/"         { curPos = skipOneLinearComment(curPos, t); continue; }
+        "/" "*"         { curPos = skipMultilineComment(curPos, t); continue; }
+        "\000"          { curPos = prevPos; break; }
+        ""              { break; }
+*/
+    }
+    t.m_text.begin = t.m_text.end = curPos;
+}
+
+const char* Scanner::skipOneLinearComment(const char* from, Scanner::Token& t)
+{
+    const char *curPos = from;
+    while(true) {
+        const char *const prevPos = curPos;
+/*!re2c
+        re2c:indent:string = "        ";
+        NL | "\000" { curPos = prevPos; t.appendComment(from, prevPos); break; }
+        ANY         { continue; }
+*/
+    };
+    return curPos;
+}
+
+const char* Scanner::skipMultilineComment(const char* from, Scanner::Token& t)
+{
+    const char *start = from;
+    const char *curPos = from;
+
+    while(true) {
+        const char *const prevPos = curPos;
+/*!re2c
+        re2c:indent:string = "        ";
+        NL       { t.appendComment(start, prevPos);
+                   nextLine(curPos);
+                   start = curPos;
+                   continue; }
+        "*" "/"  { t.appendComment(start, prevPos);
+                   break; }
+        "\000"   { curPos = prevPos; syntaxError(curPos, "Premature end of comment"); }
+        ANY      { continue; }
+*/
+    };
+    return curPos;
+}
+
+} // end namespace

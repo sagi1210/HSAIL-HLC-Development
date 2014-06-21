@@ -1,0 +1,41 @@
+#!/bin/bash
+LLVM_SRC=/home/sraghave/TestPatch/llvm-3.2.src
+PATCH=/home/sraghave/TestPatch/llvm-3.2-patch
+cp $PATCH/main-CMakeLists.txt $LLVM_SRC/CMakeLists.txt 
+cp $PATCH/InitializePasses.h $LLVM_SRC/include/llvm/InitializePasses.h 
+cp $PATCH/MCELFStreamer.h $LLVM_SRC/include/llvm/MC/MCELFStreamer.h 
+cp $PATCH/MCStreamer.h $LLVM_SRC/include/llvm/MC/MCStreamer.h 
+cp $PATCH/Operator.h $LLVM_SRC/include/llvm/Operator.h 
+cp $PATCH/DebugInfo.h $LLVM_SRC/include/llvm/DebugInfo.h
+cp $PATCH/TargetInstrInfo.h $LLVM_SRC/include/llvm/Target/TargetInstrInfo.h
+cp $PATCH/ELF.h $LLVM_SRC/include/llvm/Support/ELF.h
+cp $PATCH/Dwarf.h $LLVM_SRC/include/llvm/Support/Dwarf.h
+cp $PATCH/SelectionDAGNodes.h $LLVM_SRC/include/llvm/CodeGen/SelectionDAGNodes.h
+cp $PATCH/AsmPrinter.h $LLVM_SRC/include/llvm/CodeGen/AsmPrinter.h
+cp $PATCH/MachineFunction.h $LLVM_SRC/include/llvm/CodeGen/MachineFunction.h
+cp $PATCH/AMDLLVMContextHook.h $LLVM_SRC/include/llvm/AMDLLVMContextHook.h
+cp $PATCH/Triple.h $LLVM_SRC/include/llvm/ADT/Triple.h
+cp $PATCH/tools-CMakeLists.txt $LLVM_SRC/tools/CMakeLists.txt 
+cp $PATCH/llc.cpp $LLVM_SRC/tools/llc/llc.cpp
+cp $PATCH/tools-llc-CMakeLists.txt $LLVM_SRC/tools/llc/CMakeLists.txt
+cp $PATCH/tools-LLVMBuild.txt $LLVM_SRC/tools/LLVMBuild.txt 
+cp $PATCH/AsmWriterEmitter.cpp $LLVM_SRC/utils/TableGen/AsmWriterEmitter.cpp
+cp $PATCH/CodeGenInstruction.h $LLVM_SRC/utils/TableGen/CodeGenInstruction.h
+cp $PATCH/AMDDAGWalker.cpp $LLVM_SRC/utils/TableGen/AMDDAGWalker.cpp
+cp $PATCH/AMDBRIGLoweringEmitter.cpp $LLVM_SRC/utils/TableGen/AMDBRIGLoweringEmitter.cpp
+cp $PATCH/AMDBRIGLoweringEmitter.h $LLVM_SRC/utils/TableGen/AMDBRIGLoweringEmitter.h
+cp $PATCH/utils-TableGen-CMakeLists.txt $LLVM_SRC/utils/TableGen/CMakeLists.txt
+cp $PATCH/CodeGenInstruction.cpp $LLVM_SRC/utils/TableGen/CodeGenInstruction.cpp
+cp $PATCH/AMDDAGWalker.h $LLVM_SRC/utils/TableGen/AMDDAGWalker.h
+cp $PATCH/TableGen.cpp $LLVM_SRC/utils/TableGen/TableGen.cpp
+cp $PATCH/AMDHSAILVecMapEmiter.h $LLVM_SRC/utils/TableGen/AMDHSAILVecMapEmiter.h
+cp $PATCH/TableGenBackends.h $LLVM_SRC/utils/TableGen/TableGenBackends.h
+cp $PATCH/AMDHSAILVecMapEmiter.cpp $LLVM_SRC/utils/TableGen/AMDHSAILVecMapEmiter.cpp
+cp $PATCH/MCELFStreamer.cpp $LLVM_SRC/lib/MC/MCELFStreamer.cpp
+cp $PATCH/lib-Target-LLVMBuild.txt $LLVM_SRC/lib/Target/LLVMBuild.txt
+cp $PATCH/Triple.cpp $LLVM_SRC/lib/Support/Triple.cpp
+cp $PATCH/DwarfDebug.h $LLVM_SRC/lib/CodeGen/AsmPrinter/DwarfDebug.h
+cp $PATCH/DwarfCompileUnit.h $LLVM_SRC/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h
+cp $PATCH/DwarfDebug.cpp $LLVM_SRC/lib/CodeGen/AsmPrinter/DwarfDebug.cpp
+cp $PATCH/AsmPrinter.cpp $LLVM_SRC/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+cp $PATCH/DwarfCompileUnit.cpp $LLVM_SRC/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp
