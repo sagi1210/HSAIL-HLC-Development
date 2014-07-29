@@ -24,3 +24,14 @@ pointing to LLVM-3.2 source directory and the patch source files (from where the
 7. Build the hsail-tools (by reading the README in libHSAIL)
 8. Go to build directory and run "cmake .." and then "make"
 9. Go to tests directory and run the test after pointing the PATH (in the "run_tests")
+
+07/29/2014 - Updated with latest D2 compiler to fix issues with C++AMP (MCW):
+
+This D2 compiler update has the LLVM sources with D2 changes only. Please take llvm-3.2.src
+or tar file and build using your native compiler.
+
+You need to use the latest HSAIL-Tools-private for HSAIL tools with this compiler (which is 
+1.0P compliant).
+
+The existing binaries CLC2 could be used with this too.
+
