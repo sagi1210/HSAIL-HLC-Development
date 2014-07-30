@@ -18,10 +18,10 @@ This compiler needs to use the supplied builtins file only (and not the older bu
 
 Steps to build the LLVM-HSAIL directory (using the Target-HSAIL):
  1. Download the sources into a directory. 
- 2. Download the HSAIL-tools-private (latest drop on GITUB)
+ 2. Download the HSAIL-tools (latest drop on GITUB)
  3. Change the directory in the LLVM_SRC/CMakeLists.txt to point to the HSAIL-tools-private directory
  in both LLVM_SRC directory and in LLVM_SRC/tools/llc)
  4. Create the build directory under LLVM_SRC 
- 5. Build the hsail-tools (by reading the README there)
+ 5. Build the HSAIL-tools (by reading the README there)
  6. Go to build directory and run "cmake .." and then "make"
- 7. Go to tests directory and run the test after pointing the PATH (in the "run_tests")
+ 7. Go to tests directory and run the test after pointing the PATH (in the "run_tests"). Make sure that you use the builtins-hsail.bc given in this drop and NOT the older one (if you are using the OpenCL builtins).
