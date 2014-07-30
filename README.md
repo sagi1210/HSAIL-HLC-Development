@@ -14,3 +14,4 @@ You need to use the latest HSAIL-Tools-private for HSAIL tools with this compile
 
 The existing binaries CLC2 could be used with this too.
 
+This compiler needs to use the supplied builtins file only (and not the older builtins file)
