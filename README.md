@@ -23,3 +23,9 @@ Steps to build the LLVM-HSAIL directory (using the Target-HSAIL):
  5. Build the HSAIL-tools (by reading the README there)
  6. Go to build directory and run "cmake .." and then "make"
  7. Go to tests directory and run the test after pointing the PATH (in the "run_tests"). Make sure that you use the builtins-hsail.bc given in this drop and NOT the older one (if you are using the OpenCL builtins).
+
+08/02/2014: 
+
+Updated a few files in LLVM sources to fix an issues reported by MCW for C++AMP.
+Updated tests directory.
+Updated binary directory for all built binaries along with builtins file and front end (CLC2).
