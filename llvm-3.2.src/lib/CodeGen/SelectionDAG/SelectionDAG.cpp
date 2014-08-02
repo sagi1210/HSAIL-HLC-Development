@@ -948,6 +948,16 @@ SDValue SelectionDAG::getZExtOrTrunc(SDValue Op, DebugLoc DL, EVT VT) {
     getNode(ISD::TRUNCATE, DL, VT, Op);
 }
 
+#if defined(AMD_OPENCL) || 1
+SDValue SelectionDAG::getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT) {
+  if (VT.bitsLE(Op.getValueType()))
+    return getNode(ISD::TRUNCATE, SL, VT, Op);
+
+  TargetLowering::BooleanContent BType = TLI.getBooleanContents(VT.isVector());
+  return getNode(TLI.getExtendForContent(BType), SL, VT, Op);
+}
+#endif
+
 SDValue SelectionDAG::getZeroExtendInReg(SDValue Op, DebugLoc DL, EVT VT) {
   assert(!VT.isVector() &&
          "getZeroExtendInReg should use the vector element type instead of "
@@ -1651,7 +1661,12 @@ SDValue SelectionDAG::FoldSetCC(EVT VT, SDValue N1,
       }
     } else {
       // Ensure that the constant occurs on the RHS.
-      return getSetCC(dl, VT, N2, N1, ISD::getSetCCSwappedOperands(Cond));
+      ISD::CondCode SwappedCond = ISD::getSetCCSwappedOperands(Cond);
+      MVT CompVT = N1.getValueType().getSimpleVT();
+      if (!TM.getTargetLowering()->isCondCodeLegal(SwappedCond, CompVT))
+        return SDValue();
+
+      return getSetCC(dl, VT, N2, N1, SwappedCond);
     }
   }
 

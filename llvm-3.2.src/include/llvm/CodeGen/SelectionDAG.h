@@ -511,6 +511,13 @@ public:
   /// integer type VT, by either zero-extending or truncating it.
   SDValue getZExtOrTrunc(SDValue Op, DebugLoc DL, EVT VT);
 
+#if defined(AMD_OPENCL) || 1
+  /// getBoolExtOrTrunc - Convert Op, which must be of integer type, to the
+  /// integer type VT, by using an extension appropriate for the target's
+  /// BooleanContent or truncating it.
+  SDValue getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT);
+#endif
+
   /// getZeroExtendInReg - Return the expression required to zero extend the Op
   /// value assuming it was the smaller SrcTy value.
   SDValue getZeroExtendInReg(SDValue Op, DebugLoc DL, EVT SrcTy);
@@ -619,6 +626,19 @@ public:
       "Cannot compare scalars to vectors");
     return getNode(ISD::SETCC, DL, VT, LHS, RHS, getCondCode(Cond));
   }
+
+  // getSelect - Helper function to make it easier to build Select's if you just
+  // have operands and don't want to check for vector.
+  SDValue getSelect(DebugLoc DL, EVT VT, SDValue Cond,
+      SDValue LHS, SDValue RHS) {
+    assert(LHS.getValueType() == RHS.getValueType() &&
+        "Cannot use select on differing types");
+    assert(VT.isVector() == LHS.getValueType().isVector() &&
+        "Cannot mix vectors and scalars");
+    return getNode(Cond.getValueType().isVector() ? ISD::VSELECT : ISD::SELECT,
+        DL, VT, Cond, LHS, RHS);
+  }
+
 
   /// getSelectCC - Helper function to make it easier to build SelectCC's if you
   /// just have an ISD::CondCode instead of an SDValue.

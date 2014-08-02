@@ -57,6 +57,10 @@ class SelectionDAGLegalize : public SelectionDAG::DAGUpdateListener {
   /// LegalizedNodes - The set of nodes which have already been legalized.
   SmallPtrSet<SDNode *, 16> LegalizedNodes;
 
+  EVT getSetCCResultType(EVT VT) const {
+    return TLI.getSetCCResultType(*DAG.getContext(), VT);
+  }
+
   // Libcall insertion helpers.
 
 public:
@@ -603,7 +607,8 @@ PerformInsertVectorEltInMemory(SDValue Vec, SDValue Val, SDValue Idx,
                          false, false, 0);
   // Load the updated vector.
   return DAG.getLoad(VT, dl, Ch, StackPtr,
-                     MachinePointerInfo::getFixedStack(SPFI), false, false, 
+// D2_OPENCL
+                     MachinePointerInfo::getFixedStack(SPFI), false, false,
                      false, 0);
 }
 
@@ -1538,7 +1543,7 @@ SDValue SelectionDAGLegalize::ExpandFCOPYSIGN(SDNode* Node) {
     }
   }
   // Now get the sign bit proper, by seeing whether the value is negative.
-  SignBit = DAG.getSetCC(dl, TLI.getSetCCResultType(SignBit.getValueType()),
+  SignBit = DAG.getSetCC(dl, getSetCCResultType(SignBit.getValueType()),
                          SignBit, DAG.getConstant(0, SignBit.getValueType()),
                          ISD::SETLT);
   // Get the absolute value of the result.
@@ -1599,17 +1604,22 @@ void SelectionDAGLegalize::LegalizeSetCCCondCode(EVT VT,
     // Nothing to do.
     break;
   case TargetLowering::Expand: {
+    ISD::CondCode InvCC = ISD::getSetCCSwappedOperands(CCCode);
+    if (TLI.isCondCodeLegal(InvCC, OpVT)) {
+      std::swap(LHS, RHS);
+      CC = DAG.getCondCode(InvCC);
+      return;
+    }
     ISD::CondCode CC1 = ISD::SETCC_INVALID, CC2 = ISD::SETCC_INVALID;
-    ISD::CondCode InvCC = ISD::SETCC_INVALID;
     unsigned Opc = 0;
     switch (CCCode) {
     default: llvm_unreachable("Don't know how to expand this condition!");
-    case ISD::SETO: 
+    case ISD::SETO:
         assert(TLI.getCondCodeAction(ISD::SETOEQ, OpVT)
             == TargetLowering::Legal
             && "If SETO is expanded, SETOEQ must be legal!");
         CC1 = ISD::SETOEQ; CC2 = ISD::SETOEQ; Opc = ISD::AND; break;
-    case ISD::SETUO:  
+    case ISD::SETUO:
         assert(TLI.getCondCodeAction(ISD::SETUNE, OpVT)
             == TargetLowering::Legal
             && "If SETUO is expanded, SETUNE must be legal!");
@@ -1619,7 +1629,7 @@ void SelectionDAGLegalize::LegalizeSetCCCondCode(EVT VT,
     case ISD::SETOGE:
     case ISD::SETOLT:
     case ISD::SETOLE:
-    case ISD::SETONE: 
+    case ISD::SETONE:
     case ISD::SETUEQ: 
     case ISD::SETUNE: 
     case ISD::SETUGT: 
@@ -1642,16 +1652,9 @@ void SelectionDAGLegalize::LegalizeSetCCCondCode(EVT VT,
     case ISD::SETLT:
     case ISD::SETNE:
     case ISD::SETEQ:
-      InvCC = ISD::getSetCCSwappedOperands(CCCode);
-      if (TLI.getCondCodeAction(InvCC, OpVT) == TargetLowering::Expand) {
-        // We only support using the inverted operation and not a
-        // different manner of supporting expanding these cases.
-        llvm_unreachable("Don't know how to expand this condition!");
-      }
-      LHS = DAG.getSetCC(dl, VT, RHS, LHS, InvCC);
-      RHS = SDValue();
-      CC = SDValue();
-      return;
+      // We only support using the inverted operation, which is computed above
+      // and not a different manner of supporting expanding these cases.
+      llvm_unreachable("Don't know how to expand this condition!");
     }
     
     SDValue SetCC1, SetCC2;
@@ -2207,7 +2210,7 @@ SDValue SelectionDAGLegalize::ExpandLegalINT_TO_FP(bool isSigned,
       // select.  We happen to get lucky and machinesink does the right
       // thing most of the time.  This would be a good candidate for a
       //pseudo-op, or, even better, for whole-function isel.
-      SDValue SignBitTest = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
+      SDValue SignBitTest = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
         Op0, DAG.getConstant(0, MVT::i64), ISD::SETLT);
       return DAG.getNode(ISD::SELECT, dl, MVT::f32, SignBitTest, Slow, Fast);
     }
@@ -2220,10 +2223,10 @@ SDValue SelectionDAGLegalize::ExpandLegalINT_TO_FP(bool isSigned,
          DAG.getConstant(UINT64_C(0x800), MVT::i64));
     SDValue And2 = DAG.getNode(ISD::AND, dl, MVT::i64, Op0,
          DAG.getConstant(UINT64_C(0x7ff), MVT::i64));
-    SDValue Ne = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
+    SDValue Ne = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
                    And2, DAG.getConstant(UINT64_C(0), MVT::i64), ISD::SETNE);
     SDValue Sel = DAG.getNode(ISD::SELECT, dl, MVT::i64, Ne, Or, Op0);
-    SDValue Ge = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
+    SDValue Ge = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
                    Op0, DAG.getConstant(UINT64_C(0x0020000000000000), MVT::i64),
                    ISD::SETUGE);
     SDValue Sel2 = DAG.getNode(ISD::SELECT, dl, MVT::i64, Ge, Sel, Op0);
@@ -2245,7 +2248,7 @@ SDValue SelectionDAGLegalize::ExpandLegalINT_TO_FP(bool isSigned,
 
   SDValue Tmp1 = DAG.getNode(ISD::SINT_TO_FP, dl, DestVT, Op0);
 
-  SDValue SignSet = DAG.getSetCC(dl, TLI.getSetCCResultType(Op0.getValueType()),
+  SDValue SignSet = DAG.getSetCC(dl, getSetCCResultType(Op0.getValueType()),
                                  Op0, DAG.getConstant(0, Op0.getValueType()),
                                  ISD::SETLT);
   SDValue Zero = DAG.getIntPtrConstant(0), Four = DAG.getIntPtrConstant(4);
@@ -2805,7 +2808,7 @@ void SelectionDAGLegalize::ExpandNode(SDNode *Node) {
     APInt x = APInt::getSignBit(NVT.getSizeInBits());
     (void)apf.convertFromAPInt(x, false, APFloat::rmNearestTiesToEven);
     Tmp1 = DAG.getConstantFP(apf, VT);
-    Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(VT),
+    Tmp2 = DAG.getSetCC(dl, getSetCCResultType(VT),
                         Node->getOperand(0),
                         Tmp1, ISD::SETLT);
     True = DAG.getNode(ISD::FP_TO_SINT, dl, NVT, Node->getOperand(0));
@@ -3023,7 +3026,7 @@ void SelectionDAGLegalize::ExpandNode(SDNode *Node) {
     EVT VT = Node->getValueType(0);
     Tmp1 = Node->getOperand(0);
     Tmp2 = DAG.getConstantFP(0.0, VT);
-    Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(Tmp1.getValueType()),
+    Tmp2 = DAG.getSetCC(dl, getSetCCResultType(Tmp1.getValueType()),
                         Tmp1, Tmp2, ISD::SETUGT);
     Tmp3 = DAG.getNode(ISD::FNEG, dl, VT, Tmp1);
     Tmp1 = DAG.getNode(ISD::SELECT, dl, VT, Tmp2, Tmp1, Tmp3);
@@ -3383,10 +3386,10 @@ void SelectionDAGLegalize::ExpandNode(SDNode *Node) {
       Tmp1 = DAG.getConstant(VT.getSizeInBits() - 1,
                              TLI.getShiftAmountTy(BottomHalf.getValueType()));
       Tmp1 = DAG.getNode(ISD::SRA, dl, VT, BottomHalf, Tmp1);
-      TopHalf = DAG.getSetCC(dl, TLI.getSetCCResultType(VT), TopHalf, Tmp1,
+      TopHalf = DAG.getSetCC(dl, getSetCCResultType(VT), TopHalf, Tmp1,
                              ISD::SETNE);
     } else {
-      TopHalf = DAG.getSetCC(dl, TLI.getSetCCResultType(VT), TopHalf,
+      TopHalf = DAG.getSetCC(dl, getSetCCResultType(VT), TopHalf,
                              DAG.getConstant(0, VT), ISD::SETNE);
     }
     Results.push_back(BottomHalf);
@@ -3498,7 +3501,7 @@ void SelectionDAGLegalize::ExpandNode(SDNode *Node) {
     Tmp4 = Node->getOperand(3);   // False
     SDValue CC = Node->getOperand(4);
 
-    LegalizeSetCCCondCode(TLI.getSetCCResultType(Tmp1.getValueType()),
+    LegalizeSetCCCondCode(getSetCCResultType(Tmp1.getValueType()),
                           Tmp1, Tmp2, CC, dl);
 
     assert(!Tmp2.getNode() && "Can't legalize SELECT_CC with legal condition!");
@@ -3515,7 +3518,7 @@ void SelectionDAGLegalize::ExpandNode(SDNode *Node) {
     Tmp3 = Node->getOperand(3);              // RHS
     Tmp4 = Node->getOperand(1);              // CC
 
-    LegalizeSetCCCondCode(TLI.getSetCCResultType(Tmp2.getValueType()),
+    LegalizeSetCCCondCode(getSetCCResultType(Tmp2.getValueType()),
                           Tmp2, Tmp3, Tmp4, dl);
 
     assert(!Tmp3.getNode() && "Can't legalize BR_CC with legal condition!");
@@ -3597,7 +3600,7 @@ void SelectionDAGLegalize::PromoteNode(SDNode *Node) {
     Tmp1 = DAG.getNode(Node->getOpcode(), dl, NVT, Tmp1);
     if (Node->getOpcode() == ISD::CTTZ) {
       // FIXME: This should set a bit in the zero extended value instead.
-      Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT),
+      Tmp2 = DAG.getSetCC(dl, getSetCCResultType(NVT),
                           Tmp1, DAG.getConstant(NVT.getSizeInBits(), NVT),
                           ISD::SETEQ);
       Tmp1 = DAG.getNode(ISD::SELECT, dl, NVT, Tmp2,
