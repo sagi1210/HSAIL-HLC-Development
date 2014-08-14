@@ -30,4 +30,4 @@ the builtins file given in the drop (and not use the one given in "Stable" compi
 
 Intended usage:
 
-This compiler is expected to be used by compiler writers for various languages and those developers who woudl like to developer HSA applications using CLOC tool. Since this is open sourced too, the user can make required changes to the compiler (like adding meta data or different passes etc) as per their needs.
+This compiler is expected to be used by compiler writers for various languages and those developers who would like to develop HSA applications using CLOC tool. Since this is open sourced too, the user can make required changes to the compiler (like adding meta data or different passes etc) as per their needs.
