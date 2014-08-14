@@ -1,17 +1,19 @@
 LLVM-to-HSAIL-Test-Compiler-
 ============================
 
-LLVM to HSAIL Test Compiler for early testing. 
+LLVM to HSAIL Open Source Development HSAIL Compiler
 
 
-07/29/2014 - Updated with latest D2 compiler to fix issues with C++AMP (MCW):
+This open source compiler is HSAIL code generator based on LLVM 3.2. It has added
+Target/HSAIL backend along with with a few relevant changes to LLVM core.  The changes
+are marked "OPENCL" tag so it will be easy to search the changes done in the LLVM source 
+base.
 
-This D2 compiler update has the LLVM sources with D2 changes only. Please take llvm-3.2.src
-or tar file and build using your native compiler. You need to use the latest HSAIL-Tools-private 
-for HSAIL tools with this compiler (which is 1.0P compliant).
+The built binaries are also given. There are some test cases provided to generate
+HSAIL from the BC files (LLVMIR). There is also a front-end provided (CLC2) which is
+CLANG based front end. 
 
-The existing binaries CLC2 could be used with this too. This compiler needs to use the supplied 
-builtins file only (and not the older builtins file).
+You need the HSAIL-Tools (provided in the GITHUB) to build this compiler.
 
 Steps to build the LLVM-HSAIL directory (using the Target-HSAIL):
 
@@ -22,10 +24,6 @@ Steps to build the LLVM-HSAIL directory (using the Target-HSAIL):
  4. Create the build directory under LLVM_SRC 
  5. Build the HSAIL-tools (by reading the README there)
  6. Go to build directory and run "cmake .." and then "make"
- 7. Go to tests directory and run the test after pointing the PATH (in the "run_tests"). Make sure that you use the builtins-hsail.bc given in this drop and NOT the older one (if you are using the OpenCL builtins).
+ 7. Go to tests directory and run the test after pointing the PATH (in the "run_tests"). Make sure you use
+the builtins file given in the drop (and not use the one given in "Stable" compiler binaries).
 
-08/02/2014: 
-
-Updated a few files in LLVM sources to fix an issues reported by MCW for C++AMP.
-Updated tests directory.
-Updated binary directory for all built binaries along with builtins file and front end (CLC2).
