@@ -1,13 +1,14 @@
-LLVM-to-HSAIL-Test-Compiler-
-============================
+HSAIL-HLC-Development Compiler
+===============================
 
-LLVM to HSAIL Open Source Development HSAIL Compiler
+LLVM to HSAIL Open Source Development HSAIL Compiler. 
 
 
 This open source compiler is HSAIL code generator based on LLVM 3.2. It has added
 Target/HSAIL backend along with with a few relevant changes to LLVM core.  The changes
 are marked "OPENCL" tag so it will be easy to search the changes done in the LLVM source 
-base.
+base. HLC means High Level Compiler, which means LLVM to HSAIL code generator and NOT
+ISA generator.
 
 The built binaries are also given. There are some test cases provided to generate
 HSAIL from the BC files (LLVMIR). There is also a front-end provided (CLC2) which is
@@ -27,3 +28,6 @@ Steps to build the LLVM-HSAIL directory (using the Target-HSAIL):
  7. Go to tests directory and run the test after pointing the PATH (in the "run_tests"). Make sure you use
 the builtins file given in the drop (and not use the one given in "Stable" compiler binaries).
 
+Intended usage:
+
+This compiler is expected to be used by compiler writers for various languages and those developers who woudl like to developer HSA applications using CLOC tool. Since this is open sourced too, the user can make required changes to the compiler (like adding meta data or different passes etc) as per their needs.
