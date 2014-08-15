@@ -31,3 +31,5 @@ the builtins file given in the drop (and not use the one given in "Stable" compi
 Intended usage:
 
 This compiler is expected to be used by compiler writers for various languages and those developers who would like to develop HSA applications using CLOC tool. Since this is open sourced too, the user can make required changes to the compiler (like adding meta data or different passes etc) as per their needs.
+
+The repo also contains diffs between this source base and the pristine LLVM 3.2. This diff is obtained by command "diff -ur" between these two directories. This could be applied as git patch on LLVM 3.2. too.
