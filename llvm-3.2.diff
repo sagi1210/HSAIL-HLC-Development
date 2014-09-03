@@ -1,1866 +1,1120 @@
-Only in /home/amd/Prakash/llvm-3.2.org/bindings/python: tests
-diff -ur llvm-3.2.src/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/CMakeLists.txt
---- llvm-3.2.src/CMakeLists.txt	2014-08-14 16:49:36.576557841 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/CMakeLists.txt	2012-09-28 23:05:20.000000000 +0530
-@@ -13,16 +13,6 @@
+Only in llvm-3.2.src/: build
+diff -ur /home/amd/Prakash/llvm-3.2.org/CMakeLists.txt llvm-3.2.src/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/CMakeLists.txt	2012-09-28 23:05:20.000000000 +0530
++++ llvm-3.2.src/CMakeLists.txt	2014-09-03 10:29:31.999243296 +0530
+@@ -13,6 +13,14 @@
  set(LLVM_VERSION_MAJOR 3)
  set(LLVM_VERSION_MINOR 2)
  
--# D2_OPENCL_HSA
--set(LLVM_REQUIRES_EH ON)
--set(LLVM_REQUIRES_RTTI ON)
--add_definitions(-DANDROID)
--
--# D2_OPENCL_HSA
--include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL)
--include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/libBRIGDwarf)
--include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/libHSAIL/generated)
--
++set(LLVM_REQUIRES_EH ON)
++set(LLVM_REQUIRES_RTTI ON)
++add_definitions(-DANDROID)
++
++include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL)
++include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/libBRIGDwarf)
++include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/libHSAIL/generated)
++
  set(PACKAGE_VERSION "${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}svn")
  
  option(LLVM_USE_FOLDERS "Enable solution folders in Visual Studio. Disable for Express versions." ON)
-@@ -84,13 +74,22 @@
+@@ -74,22 +82,13 @@
  set(LLVM_LIBDIR_SUFFIX "" CACHE STRING "Define suffix of library directory name (32/64)" )
  
  set(LLVM_ALL_TARGETS
--  HSAIL
-+  ARM
-+  CellSPU
-+  CppBackend
-+  Hexagon
-+  Mips
-+  MBlaze
-+  MSP430
-+  NVPTX
-+  PowerPC
-+  Sparc
+-  ARM
+-  CellSPU
+-  CppBackend
+-  Hexagon
+-  Mips
+-  MBlaze
+-  MSP430
+-  NVPTX
+-  PowerPC
+-  Sparc
++  HSAIL
    X86
-+  XCore
+-  XCore
    )
  
--
++
  # List of targets with JIT support:
--set(LLVM_TARGETS_WITH_JIT X86)
-+set(LLVM_TARGETS_WITH_JIT X86 PowerPC ARM Mips)
+-set(LLVM_TARGETS_WITH_JIT X86 PowerPC ARM Mips)
++set(LLVM_TARGETS_WITH_JIT X86)
  
  if( MSVC )
    set(LLVM_TARGETS_TO_BUILD X86
-@@ -382,9 +381,6 @@
+@@ -381,6 +380,8 @@
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include llvm/Support/Solaris.h")
  endif( ${CMAKE_SYSTEM_NAME} MATCHES SunOS )
  
--# D2_OPENCL_HSA
--SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
--
++SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++
  include(AddLLVM)
  include(TableGen)
  
-Only in /home/amd/Prakash/llvm-3.2.org/docs: llvm-theme
-diff -ur llvm-3.2.src/include/llvm/ADT/Triple.h /home/amd/Prakash/llvm-3.2.org/include/llvm/ADT/Triple.h
---- llvm-3.2.src/include/llvm/ADT/Triple.h	2014-08-14 16:49:36.620557842 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/ADT/Triple.h	2012-11-16 02:54:48.000000000 +0530
-@@ -66,11 +66,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/ADT/Triple.h llvm-3.2.src/include/llvm/ADT/Triple.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/ADT/Triple.h	2012-11-16 02:54:48.000000000 +0530
++++ llvm-3.2.src/include/llvm/ADT/Triple.h	2014-09-03 10:36:37.063251162 +0530
+@@ -66,6 +66,8 @@
      nvptx64, // NVPTX: 64-bit
      le32,    // le32: generic little-endian 32-bit CPU (PNaCl / Emscripten)
      amdil,   // amdil: amd IL
--#if defined(AMD_OPENCL) || 1
--    amdil64, // AMDIL 64bit Target
--    hsail,   // AMD HSAIL Target
--    hsail_64,// AMD HSAIL_64 Target 
--#endif
++    hsail,   // AMD HSAIL Target
++    hsail_64,// AMD HSAIL_64 Target 
      spir,    // SPIR: standard portable IR for OpenCL 32-bit version
      spir64   // SPIR: standard portable IR for OpenCL 64-bit version
    };
-@@ -120,8 +115,7 @@
-     EABI,
-     MachO,
-     Android,
--    ELF,
--    AMDOpenCL
-+    ELF
-   };
- 
- private:
-Only in llvm-3.2.src/include/llvm: AMDLLVMContextHook.h
 Only in llvm-3.2.src/include/llvm: AMDResolveLinker.h
-Only in llvm-3.2.src/include/llvm/Analysis: AMDOpenCLSymbols.h
-diff -ur llvm-3.2.src/include/llvm/CodeGen/AsmPrinter.h /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/AsmPrinter.h
---- llvm-3.2.src/include/llvm/CodeGen/AsmPrinter.h	2014-08-14 16:49:36.628557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/AsmPrinter.h	2012-10-08 22:08:25.000000000 +0530
-@@ -106,6 +106,7 @@
+Only in llvm-3.2.src/include/llvm/Analysis: AMDKernelSymbols.h
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/AsmPrinter.h llvm-3.2.src/include/llvm/CodeGen/AsmPrinter.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/AsmPrinter.h	2012-10-08 22:08:25.000000000 +0530
++++ llvm-3.2.src/include/llvm/CodeGen/AsmPrinter.h	2014-08-29 18:00:39.527749619 +0530
+@@ -106,7 +106,6 @@
      /// If VerboseAsm is set, a pointer to the loop info for this
      /// function.
      MachineLoopInfo *LI;
-+
+-
      /// DD - If the target supports dwarf debug info, this pointer is non-null.
      DwarfDebug *DD;
  
-@@ -116,15 +117,6 @@
-   protected:
-     explicit AsmPrinter(TargetMachine &TM, MCStreamer &Streamer);
- 
--#if defined(AMD_OPENCL) || 1
--    // the target needs access to the DwarfDebug member so that it may
--    // call the DD begin* and end* functions itself at the appropriate time
--    DwarfDebug *getDwarfDebug() { return DD; };
--    void setDwarfDebug(DwarfDebug *nDD) { DD = nDD; };
--    // This function will be overloaded in HSAIL to create BRIGDwarfDebug object
--    virtual DwarfDebug *CreateDwarfDebug(Module &M);
--#endif
--
-   public:
-     virtual ~AsmPrinter();
- 
-@@ -235,13 +227,7 @@
+@@ -227,7 +226,9 @@
      /// EmitBasicBlockStart - This method prints the label for the specified
      /// MachineBasicBlock, an alignment (if present) and a comment describing
      /// it if appropriate.
--#if  defined(AMD_OPENCL) || 1
--    // BRIG LOWERING: we have to turn it to virtual and override to maintain 
--    // BasicBlock entry label map.. and it IS NOT CONST anymore
--    virtual void EmitBasicBlockStart(const MachineBasicBlock *MBB);
--#else
-     void EmitBasicBlockStart(const MachineBasicBlock *MBB) const;
--#endif // AMD_OPENCL
+-    void EmitBasicBlockStart(const MachineBasicBlock *MBB) const;
++    // BRIG LOWERING: we have to turn it to virtual and override to maintain 
++    // BasicBlock entry label map.. and it IS NOT CONST anymore
++    virtual void EmitBasicBlockStart(const MachineBasicBlock *MBB);
  
      /// EmitGlobalConstant - Print a general LLVM constant to the .s file.
      void EmitGlobalConstant(const Constant *CV, unsigned AddrSpace = 0);
-@@ -418,13 +404,6 @@
-     /// operands.
-     virtual MachineLocation getDebugValueLocation(const MachineInstr *MI) const;
- 
--#if 1 || defined(AMD_OPENCL)
--    /// getDebugResourceLocation - Get resource id information encoded in
--    /// target flags.
--    virtual bool getDebugResourceID(const Value *V, uint32_t& RID) const;
--    virtual unsigned correctDebugAS(unsigned a, const Value *) const { return a; }
--#endif
--
-     /// getISAEncoding - Get the value for DW_AT_APPLE_isa. Zero if no isa
-     /// encoding specified.
-     virtual unsigned getISAEncoding() { return 0; }
-diff -ur llvm-3.2.src/include/llvm/CodeGen/MachineFunction.h /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/MachineFunction.h
---- llvm-3.2.src/include/llvm/CodeGen/MachineFunction.h	2014-08-14 16:49:36.632557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/MachineFunction.h	2012-09-17 12:29:23.000000000 +0530
-@@ -24,10 +24,6 @@
- #include "llvm/Support/Allocator.h"
- #include "llvm/Support/Recycler.h"
- 
--#if 1 || defined(AMD_OPENCL)
--#include "llvm/ADT/DenseMap.h"
--#endif
--
- namespace llvm {
- 
- class Value;
-@@ -429,13 +425,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/MachineFunction.h llvm-3.2.src/include/llvm/CodeGen/MachineFunction.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/MachineFunction.h	2012-09-17 12:29:23.000000000 +0530
++++ llvm-3.2.src/include/llvm/CodeGen/MachineFunction.h	2014-08-29 21:09:42.075959524 +0530
+@@ -425,6 +425,7 @@
    /// getPICBaseSymbol - Return a function-local symbol to represent the PIC
    /// base.
    MCSymbol *getPICBaseSymbol() const;
--
--#if 1 || defined(AMD_OPENCL)
--  // ** Hack to get around of debugging issues **
--  // Debug use only, this will be set during ISEL lowering
--  // of dbg_declare intrinisic
--  DenseMap<const MDNode *, const Value *>  DIVToValueMap;
--#endif
++
  };
  
  //===--------------------------------------------------------------------===//
-diff -ur llvm-3.2.src/include/llvm/CodeGen/SelectionDAG.h /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/SelectionDAG.h
---- llvm-3.2.src/include/llvm/CodeGen/SelectionDAG.h	2014-08-14 16:49:36.636557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/SelectionDAG.h	2012-09-27 15:44:43.000000000 +0530
-@@ -511,13 +511,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/SelectionDAG.h llvm-3.2.src/include/llvm/CodeGen/SelectionDAG.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/SelectionDAG.h	2012-09-27 15:44:43.000000000 +0530
++++ llvm-3.2.src/include/llvm/CodeGen/SelectionDAG.h	2014-08-18 16:53:13.000000000 +0530
+@@ -511,6 +511,11 @@
    /// integer type VT, by either zero-extending or truncating it.
    SDValue getZExtOrTrunc(SDValue Op, DebugLoc DL, EVT VT);
  
--#if defined(AMD_OPENCL) || 1
--  /// getBoolExtOrTrunc - Convert Op, which must be of integer type, to the
--  /// integer type VT, by using an extension appropriate for the target's
--  /// BooleanContent or truncating it.
--  SDValue getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT);
--#endif
--
++  /// getBoolExtOrTrunc - Convert Op, which must be of integer type, to the
++  /// integer type VT, by using an extension appropriate for the target's
++  /// BooleanContent or truncating it.
++  SDValue getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT);
++
    /// getZeroExtendInReg - Return the expression required to zero extend the Op
    /// value assuming it was the smaller SrcTy value.
    SDValue getZeroExtendInReg(SDValue Op, DebugLoc DL, EVT SrcTy);
-@@ -627,19 +620,6 @@
+@@ -620,6 +625,19 @@
      return getNode(ISD::SETCC, DL, VT, LHS, RHS, getCondCode(Cond));
    }
  
--  // getSelect - Helper function to make it easier to build Select's if you just
--  // have operands and don't want to check for vector.
--  SDValue getSelect(DebugLoc DL, EVT VT, SDValue Cond,
--      SDValue LHS, SDValue RHS) {
--    assert(LHS.getValueType() == RHS.getValueType() &&
--        "Cannot use select on differing types");
--    assert(VT.isVector() == LHS.getValueType().isVector() &&
--        "Cannot mix vectors and scalars");
--    return getNode(Cond.getValueType().isVector() ? ISD::VSELECT : ISD::SELECT,
--        DL, VT, Cond, LHS, RHS);
--  }
--
--
++  // getSelect - Helper function to make it easier to build Select's if you just
++  // have operands and don't want to check for vector.
++  SDValue getSelect(DebugLoc DL, EVT VT, SDValue Cond,
++      SDValue LHS, SDValue RHS) {
++    assert(LHS.getValueType() == RHS.getValueType() &&
++        "Cannot use select on differing types");
++    assert(VT.isVector() == LHS.getValueType().isVector() &&
++        "Cannot mix vectors and scalars");
++    return getNode(Cond.getValueType().isVector() ? ISD::VSELECT : ISD::SELECT,
++        DL, VT, Cond, LHS, RHS);
++  }
++
++
    /// getSelectCC - Helper function to make it easier to build SelectCC's if you
    /// just have an ISD::CondCode instead of an SDValue.
    ///
-diff -ur llvm-3.2.src/include/llvm/CodeGen/SelectionDAGNodes.h /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/SelectionDAGNodes.h
---- llvm-3.2.src/include/llvm/CodeGen/SelectionDAGNodes.h	2014-08-14 16:49:36.636557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/CodeGen/SelectionDAGNodes.h	2012-10-30 00:05:49.000000000 +0530
-@@ -894,9 +894,6 @@
- protected:
-   /// MMO - Memory reference information.
-   MachineMemOperand *MMO;
--#if defined(AMD_OPENCL) || 1
--  unsigned memoryScope;
--#endif
- 
- public:
-   MemSDNode(unsigned Opc, DebugLoc dl, SDVTList VTs, EVT MemoryVT,
-@@ -935,11 +932,7 @@
-   SynchronizationScope getSynchScope() const {
-     return SynchronizationScope((SubclassData >> 12) & 1);
-   }
--#if defined(AMD_OPENCL) || 1
--  unsigned getMemoryScope() const {
--    return memoryScope;
--  }
--#endif
-+
-   /// Returns the SrcValue and offset that describes the location of the access
-   const Value *getSrcValue() const { return MMO->getValue(); }
-   int64_t getSrcValueOffset() const { return MMO->getOffset(); }
-@@ -1009,11 +1002,7 @@
- class AtomicSDNode : public MemSDNode {
-   SDUse Ops[4];
- 
--  void InitAtomic(AtomicOrdering Ordering, SynchronizationScope SynchScope
--#if defined(AMD_OPENCL) || 1
--          , unsigned MemoryScope
--#endif
--          ) {
-+  void InitAtomic(AtomicOrdering Ordering, SynchronizationScope SynchScope) {
-     // This must match encodeMemSDNodeFlags() in SelectionDAG.cpp.
-     assert((Ordering & 15) == Ordering &&
-            "Ordering may not require more than 4 bits!");
-@@ -1021,9 +1010,6 @@
-            "SynchScope may not require more than 1 bit!");
-     SubclassData |= Ordering << 8;
-     SubclassData |= SynchScope << 12;
--#if defined(AMD_OPENCL) || 1
--    memoryScope = MemoryScope;
--#endif
-     assert(getOrdering() == Ordering && "Ordering encoding error!");
-     assert(getSynchScope() == SynchScope && "Synch-scope encoding error!");
-   }
-@@ -1040,51 +1026,25 @@
-   AtomicSDNode(unsigned Opc, DebugLoc dl, SDVTList VTL, EVT MemVT,
-                SDValue Chain, SDValue Ptr,
-                SDValue Cmp, SDValue Swp, MachineMemOperand *MMO,
--               AtomicOrdering Ordering, SynchronizationScope SynchScope
--#if defined(AMD_OPENCL) || 1
--               // Default value for MemoryScope is required when the AtomicSDNode
--               // is created from Targets like X86 which do not need memory scope
--               , unsigned MemoryScope = 0
--#endif
--               )
-+               AtomicOrdering Ordering, SynchronizationScope SynchScope)
-     : MemSDNode(Opc, dl, VTL, MemVT, MMO) {
--    InitAtomic(Ordering, SynchScope
--#if defined(AMD_OPENCL) || 1
--            , MemoryScope
--#endif
--            );
-+    InitAtomic(Ordering, SynchScope);
-     InitOperands(Ops, Chain, Ptr, Cmp, Swp);
-   }
-   AtomicSDNode(unsigned Opc, DebugLoc dl, SDVTList VTL, EVT MemVT,
-                SDValue Chain, SDValue Ptr,
-                SDValue Val, MachineMemOperand *MMO,
--               AtomicOrdering Ordering, SynchronizationScope SynchScope
--#if defined(AMD_OPENCL) || 1
--               , unsigned MemoryScope = 0
--#endif
--               )
-+               AtomicOrdering Ordering, SynchronizationScope SynchScope)
-     : MemSDNode(Opc, dl, VTL, MemVT, MMO) {
--    InitAtomic(Ordering, SynchScope
--#if defined(AMD_OPENCL) || 1
--            , MemoryScope
--#endif
--            );
-+    InitAtomic(Ordering, SynchScope);
-     InitOperands(Ops, Chain, Ptr, Val);
-   }
-   AtomicSDNode(unsigned Opc, DebugLoc dl, SDVTList VTL, EVT MemVT,
-                SDValue Chain, SDValue Ptr,
-                MachineMemOperand *MMO,
--               AtomicOrdering Ordering, SynchronizationScope SynchScope
--#if defined(AMD_OPENCL) || 1
--               , unsigned MemoryScope = 0
--#endif
--               )
-+               AtomicOrdering Ordering, SynchronizationScope SynchScope)
-     : MemSDNode(Opc, dl, VTL, MemVT, MMO) {
--    InitAtomic(Ordering, SynchScope
--#if defined(AMD_OPENCL) || 1
--            , MemoryScope
--#endif
--            );
-+    InitAtomic(Ordering, SynchScope);
-     InitOperands(Ops, Chain, Ptr);
-   }
- 
-diff -ur llvm-3.2.src/include/llvm/DebugInfo.h /home/amd/Prakash/llvm-3.2.org/include/llvm/DebugInfo.h
---- llvm-3.2.src/include/llvm/DebugInfo.h	2014-08-14 16:49:36.636557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/DebugInfo.h	2012-10-09 13:43:15.000000000 +0530
-@@ -349,19 +349,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/DebugInfo.h llvm-3.2.src/include/llvm/DebugInfo.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/DebugInfo.h	2012-10-09 13:43:15.000000000 +0530
++++ llvm-3.2.src/include/llvm/DebugInfo.h	2014-08-18 16:57:22.000000000 +0530
+@@ -349,6 +349,17 @@
      /// return base type size.
      uint64_t getOriginalTypeSize() const;
  
--#if defined(AMD_OPENCL) || 1
--    // Index 10 onwards are used for ObjC debug info, but in our
--    // world, we are not interested in ObjC. For lack of a better
--    // "DIPointerType", we will repurpose index 10 to store the
--    // "points-to" address space. Ideally this new field should be
--    // introduced upstream in LLVM trunk.
--
--    /// \brief Return the points-to address space for a pointer type.
--    unsigned getAddressSpace() const {
--      return getUnsignedField(10);
--    }
--#endif
--
++    // Index 10 onwards are used for ObjC debug info, but in our
++    // world, we are not interested in ObjC. For lack of a better
++    // "DIPointerType", we will repurpose index 10 to store the
++    // "points-to" address space. Ideally this new field should be
++    // introduced upstream in LLVM trunk.
++
++    /// \brief Return the points-to address space for a pointer type.
++    unsigned getAddressSpace() const {
++      return getUnsignedField(10);
++    }
++
      /// getObjCProperty - Return property node, if this ivar is 
      /// associated with one.
      MDNode *getObjCProperty() const;
-diff -ur llvm-3.2.src/include/llvm/InitializePasses.h /home/amd/Prakash/llvm-3.2.org/include/llvm/InitializePasses.h
---- llvm-3.2.src/include/llvm/InitializePasses.h	2014-08-14 16:49:36.640557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/InitializePasses.h	2012-11-03 03:18:17.000000000 +0530
-@@ -208,7 +208,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/InitializePasses.h llvm-3.2.src/include/llvm/InitializePasses.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/InitializePasses.h	2012-11-03 03:18:17.000000000 +0530
++++ llvm-3.2.src/include/llvm/InitializePasses.h	2014-08-19 12:32:09.000000000 +0530
+@@ -208,6 +208,7 @@
  void initializePrintDbgInfoPass(PassRegistry&);
  void initializePrintFunctionPassPass(PassRegistry&);
  void initializePrintModulePassPass(PassRegistry&);
--void initializePrintBasicBlockPassPass(PassRegistry&);
++void initializePrintBasicBlockPassPass(PassRegistry&);
  void initializeProcessImplicitDefsPass(PassRegistry&);
  void initializeProfileEstimatorPassPass(PassRegistry&);
  void initializeProfileInfoAnalysisGroup(PassRegistry&);
-@@ -258,10 +257,6 @@
- void initializeUnreachableBlockElimPass(PassRegistry&);
- void initializeUnreachableMachineBlockElimPass(PassRegistry&);
- void initializeVerifierPass(PassRegistry&);
--#if 1 || defined(SPIR_OPENCL)
--void initializeSPIRVerifierPass(PassRegistry&);
--void initializeSPIRLoaderPass(PassRegistry&);
--#endif
- void initializeVirtRegMapPass(PassRegistry&);
- void initializeVirtRegRewriterPass(PassRegistry&);
- void initializeInstSimplifierPass(PassRegistry&);
-@@ -270,76 +265,6 @@
+@@ -232,6 +233,8 @@
+ void initializeSimpleInlinerPass(PassRegistry&);
+ void initializeRegisterCoalescerPass(PassRegistry&);
+ void initializeSimplifyLibCallsPass(PassRegistry&);
++void initializeKernelSymbolsAnalysisGroup(PassRegistry&);
++void initializeAMDKernelSymbolsPass(PassRegistry&);
+ void initializeSingleLoopExtractorPass(PassRegistry&);
+ void initializeSinkingPass(PassRegistry&);
+ void initializeSlotIndexesPass(PassRegistry&);
+@@ -265,6 +268,10 @@
  void initializeLoopVectorizePass(PassRegistry&);
  void initializeBBVectorizePass(PassRegistry&);
  void initializeMachineFunctionPrinterPassPass(PassRegistry&);
--
--#if 1 || defined(AMD_OPENCL)
--void initializeAMDDbgmovePass(PassRegistry&);
--void initializeAMDX86AdapterPass(PassRegistry&);
--void initializeAMDGenerateDevEnqMetadataPass(PassRegistry&);
--void initializeAMDLowerEnqueueKernelPass(PassRegistry&);
--void initializeAMDExternalPassPass(PassRegistry&);
--void initializeLivenessAnalysisPass(PassRegistry&);
--void initializeAMDLivenessPrinterPass(PassRegistry&);
--void initializeAMDSimplifyCallPass(PassRegistry&);
--void initializeAMDSymbolLinkagePass(PassRegistry&);
--void initializeAMDInlineAllPass(PassRegistry&);
--void initializeMachinePostDominatorTreePass(PassRegistry&);
--void initializeAMDILCFGPreparePass(PassRegistry&);
--void initializeAMDILCFGPerformPass(PassRegistry&);
--void initializeAMDExportKernelNaturePass(PassRegistry&);
--void initializeVectorCoarseningPass(PassRegistry&);
--void initializeAMDSimplifyLibCallsPass(PassRegistry&);
--void initializeAMDUseNativeCallsPass(PassRegistry&);
--void initializeOpenCLSymbolsAnalysisGroup(PassRegistry&);
--void initializeAMDOpenCLSymbolsPass(PassRegistry&);
--void initializeAMDIL7XXIOExpansionPass(PassRegistry&);
--void initializeAMDILEGIOExpansionPass(PassRegistry&);
--void initializeAMDILSIIOExpansionPass(PassRegistry&);
--void initializeAMDILCIIOExpansionPass(PassRegistry&);
--void initializeAMDILPointerManagerPass(PassRegistry&);
--void initializeAMDILEGPointerManagerPass(PassRegistry&);
--void initializeAMDILSIPointerManagerPass(PassRegistry&);
--void initializeAMDILCIPointerManagerPass(PassRegistry&);
--void initializeAMDILMachinePeepholePass(PassRegistry&);
--void initializeAMDILMachineEBBPass(PassRegistry&);
--void initializeAMDILPeepholeOptPass(PassRegistry&);
--void initializeAMDPeepholeOptPass(PassRegistry&);
--void initializeAMDFenceInfoAnalysisPass(PassRegistry&);
--void initializeAMDAliasAnalysisPass(PassRegistry&);
--void initializeAMDRemoveNoaliasPass(PassRegistry&);
--#if 1 || defined (AMD_OPENCL_MEMCOMBINE)
--void initializeVectorElementAliasAnalysisPass(PassRegistry&);
--void initializeAlignmentAnalysisAnalysisGroup(PassRegistry&);
--void initializeAMDAlignmentAnalysisPass(PassRegistry&);
--void initializeMemCombinePass(PassRegistry&);
--void initializeScalarReplArrayElemPass(PassRegistry&);
--void initializeMachineInstrCountPass(PassRegistry&);
--void initializeOpenCLIRTransformPass(PassRegistry&);
--#endif
--void initializeAMDLocalArrayUsagePass(PassRegistry&);
--void initializeAMDEDGToIA64TranslatorPass(PassRegistry&);
--void initializeAMDLowerAtomicsPass(PassRegistry&);
--void initializeAMDLowerPipeBuiltinsPass(PassRegistry&);
--void initializeAMDLowerToPreciseBuiltinsPass(PassRegistry&);
--void initializeAMDILCreateKernelStubPass(PassRegistry&);
--
--void initializeAMDPrintfRuntimeBinding(PassRegistry&);
--void initializeHSAILPrintfRuntimeBindingKernArgPass(PassRegistry&);
--void initializeHSAILPrintfRuntimeBindingMetadataPass(PassRegistry&);
--
--void initializeHSAILUniformOperationsPass(PassRegistry&);
--void initializeHSAILControlDependencyAnalysisPass(PassRegistry&);
--void initializeHSAILOptimizeMemoryOpsPass(PassRegistry&);
--void initializeHSAILResizeLocalPointerPass(PassRegistry&);
--void initializeHSAILDAGToDAGISelPass(PassRegistry&);
--void initializeHSAILPropagateImageOperandsPass(PassRegistry&);
--void initializeHSAILEarlyCFGOptsPass(PassRegistry&);
--void initializeHSAILSyntaxCleanupPassPass(PassRegistry&);
--void initializeHSAILGlobalOffsetInsertionPassPass(PassRegistry&);
--void initializeHSAILFixSpecialIntrinsicsPass(PassRegistry&);
--void initializeHSAILLowerSPIRSamplersPass(PassRegistry&);
--void initializeHSAILNullPtrInsertionPass(PassRegistry&);
--void initializeHSAILInsertKernelIndexMetadataPass(PassRegistry&);
--#endif
++
++void initializeHSAILDAGToDAGISelPass(PassRegistry&);
++void initializeAMDSymbolLinkagePass(PassRegistry&);
++void initializeAMDInlineAllPass(PassRegistry&);
  }
  
  #endif
-diff -ur llvm-3.2.src/include/llvm/Linker.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Linker.h
---- llvm-3.2.src/include/llvm/Linker.h	2014-08-14 16:49:36.640557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Linker.h	2012-03-26 12:28:25.000000000 +0530
-@@ -14,12 +14,9 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Linker.h llvm-3.2.src/include/llvm/Linker.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Linker.h	2012-03-26 12:28:25.000000000 +0530
++++ llvm-3.2.src/include/llvm/Linker.h	2014-08-30 10:24:36.300842153 +0530
+@@ -14,9 +14,12 @@
  #ifndef LLVM_LINKER_H
  #define LLVM_LINKER_H
  
--#include "llvm/ValueSymbolTable.h"
++#include "llvm/ValueSymbolTable.h"
  #include <memory>
  #include <string>
  #include <vector>
--#include <map>
--#include "llvm/ADT/StringRef.h"
++#include <map>
++#include "llvm/ADT/StringRef.h"
  
  namespace llvm {
    namespace sys { class Path; }
-@@ -254,7 +251,7 @@
+@@ -250,8 +253,8 @@
+     bool LinkInModule(
        Module* Src,              ///< Module linked into \p Dest
        std::string* ErrorMsg = 0 /// Error/diagnostic string
-     ) { 
--      return LinkModules(Composite, Src, Linker::DestroySource, ErrorMsg);
-+      return LinkModules(Composite, Src, Linker::DestroySource, ErrorMsg ); 
+-    ) { 
+-      return LinkModules(Composite, Src, Linker::DestroySource, ErrorMsg ); 
++    ) {
++      return LinkModules(Composite, Src, Linker::DestroySource, ErrorMsg);
      }
  
      /// This is the heart of the linker. This method will take unconditional
-@@ -268,13 +265,6 @@
+@@ -265,6 +268,11 @@
      /// error.
      /// @returns True if an error occurs, false otherwise.
      /// @brief Generically link two modules together.
--
--#if defined(AMD_OPENCL) || 1
--    static bool LinkModules(Module* Dest, Module* Src, unsigned Mode,
--                            std::map<const Value*, bool>* ReferenceMap,
--                            std::string* ErrorMsg);
--#endif
--
++
++    static bool LinkModules(Module* Dest, Module* Src, unsigned Mode,
++                            std::map<const Value*, bool>* ReferenceMap,
++                            std::string* ErrorMsg);
++
      static bool LinkModules(Module* Dest, Module* Src, unsigned Mode,
                              std::string* ErrorMsg);
  
 Only in llvm-3.2.src/include/llvm/MC: MCELFStreamer.h
-diff -ur llvm-3.2.src/include/llvm/MC/MCStreamer.h /home/amd/Prakash/llvm-3.2.org/include/llvm/MC/MCStreamer.h
---- llvm-3.2.src/include/llvm/MC/MCStreamer.h	2014-08-14 16:49:36.644557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/MC/MCStreamer.h	2012-10-15 21:13:14.000000000 +0530
-@@ -63,19 +63,6 @@
-     void EnsureValidW64UnwindInfo();
- 
-     MCSymbol* LastSymbol;
--#if 1 || defined(AMD_OPENCL)
--  public:
--    enum MCStreamerKind {
--      // currently we need to support pseudo-RTTI operations only with BRIGDwarfStreamer
--      UnknownStreamer,
--      BRIGDwarfStreamer
--    };
--  public:
--    virtual MCStreamerKind getStreamerKind() const {
--      return UnknownStreamer;
--    }
--#endif
--
- 
-     /// SectionStack - This is stack of current and previous section
-     /// values saved by PushSection.
-@@ -105,11 +92,7 @@
-     MCContext &getContext() const { return Context; }
- 
-     unsigned getNumFrameInfos() {
--      return
--#if defined(AMD_OPENCL) || 1
--        (unsigned)
--#endif
--        FrameInfos.size();
-+      return FrameInfos.size();
-     }
- 
-     const MCDwarfFrameInfo &getFrameInfo(unsigned i) {
-@@ -121,11 +104,7 @@
-     }
- 
-     unsigned getNumW64UnwindInfos() {
--      return
--#if defined(AMD_OPENCL) || 1
--        (unsigned)
--#endif
--        W64UnwindInfos.size();
-+      return W64UnwindInfos.size();
-     }
- 
-     MCWin64EHUnwindInfo &getW64UnwindInfo(unsigned i) {
-diff -ur llvm-3.2.src/include/llvm/Operator.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Operator.h
---- llvm-3.2.src/include/llvm/Operator.h	2014-08-14 16:49:36.648557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Operator.h	2012-10-25 00:47:42.000000000 +0530
-@@ -16,9 +16,7 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Operator.h llvm-3.2.src/include/llvm/Operator.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Operator.h	2012-10-25 00:47:42.000000000 +0530
++++ llvm-3.2.src/include/llvm/Operator.h	2014-07-21 15:59:42.000000000 +0530
+@@ -16,7 +16,9 @@
  #define LLVM_OPERATOR_H
  
  #include "llvm/Constants.h"
--#include "llvm/DataLayout.h"
++#include "llvm/DataLayout.h"
  #include "llvm/DerivedTypes.h"
--#include "llvm/Support/GetElementPtrTypeIterator.h"
++#include "llvm/Support/GetElementPtrTypeIterator.h"
  #include "llvm/Instruction.h"
  #include "llvm/Type.h"
  
-@@ -309,75 +307,6 @@
+@@ -307,6 +309,75 @@
      }
      return true;
    }
--
--  /// \brief Accumulate the constant address offset of this GEP if possible.
--  ///
--  /// This routine accepts an APInt into which it will accumulate the constant
--  /// offset of this GEP if the GEP is in fact constant. If the GEP is not
--  /// all-constant, it returns false and the value of the offset APInt is
--  /// undefined (it is *not* preserved!). The APInt passed into this routine
--  /// must be at exactly as wide as the IntPtr type for the address space of the
--  /// base GEP pointer.
--  bool accumulateConstantOffset(const DataLayout &DL, APInt &Offset) const {
--    assert(Offset.getBitWidth() ==
--           DL.getPointerSizeInBits(getPointerAddressSpace()) &&
--           "The offset must have exactly as many bits as our pointer.");
--
--    for (gep_type_iterator GTI = gep_type_begin(this), GTE = gep_type_end(this);
--         GTI != GTE; ++GTI) {
--      ConstantInt *OpC = dyn_cast<ConstantInt>(GTI.getOperand());
--      if (!OpC)
--        return false;
--      if (OpC->isZero())
--        continue;
--
--      // Handle a struct index, which adds its field offset to the pointer.
--      if (StructType *STy = dyn_cast<StructType>(*GTI)) {
--        unsigned ElementIdx = OpC->getZExtValue();
--        const StructLayout *SL = DL.getStructLayout(STy);
--        Offset += APInt(Offset.getBitWidth(),
--                        SL->getElementOffset(ElementIdx));
--        continue;
--      }
--
--      // For array or vector indices, scale the index by the size of the type.
--      APInt Index = OpC->getValue().sextOrTrunc(Offset.getBitWidth());
--      Offset += Index * APInt(Offset.getBitWidth(),
--                              DL.getTypeAllocSize(GTI.getIndexedType()));
--    }
--    return true;
--  }
--
--};
--
--class PtrToIntOperator
--    : public ConcreteOperator<Operator, Instruction::PtrToInt> {
--  friend class PtrToInt;
--  friend class ConstantExpr;
--
--public:
--  Value *getPointerOperand() {
--    return getOperand(0);
--  }
--  const Value *getPointerOperand() const {
--    return getOperand(0);
--  }
--  static unsigned getPointerOperandIndex() {
--    return 0U;                      // get index for modifying correct operand
--  }
--
--  /// getPointerOperandType - Method to return the pointer operand as a
--  /// PointerType.
--  Type *getPointerOperandType() const {
--    return getPointerOperand()->getType();
--  }
--
--  /// getPointerAddressSpace - Method to return the address space of the
--  /// pointer operand.
--  unsigned getPointerAddressSpace() const {
--    return cast<PointerType>(getPointerOperandType())->getAddressSpace();
--  }
--
++
++  /// \brief Accumulate the constant address offset of this GEP if possible.
++  ///
++  /// This routine accepts an APInt into which it will accumulate the constant
++  /// offset of this GEP if the GEP is in fact constant. If the GEP is not
++  /// all-constant, it returns false and the value of the offset APInt is
++  /// undefined (it is *not* preserved!). The APInt passed into this routine
++  /// must be at exactly as wide as the IntPtr type for the address space of the
++  /// base GEP pointer.
++  bool accumulateConstantOffset(const DataLayout &DL, APInt &Offset) const {
++    assert(Offset.getBitWidth() ==
++           DL.getPointerSizeInBits(getPointerAddressSpace()) &&
++           "The offset must have exactly as many bits as our pointer.");
++
++    for (gep_type_iterator GTI = gep_type_begin(this), GTE = gep_type_end(this);
++         GTI != GTE; ++GTI) {
++      ConstantInt *OpC = dyn_cast<ConstantInt>(GTI.getOperand());
++      if (!OpC)
++        return false;
++      if (OpC->isZero())
++        continue;
++
++      // Handle a struct index, which adds its field offset to the pointer.
++      if (StructType *STy = dyn_cast<StructType>(*GTI)) {
++        unsigned ElementIdx = OpC->getZExtValue();
++        const StructLayout *SL = DL.getStructLayout(STy);
++        Offset += APInt(Offset.getBitWidth(),
++                        SL->getElementOffset(ElementIdx));
++        continue;
++      }
++
++      // For array or vector indices, scale the index by the size of the type.
++      APInt Index = OpC->getValue().sextOrTrunc(Offset.getBitWidth());
++      Offset += Index * APInt(Offset.getBitWidth(),
++                              DL.getTypeAllocSize(GTI.getIndexedType()));
++    }
++    return true;
++  }
++
++};
++
++class PtrToIntOperator
++    : public ConcreteOperator<Operator, Instruction::PtrToInt> {
++  friend class PtrToInt;
++  friend class ConstantExpr;
++
++public:
++  Value *getPointerOperand() {
++    return getOperand(0);
++  }
++  const Value *getPointerOperand() const {
++    return getOperand(0);
++  }
++  static unsigned getPointerOperandIndex() {
++    return 0U;                      // get index for modifying correct operand
++  }
++
++  /// getPointerOperandType - Method to return the pointer operand as a
++  /// PointerType.
++  Type *getPointerOperandType() const {
++    return getPointerOperand()->getType();
++  }
++
++  /// getPointerAddressSpace - Method to return the address space of the
++  /// pointer operand.
++  unsigned getPointerAddressSpace() const {
++    return cast<PointerType>(getPointerOperandType())->getAddressSpace();
++  }
++
  };
  
  } // End llvm namespace
-diff -ur llvm-3.2.src/include/llvm/Support/Dwarf.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/Dwarf.h
---- llvm-3.2.src/include/llvm/Support/Dwarf.h	2014-08-14 16:49:36.648557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/Dwarf.h	2012-03-30 03:05:05.000000000 +0530
-@@ -132,9 +132,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/Dwarf.h llvm-3.2.src/include/llvm/Support/Dwarf.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/Dwarf.h	2012-03-30 03:05:05.000000000 +0530
++++ llvm-3.2.src/include/llvm/Support/Dwarf.h	2014-08-18 17:23:07.000000000 +0530
+@@ -132,6 +132,7 @@
    DW_TAG_GNU_formal_parameter_pack = 0x4108,
    DW_TAG_lo_user = 0x4080,
    DW_TAG_APPLE_property = 0x4200,
--#if defined(AMD_OPENCL) || 1
--  DW_TAG_HSA_argument_scope = 0x8000,
--#endif
++  DW_TAG_HSA_argument_scope = 0x8000,
    DW_TAG_hi_user = 0xffff,
  
    // Children flag
-@@ -258,13 +255,6 @@
+@@ -255,6 +256,11 @@
    DW_AT_GNU_vector = 0x2107,
    DW_AT_GNU_template_name = 0x2110,
    DW_AT_MIPS_assumed_size = 0x2011,
--#if defined(AMD_OPENCL) || 1
--  DW_AT_HSA_is_kernel = 0x3000,
--  DW_AT_HSA_is_outParam = 0x3001,
--  DW_AT_HSA_workitemid_offset = 0x3002,
--  DW_AT_HSA_isa_memory_region = 0x3003,
--  DW_AT_HSA_brig_offset = 0x3004,
--#endif
++  DW_AT_HSA_is_kernel = 0x3000,
++  DW_AT_HSA_is_outParam = 0x3001,
++  DW_AT_HSA_workitemid_offset = 0x3002,
++  DW_AT_HSA_isa_memory_region = 0x3003,
++  DW_AT_HSA_brig_offset = 0x3004,
    DW_AT_lo_user = 0x2000,
    DW_AT_hi_user = 0x3fff,
  
-@@ -283,13 +273,6 @@
+@@ -272,6 +278,8 @@
+   DW_AT_APPLE_property_attribute = 0x3feb,
    DW_AT_APPLE_objc_complete_type = 0x3fec,
    DW_AT_APPLE_property = 0x3fed,
++  DW_AT_AMDIL_address_space = 0x3ff1,
++  DW_AT_AMDIL_resource = 0x3ff2,
  
--  // jgolds
--#if 1 || defined(AMD_OPENCL)
--  // AMDIL extensions.
--  DW_AT_AMDIL_address_space = 0x3ff1,
--  DW_AT_AMDIL_resource = 0x3ff2,
--#endif
--
    // Attribute form encodings
    DW_FORM_addr = 0x01,
-   DW_FORM_block2 = 0x03,
-@@ -547,9 +530,6 @@
+@@ -530,6 +538,7 @@
    DW_LANG_Python = 0x0014,
    DW_LANG_lo_user = 0x8000,
    DW_LANG_Mips_Assembler = 0x8001,
--#if defined(AMD_OPENCL) || 1
--  DW_LANG_HSA_Assembly = 0x9000,
--#endif
++  DW_LANG_HSA_Assembly = 0x9000,
    DW_LANG_hi_user = 0xffff,
  
    // Identifier case codes
-diff -ur llvm-3.2.src/include/llvm/Support/ELF.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/ELF.h
---- llvm-3.2.src/include/llvm/Support/ELF.h	2014-08-14 16:49:36.652557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/ELF.h	2012-11-20 09:27:32.000000000 +0530
-@@ -287,10 +287,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/ELF.h llvm-3.2.src/include/llvm/Support/ELF.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Support/ELF.h	2012-11-20 09:27:32.000000000 +0530
++++ llvm-3.2.src/include/llvm/Support/ELF.h	2014-08-18 16:53:56.000000000 +0530
+@@ -287,6 +287,8 @@
    EM_VIDEOCORE5    = 198, // Broadcom VideoCore V processor
    EM_78KOR         = 199, // Renesas 78KOR family
    EM_56800EX       = 200, // Freescale 56800EX Digital Signal Controller (DSC)
--#if defined(AMD_OPENCL) || 1
--  EM_HSAIL     = 128,  // HSAIL 32bit
--  EM_HSAIL_64  = 129,  // HSAIL 64bit
--#endif
++  EM_HSAIL     = 128,  // HSAIL 32bit
++  EM_HSAIL_64  = 129,  // HSAIL 64bit
    EM_MBLAZE        = 47787 // Xilinx MicroBlaze
  };
  
-diff -ur llvm-3.2.src/include/llvm/TableGen/Record.h /home/amd/Prakash/llvm-3.2.org/include/llvm/TableGen/Record.h
---- llvm-3.2.src/include/llvm/TableGen/Record.h	2014-08-14 16:49:36.656557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/TableGen/Record.h	2012-10-12 05:00:49.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/TableGen/Record.h llvm-3.2.src/include/llvm/TableGen/Record.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/TableGen/Record.h	2012-10-12 05:00:49.000000000 +0530
++++ llvm-3.2.src/include/llvm/TableGen/Record.h	2014-07-21 17:49:44.000000000 +0530
 @@ -991,7 +991,7 @@
  ///
  class BinOpInit : public OpInit {
  public:
--  enum BinaryOp { ADD, SHL, SRA, SRL, STRCONCAT, CONCAT, EQ };
-+  enum BinaryOp { SHL, SRA, SRL, STRCONCAT, CONCAT, EQ };
+-  enum BinaryOp { SHL, SRA, SRL, STRCONCAT, CONCAT, EQ };
++  enum BinaryOp { ADD, SHL, SRA, SRL, STRCONCAT, CONCAT, EQ };
  private:
    BinaryOp Opc;
    Init *LHS, *RHS;
-diff -ur llvm-3.2.src/include/llvm/Target/TargetInstrInfo.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetInstrInfo.h
---- llvm-3.2.src/include/llvm/Target/TargetInstrInfo.h	2014-08-14 16:49:36.656557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetInstrInfo.h	2012-10-10 11:13:09.000000000 +0530
-@@ -621,19 +621,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetInstrInfo.h llvm-3.2.src/include/llvm/Target/TargetInstrInfo.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetInstrInfo.h	2012-10-10 11:13:09.000000000 +0530
++++ llvm-3.2.src/include/llvm/Target/TargetInstrInfo.h	2014-09-03 10:28:53.071242575 +0530
+@@ -621,6 +621,15 @@
      return false;
    }
  
--#if defined(AMD_OPENCL) || 1
--  /// Schedule this instruction based entirely on it's Sethi-Ullman number,
--  /// without raising or lowering it's priority based on use or def numbers.
--  /// What this really says is that the instruction has some effect on execution
--  /// that is not modeled in the DAG. (For instance, a multi-thread execution 
--  /// barrier.) On the GPU AMDIL backend, moving these instructions too far up
--  /// or down in the execution can artificially constrain the scheduling in the 
--  /// shared compiler.
--  virtual bool shouldScheduleWithNormalPriority(SDNode* instruction) const {
--    return false;
--  }
--#endif
--
++  /// Schedule this instruction based entirely on it's Sethi-Ullman number,
++  /// without raising or lowering it's priority based on use or def numbers.
++  /// What this really says is that the instruction has some effect on execution
++  /// that is not modeled in the DAG. (For instance, a multi-thread execution 
++  /// barrier.) 
++  virtual bool shouldScheduleWithNormalPriority(SDNode* instruction) const {
++    return false;
++  }
++
    /// ReverseBranchCondition - Reverses the branch condition of the specified
    /// condition list, returning false on success and true if it cannot be
    /// reversed.
-diff -ur llvm-3.2.src/include/llvm/Target/TargetLowering.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetLowering.h
---- llvm-3.2.src/include/llvm/Target/TargetLowering.h	2014-08-14 16:49:36.656557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetLowering.h	2012-11-05 08:29:23.000000000 +0530
-@@ -187,13 +187,12 @@
-     return predictableSelectIsExpensive;
-   }
- 
--//D2_OPENCL
-   /// getSetCCResultType - Return the ValueType of the result of SETCC
-   /// operations.  Also used to obtain the target's preferred type for
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetLowering.h llvm-3.2.src/include/llvm/Target/TargetLowering.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Target/TargetLowering.h	2012-11-05 08:29:23.000000000 +0530
++++ llvm-3.2.src/include/llvm/Target/TargetLowering.h	2014-08-18 16:58:45.000000000 +0530
+@@ -192,7 +192,7 @@
    /// the condition operand of SELECT and BRCOND nodes.  In the case of
    /// BRCOND the argument passed is MVT::Other since there are no other
    /// operands to get a type hint from.
--  virtual EVT getSetCCResultType(LLVMContext &Context, EVT VT) const;
-+  virtual EVT getSetCCResultType(EVT VT) const;
+-  virtual EVT getSetCCResultType(EVT VT) const;
++  virtual EVT getSetCCResultType(LLVMContext &Context, EVT VT) const;
  
    /// getCmpLibcallReturnType - Return the ValueType for comparison
    /// libcalls. Comparions libcalls include floating point comparion calls,
-diff -ur llvm-3.2.src/include/llvm/Transforms/IPO.h /home/amd/Prakash/llvm-3.2.org/include/llvm/Transforms/IPO.h
---- llvm-3.2.src/include/llvm/Transforms/IPO.h	2014-08-14 16:49:36.660557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/include/llvm/Transforms/IPO.h	2012-10-27 00:17:48.000000000 +0530
-@@ -16,9 +16,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/include/llvm/Transforms/IPO.h llvm-3.2.src/include/llvm/Transforms/IPO.h
+--- /home/amd/Prakash/llvm-3.2.org/include/llvm/Transforms/IPO.h	2012-10-27 00:17:48.000000000 +0530
++++ llvm-3.2.src/include/llvm/Transforms/IPO.h	2014-08-18 16:57:56.000000000 +0530
+@@ -16,6 +16,9 @@
  #define LLVM_TRANSFORMS_IPO_H
  
  #include <vector>
--#include <set>
--#include <string>
--
++#include <set>
++#include <string>
++
  
  namespace llvm {
  
-@@ -197,19 +194,6 @@
+@@ -194,6 +197,16 @@
  /// manager.
  ModulePass *createBarrierNoopPass();
  
--#if defined(AMD_OPENCL) || 1
--//===----------------------------------------------------------------------===//
--/// createAMDInlineAllPass - Return a new pass object that inlines all
--/// functions. And if isWhole is true (whole program mode), it will also
--/// remove all non-kernel functions.
--///
--Pass *createAMDInlineAllPass(bool isWhole=false);
--ModulePass *createAMDSymbolLinkagePass(bool isWhole=false,
--                                       std::set<std::string> *reqFuns = NULL);
--
--#endif
--
--
++//===----------------------------------------------------------------------===//
++/// createAMDInlineAllPass - Return a new pass object that inlines all
++/// functions. And if isWhole is true (whole program mode), it will also
++/// remove all non-kernel functions.
++///
++Pass *createAMDInlineAllPass(bool isWhole=false);
++ModulePass *createAMDSymbolLinkagePass(bool isWhole=false,
++                                       std::set<std::string> *reqFuns = NULL);
++
++
  } // End llvm namespace
  
  #endif
-Only in llvm-3.2.src/lib/Analysis/IPA: AMDOpenCLSymbols.cpp
-diff -ur llvm-3.2.src/lib/Analysis/IPA/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/lib/Analysis/IPA/CMakeLists.txt
---- llvm-3.2.src/lib/Analysis/IPA/CMakeLists.txt	2014-08-14 16:49:36.664557843 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Analysis/IPA/CMakeLists.txt	2012-06-24 19:02:01.000000000 +0530
-@@ -4,7 +4,6 @@
+Only in llvm-3.2.src/lib/Analysis/IPA: AMDKernelSymbols.cpp
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Analysis/IPA/CMakeLists.txt llvm-3.2.src/lib/Analysis/IPA/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/lib/Analysis/IPA/CMakeLists.txt	2012-06-24 19:02:01.000000000 +0530
++++ llvm-3.2.src/lib/Analysis/IPA/CMakeLists.txt	2014-08-19 12:30:41.000000000 +0530
+@@ -4,6 +4,7 @@
    FindUsedTypes.cpp
    GlobalsModRef.cpp
    IPA.cpp
--  AMDOpenCLSymbols.cpp
++  AMDKernelSymbols.cpp 
    )
  
  add_dependencies(LLVMipa intrinsics_gen)
-diff -ur llvm-3.2.src/lib/CodeGen/AsmPrinter/AsmPrinter.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
---- llvm-3.2.src/lib/CodeGen/AsmPrinter/AsmPrinter.cpp	2014-08-14 16:49:36.676557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/AsmPrinter.cpp	2012-11-01 14:44:31.000000000 +0530
-@@ -188,12 +188,7 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/AsmPrinter.cpp llvm-3.2.src/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/AsmPrinter.cpp	2012-11-01 14:44:31.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/AsmPrinter/AsmPrinter.cpp	2014-08-29 22:29:50.456048508 +0530
+@@ -187,9 +187,6 @@
+     OutStreamer.AddBlankLine();
    }
  
-   if (MAI->doesSupportDebugInformation())
--#if defined(AMD_OPENCL) || 1
--    DD = CreateDwarfDebug(M);
--#else
-     DD = new DwarfDebug(this, &M);
--#endif
+-  if (MAI->doesSupportDebugInformation())
+-    DD = new DwarfDebug(this, &M);
 -
- 
    switch (MAI->getExceptionHandlingType()) {
    case ExceptionHandling::None:
-@@ -212,13 +207,6 @@
- 
-   llvm_unreachable("Unknown exception type.");
- }
--#if defined(AMD_OPENCL) || 1
--// This function will be used by HSAIL target to use BrigDwarfDebug
--// in the place of DwarfDebug
--DwarfDebug *AsmPrinter::CreateDwarfDebug(Module &M) {
--    return new DwarfDebug(this,&M);
--}
--#endif
- 
- void AsmPrinter::EmitLinkage(unsigned Linkage, MCSymbol *GVSym) const {
-   switch ((GlobalValue::LinkageTypes)Linkage) {
-@@ -801,14 +789,6 @@
-   // Target specific DBG_VALUE instructions are handled by each target.
-   return MachineLocation();
- }
--//jgolds
--#if 1 | defined(AMD_OPENCL)
--/// getDebugResourceLocation - Get resource id information encoded in
--/// target flags.
--bool AsmPrinter::getDebugResourceID(const Value *V, uint32_t& RID) const {
--  return false;
--}
--#endif
- 
- /// EmitDwarfRegOp - Emit dwarf register operation.
- void AsmPrinter::EmitDwarfRegOp(const MachineLocation &MLoc) const {
-@@ -955,11 +935,6 @@
+     return false;
+@@ -935,6 +932,9 @@
      if (const MCSection *S = MAI->getNonexecutableStackSection(OutContext))
        OutStreamer.SwitchSection(S);
  
--#if 1 || AMD_OPENCL
--  // LLVM Bug 9761. Nothing should be emitted after EmitEndOfAsmFile()
--  OutStreamer.Finish();
--#endif
--
++  // LLVM Bug 9761. Nothing should be emitted after EmitEndOfAsmFile()
++  OutStreamer.Finish();
++
    // Allow the target to emit any magic that it wants at the end of the file,
    // after everything else has gone out.
    EmitEndOfAsmFile(M);
-@@ -967,11 +942,7 @@
+@@ -942,7 +942,6 @@
    delete Mang; Mang = 0;
    MMI = 0;
  
--#if 1 || AMD_OPENCL
--#if 0
-   OutStreamer.Finish();
--#endif
--#endif
+-  OutStreamer.Finish();
    return false;
  }
  
-@@ -2099,11 +2070,7 @@
+@@ -2070,7 +2069,7 @@
  /// EmitBasicBlockStart - This method prints the label for the specified
  /// MachineBasicBlock, an alignment (if present) and a comment describing
  /// it if appropriate.
--#if defined(AMD_OPENCL) || 1
--void AsmPrinter::EmitBasicBlockStart(const MachineBasicBlock *MBB) {
--#else
- void AsmPrinter::EmitBasicBlockStart(const MachineBasicBlock *MBB) const {
--#endif
+-void AsmPrinter::EmitBasicBlockStart(const MachineBasicBlock *MBB) const {
++void AsmPrinter::EmitBasicBlockStart(const MachineBasicBlock *MBB) {
    // Emit an alignment directive for this block, if needed.
    if (unsigned Align = MBB->getAlignment())
      EmitAlignment(Align);
-diff -ur llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp
---- llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp	2014-08-14 16:49:36.676557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp	2012-10-08 22:08:25.000000000 +0530
-@@ -29,44 +29,14 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp	2012-10-08 22:08:25.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.cpp	2014-08-30 10:27:02.556844860 +0530
+@@ -28,11 +28,16 @@
+ #include "llvm/Target/TargetRegisterInfo.h"
  #include "llvm/ADT/APFloat.h"
  #include "llvm/Support/ErrorHandling.h"
++#include "llvm/Module.h"
++#include "llvm/Function.h"
++#include "llvm/CodeGen/MachineFunction.h"
++#include "llvm/CodeGen/MachineModuleInfo.h"
  
--#if 1 || defined(AMD_OPENCL) 
--#include "llvm/AMDLLVMContextHook.h"
--#include "llvm/Module.h"
--#include "llvm/Function.h"
--#include "llvm/CodeGen/MachineFunction.h"
--#include "llvm/CodeGen/MachineModuleInfo.h"
--#endif
--
  using namespace llvm;
  
--#if defined(AMD_OPENCL) || 1
--
--/// CompileUnit - Compile unit constructor.
--CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, 
--             DwarfDebug *DW, CUKind scid)
--  : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0), 
--    SubclassID(scid) {
--  DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
--}
--
--CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, 
--             DwarfDebug *DW) 
--  : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0), 
--    SubclassID(DwarfCompileUnit) {
--  DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
--}
--
--CompileUnit::CUKind CompileUnit::getCUKind() const {
--  return SubclassID;
--}
--#else
++
  /// CompileUnit - Compile unit constructor.
- CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A,
+-CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A,
++CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, 
                           DwarfDebug *DW)
    : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0) {
    DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
- }
--#endif // AMD_OPENCL
- 
- /// ~CompileUnit - Destructor for compile unit.
- CompileUnit::~CompileUnit() {
-@@ -83,14 +53,8 @@
+@@ -53,10 +58,6 @@
  
  /// addFlag - Add a flag that is true.
  void CompileUnit::addFlag(DIE *Die, unsigned Attribute) {
--#if defined(AMD_OPENCL) || 1
--  // HSA expects DW_FORM_flag attribute
--  if (!AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple()) &&
--      !DD->useDarwinGDBCompat())
--#else
-   if (!DD->useDarwinGDBCompat())
--#endif // AMD_OPENCL
--      Die->addValue(Attribute, dwarf::DW_FORM_flag_present,
-+    Die->addValue(Attribute, dwarf::DW_FORM_flag_present,
-                   DIEIntegerOne);
-   else
+-  if (!DD->useDarwinGDBCompat())
+-    Die->addValue(Attribute, dwarf::DW_FORM_flag_present,
+-                  DIEIntegerOne);
+-  else
      addUInt(Die, Attribute, dwarf::DW_FORM_flag, 1);
-@@ -772,25 +736,12 @@
+ }
+ 
+@@ -736,12 +737,17 @@
      addString(&Buffer, dwarf::DW_AT_name, Name);
  
    // Add size if non-zero (derived types might be zero-sized.)
--#if defined(AMD_OPENCL) || 1
--  // HSA Debugger is expecting DW_AT_byte_size for pointer type
--  if (Size && 
--     (AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple()) ||
--      Tag != dwarf::DW_TAG_pointer_type))
--#else
-   if (Size && Tag != dwarf::DW_TAG_pointer_type)
--#endif
+-  if (Size && Tag != dwarf::DW_TAG_pointer_type)
++  // HSA Debugger is expecting DW_AT_byte_size for pointer type
++  if (Size && 
++      Tag != dwarf::DW_TAG_pointer_type)
      addUInt(&Buffer, dwarf::DW_AT_byte_size, 0, Size);
  
    // Add source line info if available and TyDesc is not a forward declaration.
    if (!DTy.isForwardDecl())
      addSourceLine(&Buffer, DTy);
--
--#if defined(AMD_OPENCL) || 1
--  // Add the address space as an attribute
--  if (AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple()))
--    addUInt(&Buffer, dwarf::DW_AT_address_class, dwarf::DW_FORM_data4, DTy.getAddressSpace());
--#endif
++
++  // Add the address space as an attribute
++  addUInt(&Buffer, dwarf::DW_AT_address_class, dwarf::DW_FORM_data4, DTy.getAddressSpace());
  }
  
  /// constructTypeDIE - Construct type DIE from DICompositeType.
-@@ -1236,27 +1187,6 @@
- 
-   // Add line number info.
-   addSourceLine(VariableDIE, GV);
--#if 1 || defined(AMD_OPENCL) 
--  if (isGlobalVariable) {
--    const Module *M = Asm->MMI->getModule();
--    if (Value *V = M->getNamedGlobal(LinkageName)) {
--      if (PointerType *PT = dyn_cast<PointerType>(V->getType())) {
--        unsigned addressSpace = PT->getAddressSpace();
--        // Since the IR for a constant global designates it to be in the private address space,
--        // it needs to be converted to the constant address space.
--        addressSpace = Asm->correctDebugAS(addressSpace, V);
--        // We don't want to emit this information for the default address space.
--        if (addressSpace) {
--          addUInt(VariableDIE, dwarf::DW_AT_AMDIL_address_space, 0, addressSpace);
--        }
--        uint32_t RID;
--        if (Asm->getDebugResourceID(V, RID))
--          addUInt(VariableDIE, dwarf::DW_AT_AMDIL_resource, 0, RID);
--      }
--    }
--  }
--#endif
--
-   // Add to context owner.
-   DIDescriptor GVContext = GV.getContext();
-   addToContextOwner(VariableDIE, GVContext);
-@@ -1267,13 +1197,8 @@
-     addToAccelTable = true;
-     DIEBlock *Block = new (DIEValueAllocator) DIEBlock();
+@@ -1199,6 +1205,7 @@
      addUInt(Block, 0, dwarf::DW_FORM_data1, dwarf::DW_OP_addr);
--#if defined(AMD_OPENCL) || 1
--    addGVLabelToBlock(Block, &GV);
--#else
      addLabel(Block, 0, dwarf::DW_FORM_udata,
               Asm->Mang->getSymbol(GV.getGlobal()));
--#endif
--
++
      // Do not create specification DIE if context is either compile unit
      // or a subprogram.
      if (GVContext && GV.isDefinition() && !GVContext.isCompileUnit() &&
-@@ -1419,51 +1344,6 @@
+@@ -1344,7 +1351,7 @@
      addString(VariableDie, dwarf::DW_AT_name, Name);
      addSourceLine(VariableDie, DV->getVariable());
      addType(VariableDie, DV->getType());
--#if defined(AMD_OPENCL) || 1
--    if (!AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple())) {
--      bool hasATSet = false;
--      DenseMap<const DbgVariable *, unsigned>::iterator DVASI =
--      DD->DbgVariableToAddrSpaceMap.find(DV);
--      if (DVASI != DD->DbgVariableToAddrSpaceMap.end()) {
--        unsigned addressSpace = DVASI->second;
--        addUInt(VariableDie, dwarf::DW_AT_AMDIL_address_space, 0, addressSpace );
--        hasATSet = true;
--      }
--      //the resource ID for every kernel argument:
--      DenseMap<const DbgVariable *, const Value *>::iterator DVVALUE =
--      DD->DbgVariableToValueMap.find(DV);
--      if (DVVALUE != DD->DbgVariableToValueMap.end()) {
--        const Value *Val = DVVALUE->second;
--        uint32_t RID;
--        if (Asm->getDebugResourceID(Val, RID)) {
--          addUInt(VariableDie, dwarf::DW_AT_AMDIL_resource, 0, RID);
--          hasATSet = true;
--        }
--      }
--      if (!hasATSet) {
--        MDNode *MDN = &*DV->getVariable();
--        const MachineFunction *MF = Asm->MF;
--        DenseMap<const MDNode *, const Value*>::const_iterator II =
--          MF->DIVToValueMap.find(MDN);
--        if (II != MF->DIVToValueMap.end()) {
--          const Value *V = II->second;
--          PointerType *PTy = dyn_cast<PointerType>(V->getType());
--          assert(PTy && "DIVToValueMap[] should have value of pointer type");
--          if (PointerType *PT = dyn_cast<PointerType>(PTy->getElementType())) {
--            unsigned addressSpace = PT->getAddressSpace();
--            if (addressSpace > 0) {
--              addUInt(VariableDie, dwarf::DW_AT_AMDIL_address_space, 0, addressSpace);
--              hasATSet = true;
--
--              uint32_t RID;
--              if (Asm->getDebugResourceID(V, RID))
--                addUInt(VariableDie, dwarf::DW_AT_AMDIL_resource, 0, RID);
--            }
--          }
--        }
--      }
--    }
--#endif // AMD_OPENCL
-   }
+-  }
++      }
  
    if (DV->isArtificial())
-@@ -1478,14 +1358,9 @@
- 
-   unsigned Offset = DV->getDotDebugLocOffset();
-   if (Offset != ~0U) {
--#if defined(AMD_OPENCL) || 1
--    addDebugLocOffset(DV, VariableDie, Offset);
--#else
+     addFlag(VariableDie, dwarf::DW_AT_artificial);
+@@ -1361,6 +1368,7 @@
      addLabel(VariableDie, dwarf::DW_AT_location,
--                          dwarf::DW_FORM_data4,
--                          Asm->GetTempSymbol("debug_loc", Offset));
--#endif
--
-+                         dwarf::DW_FORM_data4,
-+                         Asm->GetTempSymbol("debug_loc", Offset));
+                          dwarf::DW_FORM_data4,
+                          Asm->GetTempSymbol("debug_loc", Offset));
++
      DV->setDIE(VariableDie);
      return VariableDie;
    }
-@@ -1666,15 +1541,3 @@
-   }
-   return MemberDie;
- }
--#if defined(AMD_OPENCL) || 1
--void CompileUnit::addGVLabelToBlock(DIEBlock* block, const DIGlobalVariable* GV) {
--  addLabel(block, 0, dwarf::DW_FORM_udata, Asm->Mang->getSymbol(GV->getGlobal()));
--}
--
--void CompileUnit::addDebugLocOffset(const DbgVariable* dbgv, DIE* VariableDie, unsigned int Offset) {
--  addLabel(VariableDie, 
--           dwarf::DW_AT_location,
--           dwarf::DW_FORM_data4,
--           Asm->GetTempSymbol("debug_loc", Offset));
--}
--#endif
-diff -ur llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h
---- llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h	2014-08-14 16:49:36.676557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h	2012-09-11 05:04:03.000000000 +0530
-@@ -20,13 +20,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h	2012-09-11 05:04:03.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfCompileUnit.h	2014-08-29 23:30:56.144116345 +0530
+@@ -20,6 +20,9 @@
  #include "llvm/ADT/StringMap.h"
  #include "llvm/ADT/OwningPtr.h"
  
--#if defined (AMD_OPENCL) || 1
--// HSA need some functions to be redefined in BRIGDwarfCompileUnit class
--#define VIRTUAL_D virtual
--#else
--#define VIRTUAL_D 
--#endif
--
++// HSA need some functions to be redefined in BRIGDwarfCompileUnit class
++#define VIRTUAL_D virtual
++
  namespace llvm {
  
  class DwarfDebug;
-@@ -87,25 +80,8 @@
-   DenseMap<DIE *, const MDNode *> ContainingTypeMap;
+@@ -81,7 +84,8 @@
  
  public:
--
--#if defined(AMD_OPENCL) || 1
--  /// Discriminator for LLVM-style RTTI (dyn_cast<>)
--  /// Required for HSA debug information
--  enum CUKind {
--    DwarfCompileUnit = 1, // regular compile unit
--    BRIGDwarfCompileUnit  // BRIG DWARF compile unit
--  };
--  CompileUnit::CUKind getCUKind() const;
--protected:
--  CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, DwarfDebug *DW, CUKind scid);
--private:
--  const CUKind SubclassID;   // Subclass identifier (for isa/dyn_cast)
--#endif
--
--public:
    CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, DwarfDebug *DW);
--
--  VIRTUAL_D ~CompileUnit();
-+  ~CompileUnit();
+-  ~CompileUnit();
++
++  VIRTUAL_D ~CompileUnit();
  
    // Accessors.
    unsigned getID()                  const { return ID; }
-@@ -213,17 +189,18 @@
+@@ -189,18 +193,17 @@
  
    /// addString - Add a string attribute data and value.
    ///
--  VIRTUAL_D void addString(DIE *Die, unsigned Attribute, const StringRef Str);
-+  void addString(DIE *Die, unsigned Attribute, const StringRef Str);
+-  void addString(DIE *Die, unsigned Attribute, const StringRef Str);
++  VIRTUAL_D void addString(DIE *Die, unsigned Attribute, const StringRef Str);
  
--  /// addLabel - Add a Dwarf label attribute data and value
-+  /// addLabel - Add a Dwarf label attribute data and value.
+-  /// addLabel - Add a Dwarf label attribute data and value.
++  /// addLabel - Add a Dwarf label attribute data and value
    ///
--  VIRTUAL_D void addLabel(DIE *Die, unsigned Attribute, unsigned Form,
-+  void addLabel(DIE *Die, unsigned Attribute, unsigned Form,
+-  void addLabel(DIE *Die, unsigned Attribute, unsigned Form,
++  VIRTUAL_D void addLabel(DIE *Die, unsigned Attribute, unsigned Form,
                  const MCSymbol *Label);
  
    /// addDelta - Add a label delta attribute data and value.
    ///
--  VIRTUAL_D void addDelta(DIE *Die, unsigned Attribute, unsigned Form,
-+  void addDelta(DIE *Die, unsigned Attribute, unsigned Form,
+-  void addDelta(DIE *Die, unsigned Attribute, unsigned Form,
++  VIRTUAL_D void addDelta(DIE *Die, unsigned Attribute, unsigned Form,
                  const MCSymbol *Hi, const MCSymbol *Lo);
-+
+-
    /// addDIEEntry - Add a DIE attribute data and value.
    ///
    void addDIEEntry(DIE *Die, unsigned Attribute, unsigned Form, DIE *Entry);
-@@ -279,9 +256,10 @@
+@@ -256,10 +259,9 @@
    ///
    void addBlockByrefAddress(DbgVariable *&DV, DIE *Die, unsigned Attribute,
                              const MachineLocation &Location);
-+
+-
    /// addVariableAddress - Add DW_AT_location attribute for a 
    /// DbgVariable based on provided MachineLocation.
--  VIRTUAL_D void addVariableAddress(DbgVariable *&DV, DIE *Die, MachineLocation Location);
-+  void addVariableAddress(DbgVariable *&DV, DIE *Die, MachineLocation Location);
+-  void addVariableAddress(DbgVariable *&DV, DIE *Die, MachineLocation Location);
++  VIRTUAL_D void addVariableAddress(DbgVariable *&DV, DIE *Die, MachineLocation Location);
  
    /// addToContextOwner - Add Die into the list of its context owner's children.
    void addToContextOwner(DIE *Die, DIDescriptor Context);
-@@ -314,7 +292,7 @@
+@@ -292,7 +294,7 @@
    DIEEntry *createDIEEntry(DIE *Entry);
  
    /// createGlobalVariableDIE - create global variable DIE.
--  VIRTUAL_D void createGlobalVariableDIE(const MDNode *N);
-+  void createGlobalVariableDIE(const MDNode *N);
+-  void createGlobalVariableDIE(const MDNode *N);
++  VIRTUAL_D void createGlobalVariableDIE(const MDNode *N);
  
    void addPubTypes(DISubprogram SP);
  
-@@ -349,25 +327,11 @@
+@@ -327,11 +329,11 @@
  
    /// createMemberDIE - Create new member DIE.
    DIE *createMemberDIE(DIDerivedType DT);
--#if defined(AMD_OPENCL) || 1
--protected:
--  // make DIEValueAllocator protected - to access it from BRIGDwarfCompileUnit.
--  BumpPtrAllocator DIEValueAllocator;
--
--  /// adds an address of global variable to block
--  ///
--  virtual void addGVLabelToBlock(DIEBlock* block, const DIGlobalVariable* GV);
++protected:
++  // make DIEValueAllocator protected - to access it from BRIGDwarfCompileUnit.
++  BumpPtrAllocator DIEValueAllocator;
  
--  /// adds debug location offset to the DIE
--  ///
--  virtual void addDebugLocOffset(const DbgVariable* dbgv, DIE* VariableDie, unsigned int Offset);
--
--#else
  private:
-+
-   // DIEValueAllocator - All DIEValues are allocated through this allocator.
-   BumpPtrAllocator DIEValueAllocator;
--#endif // AMD_OPENCL
--private:
+-
+-  // DIEValueAllocator - All DIEValues are allocated through this allocator.
+-  BumpPtrAllocator DIEValueAllocator;
    DIEInteger *DIEIntegerOne;
  };
  
-diff -ur llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.cpp
---- llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.cpp	2014-08-14 16:49:36.680557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.cpp	2012-11-07 10:49:04.000000000 +0530
-@@ -44,11 +44,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.cpp llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.cpp	2012-11-07 10:49:04.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.cpp	2014-08-29 23:09:24.304092439 +0530
+@@ -44,6 +44,7 @@
  #include "llvm/Support/FormattedStream.h"
  #include "llvm/Support/Timer.h"
  #include "llvm/Support/Path.h"
--
--#if defined(AMD_OPENCL) || 1
--#include "llvm/AMDLLVMContextHook.h"
--#endif // AMD_OPENCL
--
++
  using namespace llvm;
  
  static cl::opt<bool> DisableDebugInfoPrinting("disable-debug-info-print",
-@@ -178,10 +173,7 @@
+@@ -173,11 +174,6 @@
        hasDwarfAccelTables = false;
    } else
      hasDwarfAccelTables = DwarfAccelTables == Enable ? true : false;
--#if defined(AMD_OPENCL) || 1
--  // For HSA beginModule must be explicitly called by AsmPrinter
--  if (!AMDOptions::isTargetHSAIL(M->getTargetTriple()))
--#endif
-+
-   {
-     NamedRegionTimer T(DbgTimerName, DWARFGroupName, TimePassesIsEnabled);
-     beginModule(M);
-@@ -505,49 +497,6 @@
-   return ScopeDIE;
+-
+-  {
+-    NamedRegionTimer T(DbgTimerName, DWARFGroupName, TimePassesIsEnabled);
+-    beginModule(M);
+-  }
  }
- 
--#if defined(AMD_OPENCL) || 1
--
--DIE *DwarfDebug::constructDIEsForFnArguments(CompileUnit *TheCU, LexicalScope *Scope,
--                                             SmallVector <DIE *, 8>& Children) {
--  DIE *ObjectPointer = NULL;
--
--  // Collect arguments for current function.
--  if (LScopes.isCurrentFunctionScope(Scope))
--    for (unsigned i = 0, N = CurrentFnArguments.size(); i < N; ++i)
--      if (DbgVariable *ArgDV = CurrentFnArguments[i])
--        if (DIE *Arg = 
--            TheCU->constructVariableDIE(ArgDV, Scope->isAbstractScope())) {
--          Children.push_back(Arg);
--          if (ArgDV->isObjectPointer()) ObjectPointer = Arg;
--        }
--  return ObjectPointer;
--}
--
--DIE *DwarfDebug::constructDIEsForScopeVariables(CompileUnit *TheCU, LexicalScope *Scope,
--                                                SmallVector <DIE *, 8>& Children) {
--  DIE *ObjectPointer = NULL;
--
--  const SmallVector<DbgVariable *, 8> &Variables = ScopeVariables.lookup(Scope);
--  for (unsigned i = 0, N = Variables.size(); i < N; ++i)
--    if (DIE *Variable = 
--        TheCU->constructVariableDIE(Variables[i], Scope->isAbstractScope())) {
--      Children.push_back(Variable);
--      if (Variables[i]->isObjectPointer()) ObjectPointer = Variable;
--    }
--  return ObjectPointer;
--}
--
--void DwarfDebug::constructDIEsForNestedScopes(CompileUnit *TheCU, LexicalScope *Scope,
--                                              SmallVector <DIE *, 8>& Children) {
--  const SmallVector<LexicalScope *, 4> &Scopes = Scope->getChildren();
--  for (unsigned j = 0, M = Scopes.size(); j < M; ++j)
--    if (DIE *Nested = constructScopeDIE(TheCU, Scopes[j]))
--      Children.push_back(Nested);
--}
--
--
--#endif // AMD_OPENCL
--
- /// constructScopeDIE - Construct a DIE for this scope.
- DIE *DwarfDebug::constructScopeDIE(CompileUnit *TheCU, LexicalScope *Scope) {
-   if (!Scope || !Scope->getScopeNode())
-@@ -555,11 +504,7 @@
- 
-   SmallVector<DIE *, 8> Children;
-   DIE *ObjectPointer = NULL;
--#if defined(AMD_OPENCL) || 1
--  ObjectPointer = constructDIEsForFnArguments(TheCU, Scope, Children);
--  ObjectPointer = constructDIEsForScopeVariables(TheCU, Scope, Children);
--  constructDIEsForNestedScopes(TheCU, Scope, Children);
--#else
-+
-   // Collect arguments for current function.
+ DwarfDebug::~DwarfDebug() {
+ }
+@@ -509,7 +505,7 @@
    if (LScopes.isCurrentFunctionScope(Scope))
      for (unsigned i = 0, N = CurrentFnArguments.size(); i < N; ++i)
-@@ -582,7 +527,6 @@
-   for (unsigned j = 0, M = Scopes.size(); j < M; ++j)
-     if (DIE *Nested = constructScopeDIE(TheCU, Scopes[j]))
-       Children.push_back(Nested);
--#endif
-   DIScope DS(Scope->getScopeNode());
-   DIE *ScopeDIE = NULL;
-   if (Scope->getInlinedAt())
-@@ -654,15 +598,6 @@
-   return SrcId;
- }
+       if (DbgVariable *ArgDV = CurrentFnArguments[i])
+-        if (DIE *Arg = 
++        if (DIE *Arg =
+             TheCU->constructVariableDIE(ArgDV, Scope->isAbstractScope())) {
+           Children.push_back(Arg);
+           if (ArgDV->isObjectPointer()) ObjectPointer = Arg;
+@@ -518,7 +514,7 @@
+   // Collect lexical scope children first.
+   const SmallVector<DbgVariable *, 8> &Variables = ScopeVariables.lookup(Scope);
+   for (unsigned i = 0, N = Variables.size(); i < N; ++i)
+-    if (DIE *Variable = 
++    if (DIE *Variable =
+         TheCU->constructVariableDIE(Variables[i], Scope->isAbstractScope())) {
+       Children.push_back(Variable);
+       if (Variables[i]->isObjectPointer()) ObjectPointer = Variable;
+@@ -548,7 +544,7 @@
+       return NULL;
+     ScopeDIE = constructLexicalScopeDIE(TheCU, Scope);
+   }
+-  
++
+   if (!ScopeDIE) return NULL;
  
--#if defined(AMD_OPENCL) || 1
--/// createCompileUnitInstance - Returns target-specific instance of CompileUnit
--CompileUnit *DwarfDebug::createCompileUnit(unsigned int I, 
--                                                   unsigned int L,
--                                                   DIE* D) {
--  return new CompileUnit(I, L, D, Asm, this);
--}
--#endif
--
- /// constructCompileUnit - Create new CompileUnit for the given
- /// metadata node with tag DW_TAG_compile_unit.
- CompileUnit *DwarfDebug::constructCompileUnit(const MDNode *N) {
-@@ -672,13 +607,8 @@
+   // Add children
+@@ -607,6 +603,7 @@
    unsigned ID = GetOrCreateSourceID(FN, CompilationDir);
  
    DIE *Die = new DIE(dwarf::DW_TAG_compile_unit);
--
--#if defined(AMD_OPENCL) || 1
--  CompileUnit *NewCU = createCompileUnit(ID, DIUnit.getLanguage(), Die);
--#else
++
    CompileUnit *NewCU = new CompileUnit(ID, DIUnit.getLanguage(), Die,
                                         Asm, this);
--#endif
    NewCU->addString(Die, dwarf::DW_AT_producer, DIUnit.getProducer());
-   NewCU->addUInt(Die, dwarf::DW_AT_language, dwarf::DW_FORM_data2,
-                  DIUnit.getLanguage());
-@@ -816,12 +746,6 @@
+@@ -746,6 +743,9 @@
  /// content. Create global DIEs and emit initial debug info sections.
  /// This is invoked by the target AsmPrinter.
  void DwarfDebug::beginModule(Module *M) {
--#if defined(AMD_OPENCL) || 1
--  // for HSA moved here from constructor
--  NamedRegionTimer T(DbgTimerName, DWARFGroupName,
--                     TimePassesIsEnabled &&
--                       AMDOptions::isTargetHSAIL(M->getTargetTriple()));
--#endif
++  // for HSA moved here from constructor
++  NamedRegionTimer T(DbgTimerName, DWARFGroupName,
++                     TimePassesIsEnabled);
    if (DisableDebugInfoPrinting)
      return;
  
-@@ -1099,60 +1023,6 @@
-   llvm_unreachable("Unexpected 3 operand DBG_VALUE instruction!");
+@@ -1103,7 +1103,7 @@
+         SLabel = FunctionEndSym;
+       else {
+         const MachineInstr *End = HI[1];
+-        DEBUG(dbgs() << "DotDebugLoc Pair:\n" 
++        DEBUG(dbgs() << "DotDebugLoc Pair:\n"
+               << "\t" << *Begin << "\t" << *End << "\n");
+         if (End->isDebugValue())
+           SLabel = getLabelBeforeInsn(End);
+@@ -1115,6 +1115,7 @@
+         }
+       }
+ 
++
+       // The value is valid until the next DBG_VALUE or clobber.
+       DotDebugLocEntries.push_back(getDebugLocEntry(Asm, FLabel, SLabel,
+                                                     Begin));
+@@ -1134,6 +1135,7 @@
+   }
  }
  
--#if defined(AMD_OPENCL) || 1
--
--/// shouldCoalesceDbgValue - Returns true if MInst should be coalesced with History
--bool 
--DwarfDebug::shouldCoalesceDbgValue(const SmallVectorImpl<const MachineInstr*> &History,
--                                   const MachineInstr* MInsn) {
--  return History.size() <= 1 || 
--    (History.size() == 2 && MInsn->isIdenticalTo(History.back()));
--}
--
--/// recordDebugLocsForVariable - records debug locations for variable
--void DwarfDebug::recordDebugLocsForVariable(
--       const SmallVectorImpl<const MachineInstr*> &History,
--       DbgVariable *RegVar, LexicalScope *Scope) {
--  // handle multiple DBG_VALUE instructions describing one variable.
--  RegVar->setDotDebugLocOffset(DotDebugLocEntries.size());
--  for (SmallVectorImpl<const MachineInstr*>::const_iterator
--          HI = History.begin(), HE = History.end(); HI != HE; ++HI) {
--    const MachineInstr *Begin = *HI;
--    assert(Begin->isDebugValue() && "Invalid History entry");
--
--    // Check if DBG_VALUE is truncating a range.
--    if (Begin->getNumOperands() > 1 && Begin->getOperand(0).isReg()
--        && !Begin->getOperand(0).getReg())
--      continue;
--
--    // Compute the range for a register location.
--    const MCSymbol *FLabel = getLabelBeforeInsn(Begin);
--    const MCSymbol *SLabel = 0;
--
--    if (HI + 1 == HE)
--      // If Begin is the last instruction in History then its value is valid
--      // until the end of the function.
--      SLabel = FunctionEndSym;
--    else {
--      const MachineInstr *End = HI[1];
--      DEBUG(dbgs() << "DotDebugLoc Pair:\n" 
--            << "\t" << *Begin << "\t" << *End << "\n");
--      if (End->isDebugValue())
--        SLabel = getLabelBeforeInsn(End);
--      else {
--        // End is a normal instruction clobbering the range.
--        SLabel = getLabelAfterInsn(End);
--        assert(SLabel && "Forgot label after clobber instruction");
--        ++HI;
--      }
--    }
--
--    // The value is valid until the next DBG_VALUE or clobber.
--    DotDebugLocEntries.push_back(getDebugLocEntry(Asm, FLabel, SLabel, Begin));
--  }
--  DotDebugLocEntries.push_back(DotDebugLocEntry());
--}
--#endif // AMD_OPENCL
- /// collectVariableInfo - Find variables for each lexical scope.
- void
- DwarfDebug::collectVariableInfo(const MachineFunction *MF,
-@@ -1204,21 +1074,12 @@
-       AbsVar->setMInsn(MInsn);
- 
-     // Simplify ranges that are fully coalesced.
--#if defined(AMD_OPENCL) || 1
--    if (shouldCoalesceDbgValue(History, MInsn))
--#else
-     if (History.size() <= 1 || (History.size() == 2 &&
--                                MInsn->isIdenticalTo(History.back())))
--#endif
--    {
-+                                MInsn->isIdenticalTo(History.back()))) {
-       RegVar->setMInsn(MInsn);
-       continue;
-     }
- 
--#if defined(AMD_OPENCL) || 1
--    recordDebugLocsForVariable(History, RegVar, Scope);
--#else
--
-     // handle multiple DBG_VALUE instructions describing one variable.
-     RegVar->setDotDebugLocOffset(DotDebugLocEntries.size());
- 
-@@ -1259,7 +1120,6 @@
-                                                     Begin));
-     }
-     DotDebugLocEntries.push_back(DotDebugLocEntry());
--#endif
-   }
- 
-   // Collect info for variables that were optimized out.
-diff -ur llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.h /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.h
---- llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.h	2014-08-14 16:49:36.680557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.h	2012-10-31 19:15:49.000000000 +0530
-@@ -191,10 +191,6 @@
++
+ /// getLabelBeforeInsn - Return Label preceding the instruction.
+ const MCSymbol *DwarfDebug::getLabelBeforeInsn(const MachineInstr *MI) {
+   MCSymbol *Label = LabelsBeforeInsn.lookup(MI);
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.h llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.h
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/AsmPrinter/DwarfDebug.h	2012-10-31 19:15:49.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/AsmPrinter/DwarfDebug.h	2014-08-29 23:44:22.080131260 +0530
+@@ -191,6 +191,8 @@
  };
  
  class DwarfDebug {
--#if defined(AMD_OPENCL) || 1
--// HSA requires relaxed abstraction
--protected:
--#endif
++// HSA requires relaxed abstraction
++protected:
    /// Asm - Target of Dwarf emission.
    AsmPrinter *Asm;
  
-@@ -458,24 +454,6 @@
+@@ -454,15 +456,18 @@
    /// beginning of or ending of a scope.
    void identifyScopeMarkers();
  
--#if defined(AMD_OPENCL) || 1
--protected:
--  /// addCurrentFnArgument - If Var is an current function argument that add
--  /// it in CurrentFnArguments list. This method is declared virtual because
--  /// function arguments need special handling in BRIGDwarfDebug
--  virtual bool addCurrentFnArgument(const MachineFunction *MF,
--                                    DbgVariable *Var, LexicalScope *Scope);
--
--  /// collectVariableInfo - Populate LexicalScope entries with variables' info.
--  /// This method is declared virtual because private and group variables
--  /// require special handling in BRIGDwarfDebug
--  virtual void collectVariableInfo(const MachineFunction *,
--                                   SmallPtrSet<const MDNode *, 16> &ProcessedVars);
--
--private:
--
--#else
--
++protected:
    /// addCurrentFnArgument - If Var is an current function argument that add
-   /// it in CurrentFnArguments list.
+-  /// it in CurrentFnArguments list.
++  /// it in CurrentFnArguments list. 
    bool addCurrentFnArgument(const MachineFunction *MF,
-@@ -484,8 +462,7 @@
+                             DbgVariable *Var, LexicalScope *Scope);
+ 
    /// collectVariableInfo - Populate LexicalScope entries with variables' info.
    void collectVariableInfo(const MachineFunction *,
                             SmallPtrSet<const MDNode *, 16> &ProcessedVars);
--
--#endif // AMD_OPENCL
-+  
+-  
++
++private:
++
    /// collectVariableInfoFromMMITable - Collect variable information from
    /// side table maintained by MMI.
    void collectVariableInfoFromMMITable(const MachineFunction * MF,
-@@ -506,49 +483,14 @@
- 
-   /// getLabelAfterInsn - Return Label immediately following the instruction.
-   const MCSymbol *getLabelAfterInsn(const MachineInstr *MI);
--#if defined(AMD_OPENCL) || 1
--protected:
--  /// createCompileUnitInstance - Returns target-specific instance of CompileUnit
--  virtual CompileUnit* createCompileUnit(unsigned int I, 
--                                         unsigned int L, DIE* D);
--
--  /// shouldCoalesceDbgValue - Returns true if MInst should be coalesced with History
--  virtual bool shouldCoalesceDbgValue(const SmallVectorImpl<const MachineInstr*> &History,
--                                      const MachineInstr* MInsn);
--
--  /// recordDebugLocsForVariable - records debug locations for variable
--  virtual void recordDebugLocsForVariable(const SmallVectorImpl<const MachineInstr*> &History,
--                                          DbgVariable *RegVar, LexicalScope *Scope);
--
--  virtual DIE *constructDIEsForFnArguments(CompileUnit *TheCU, LexicalScope *Scope,
--                                           SmallVector <DIE *, 8>& Children);
--
--  virtual DIE *constructDIEsForScopeVariables(CompileUnit *TheCU, LexicalScope *Scope,
--                                              SmallVector <DIE *, 8>& Children);
--
--  virtual void constructDIEsForNestedScopes(CompileUnit *TheCU, LexicalScope *Scope,
--                                            SmallVector <DIE *, 8>& Children);
--  
--#endif // AMD_OPENCL
- 
- public:
+@@ -488,9 +493,14 @@
    //===--------------------------------------------------------------------===//
    // Main entry points.
    //
--#if defined(AMD_OPENCL) || 1
--protected:
--  // allow constructor call from either AsmPrinter or children
--  // AsmPrinter must call beginModule() after just after instantiating DwarfDebug
--  friend class AsmPrinter;
--  DwarfDebug(AsmPrinter *A, Module *M);
--
--public:
--  virtual ~DwarfDebug();
--#else
--
++protected:
++  // allow constructor call from either AsmPrinter or children
++  // AsmPrinter must call beginModule() after just after instantiating DwarfDebug
++  friend class AsmPrinter;
    DwarfDebug(AsmPrinter *A, Module *M);
-   ~DwarfDebug();
--#endif // AMD_OPENCL
-+
+-  ~DwarfDebug();
+ 
++public:
++  virtual ~DwarfDebug();
    /// collectInfoFromNamedMDNodes - Collect debug info from named mdnodes such
    /// as llvm.dbg.enum and llvm.dbg.ty
    void collectInfoFromNamedMDNodes(Module *M);
-@@ -591,16 +533,6 @@
-   /// string text.
-   MCSymbol *getStringPoolEntry(StringRef Str);
- 
--  // jgolds
--#if 1 || defined(AMD_OPENCL)
--  /// DbgVariableToAddrSpaceMap - Maps DbgVariable of pointer type
--  /// to the address space
--  DenseMap<const DbgVariable *, unsigned> DbgVariableToAddrSpaceMap;
--
--  /// DbgVariableToValueMap - Maps DbgVariable to Value
--  DenseMap<const DbgVariable *, const Value *> DbgVariableToValueMap;
--#endif
--
-   /// useDarwinGDBCompat - returns whether or not to limit some of our debug
-   /// output to the limitations of darwin gdb.
-   bool useDarwinGDBCompat() { return isDarwinGDBCompat; }
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/DAGCombiner.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/DAGCombiner.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/DAGCombiner.cpp	2014-08-14 16:49:36.692557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/DAGCombiner.cpp	2012-11-26 22:31:12.000000000 +0530
-@@ -330,13 +330,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/DAGCombiner.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/DAGCombiner.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/DAGCombiner.cpp	2012-11-26 22:31:12.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/DAGCombiner.cpp	2014-08-02 12:04:59.000000000 +0530
+@@ -330,6 +330,13 @@
        if (!LegalTypes) return true;
        return TLI.isTypeLegal(VT);
      }
--
--    /// getSetCCResultType - Convenience wrapper around
--    /// TargetLowering::getSetCCResultType
--    EVT getSetCCResultType(EVT VT) const {
--      return TLI.getSetCCResultType(*DAG.getContext(), VT);
--    }
--
++
++    /// getSetCCResultType - Convenience wrapper around
++    /// TargetLowering::getSetCCResultType
++    EVT getSetCCResultType(EVT VT) const {
++      return TLI.getSetCCResultType(*DAG.getContext(), VT);
++    }
++
    };
  }
  
-@@ -4132,7 +4125,7 @@
+@@ -4125,7 +4132,7 @@
      return N2;
  
    // Determine if the condition we're dealing with is constant
--  SDValue SCC = SimplifySetCC(getSetCCResultType(N0.getValueType()),
-+  SDValue SCC = SimplifySetCC(TLI.getSetCCResultType(N0.getValueType()),
+-  SDValue SCC = SimplifySetCC(TLI.getSetCCResultType(N0.getValueType()),
++  SDValue SCC = SimplifySetCC(getSetCCResultType(N0.getValueType()),
                                N0, N1, CC, N->getDebugLoc(), false);
    if (SCC.getNode()) AddToWorkList(SCC.getNode());
  
-@@ -4413,7 +4406,7 @@
+@@ -4406,7 +4413,7 @@
        // On some architectures (such as SSE/NEON/etc) the SETCC result type is
        // of the same size as the compared operands. Only optimize sext(setcc())
        // if this is the case.
--      EVT SVT = getSetCCResultType(N0VT);
-+      EVT SVT = TLI.getSetCCResultType(N0VT);
+-      EVT SVT = TLI.getSetCCResultType(N0VT);
++      EVT SVT = getSetCCResultType(N0VT);
  
        // We know that the # elements of the results is the same as the
        // # elements of the compare (and the # elements of the compare result
-@@ -4451,20 +4444,14 @@
+@@ -4444,14 +4451,20 @@
                         NegOne, DAG.getConstant(0, VT),
                         cast<CondCodeSDNode>(N0.getOperand(2))->get(), true);
      if (SCC.getNode()) return SCC;
--    if (!VT.isVector()) {
--      EVT SetCCVT = getSetCCResultType(N0.getOperand(0).getValueType());
--      if (!LegalOperations || TLI.isOperationLegal(ISD::SETCC, SetCCVT)) {
--        DebugLoc DL = N->getDebugLoc();
--        const CondCodeSDNode *CC = cast<CondCodeSDNode>(N0.getOperand(2));
--        SDValue SetCC = DAG.getSetCC(N->getDebugLoc(), SetCCVT,
--                                     N0.getOperand(0), N0.getOperand(1),
--                                     CC->get());
--        EVT SelectVT = getSetCCResultType(VT);
--        return DAG.getSelect(DL, VT,
--                             DAG.getSExtOrTrunc(SetCC, DL, SelectVT),
--                             NegOne, DAG.getConstant(0, VT));
--      }
--    }
-+    if (!LegalOperations ||
-+        TLI.isOperationLegal(ISD::SETCC, TLI.getSetCCResultType(VT)))
-+      return DAG.getNode(ISD::SELECT, N->getDebugLoc(), VT,
-+                         DAG.getSetCC(N->getDebugLoc(),
-+                                      TLI.getSetCCResultType(VT),
-+                                      N0.getOperand(0), N0.getOperand(1),
-+                                 cast<CondCodeSDNode>(N0.getOperand(2))->get()),
-+                         NegOne, DAG.getConstant(0, VT));
+-    if (!LegalOperations ||
+-        TLI.isOperationLegal(ISD::SETCC, TLI.getSetCCResultType(VT)))
+-      return DAG.getNode(ISD::SELECT, N->getDebugLoc(), VT,
+-                         DAG.getSetCC(N->getDebugLoc(),
+-                                      TLI.getSetCCResultType(VT),
+-                                      N0.getOperand(0), N0.getOperand(1),
+-                                 cast<CondCodeSDNode>(N0.getOperand(2))->get()),
+-                         NegOne, DAG.getConstant(0, VT));
++    if (!VT.isVector()) {
++      EVT SetCCVT = getSetCCResultType(N0.getOperand(0).getValueType());
++      if (!LegalOperations || TLI.isOperationLegal(ISD::SETCC, SetCCVT)) {
++        DebugLoc DL = N->getDebugLoc();
++        const CondCodeSDNode *CC = cast<CondCodeSDNode>(N0.getOperand(2));
++        SDValue SetCC = DAG.getSetCC(N->getDebugLoc(), SetCCVT,
++                                     N0.getOperand(0), N0.getOperand(1),
++                                     CC->get());
++        EVT SelectVT = getSetCCResultType(VT);
++        return DAG.getSelect(DL, VT,
++                             DAG.getSExtOrTrunc(SetCC, DL, SelectVT),
++                             NegOne, DAG.getConstant(0, VT));
++      }
++    }
    }
  
    // fold (sext x) -> (zext x) if the sign bit is known zero.
-@@ -6657,7 +6644,7 @@
+@@ -6644,7 +6657,7 @@
              cast<ConstantSDNode>(Op1)->getAPIntValue()==AndConst.logBase2()) {
            SDValue SetCC =
              DAG.getSetCC(N->getDebugLoc(),
--                         getSetCCResultType(Op0.getValueType()),
-+                         TLI.getSetCCResultType(Op0.getValueType()),
+-                         TLI.getSetCCResultType(Op0.getValueType()),
++                         getSetCCResultType(Op0.getValueType()),
                           Op0, DAG.getConstant(0, Op0.getValueType()),
                           ISD::SETNE);
  
-@@ -6721,7 +6708,7 @@
+@@ -6708,7 +6721,7 @@
  
        EVT SetCCVT = N1.getValueType();
        if (LegalTypes)
--        SetCCVT = getSetCCResultType(SetCCVT);
-+        SetCCVT = TLI.getSetCCResultType(SetCCVT);
+-        SetCCVT = TLI.getSetCCResultType(SetCCVT);
++        SetCCVT = getSetCCResultType(SetCCVT);
        SDValue SetCC = DAG.getSetCC(TheXor->getDebugLoc(),
                                     SetCCVT,
                                     Op0, Op1,
-@@ -6752,7 +6739,7 @@
+@@ -6739,7 +6752,7 @@
    // MachineBasicBlock CFG, which is awkward.
  
    // Use SimplifySetCC to simplify SETCC's.
--  SDValue Simp = SimplifySetCC(getSetCCResultType(CondLHS.getValueType()),
-+  SDValue Simp = SimplifySetCC(TLI.getSetCCResultType(CondLHS.getValueType()),
+-  SDValue Simp = SimplifySetCC(TLI.getSetCCResultType(CondLHS.getValueType()),
++  SDValue Simp = SimplifySetCC(getSetCCResultType(CondLHS.getValueType()),
                                 CondLHS, CondRHS, CC->get(), N->getDebugLoc(),
                                 false);
    if (Simp.getNode()) AddToWorkList(Simp.getNode());
-@@ -9270,7 +9257,7 @@
+@@ -9257,7 +9270,7 @@
    ConstantSDNode *N3C = dyn_cast<ConstantSDNode>(N3.getNode());
  
    // Determine if the condition we're dealing with is constant
--  SDValue SCC = SimplifySetCC(getSetCCResultType(N0.getValueType()),
-+  SDValue SCC = SimplifySetCC(TLI.getSetCCResultType(N0.getValueType()),
+-  SDValue SCC = SimplifySetCC(TLI.getSetCCResultType(N0.getValueType()),
++  SDValue SCC = SimplifySetCC(getSetCCResultType(N0.getValueType()),
                                N0, N1, CC, DL, false);
    if (SCC.getNode()) AddToWorkList(SCC.getNode());
    ConstantSDNode *SCCC = dyn_cast_or_null<ConstantSDNode>(SCC.getNode());
-@@ -9336,7 +9323,7 @@
+@@ -9323,7 +9336,7 @@
          SDValue One = DAG.getIntPtrConstant(EltSize);
  
          SDValue Cond = DAG.getSetCC(DL,
--                                    getSetCCResultType(N0.getValueType()),
-+                                    TLI.getSetCCResultType(N0.getValueType()),
+-                                    TLI.getSetCCResultType(N0.getValueType()),
++                                    getSetCCResultType(N0.getValueType()),
                                      N0, N1, CC);
          AddToWorkList(Cond.getNode());
          SDValue CstOffset = DAG.getNode(ISD::SELECT, DL, Zero.getValueType(),
-@@ -9439,11 +9426,11 @@
+@@ -9426,11 +9439,11 @@
      // NOTE: Don't create a SETCC if it's not legal on this target.
      if (!LegalOperations ||
          TLI.isOperationLegal(ISD::SETCC,
--          LegalTypes ? getSetCCResultType(N0.getValueType()) : MVT::i1)) {
-+          LegalTypes ? TLI.getSetCCResultType(N0.getValueType()) : MVT::i1)) {
+-          LegalTypes ? TLI.getSetCCResultType(N0.getValueType()) : MVT::i1)) {
++          LegalTypes ? getSetCCResultType(N0.getValueType()) : MVT::i1)) {
        SDValue Temp, SCC;
        // cast from setcc result type to select result type
        if (LegalTypes) {
--        SCC  = DAG.getSetCC(DL, getSetCCResultType(N0.getValueType()),
-+        SCC  = DAG.getSetCC(DL, TLI.getSetCCResultType(N0.getValueType()),
+-        SCC  = DAG.getSetCC(DL, TLI.getSetCCResultType(N0.getValueType()),
++        SCC  = DAG.getSetCC(DL, getSetCCResultType(N0.getValueType()),
                              N0, N1, CC);
          if (N2.getValueType().bitsLT(SCC.getValueType()))
            Temp = DAG.getZeroExtendInReg(SCC, N2.getDebugLoc(),
-@@ -9476,8 +9463,8 @@
+@@ -9463,8 +9476,8 @@
    if (0 && N3C && N3C->isNullValue() && N2C && (N2C->getAPIntValue() == 1ULL)) {
      EVT XType = N0.getValueType();
      if (!LegalOperations ||
--        TLI.isOperationLegal(ISD::SETCC, getSetCCResultType(XType))) {
--      SDValue Res = DAG.getSetCC(DL, getSetCCResultType(XType), N0, N1, CC);
-+        TLI.isOperationLegal(ISD::SETCC, TLI.getSetCCResultType(XType))) {
-+      SDValue Res = DAG.getSetCC(DL, TLI.getSetCCResultType(XType), N0, N1, CC);
+-        TLI.isOperationLegal(ISD::SETCC, TLI.getSetCCResultType(XType))) {
+-      SDValue Res = DAG.getSetCC(DL, TLI.getSetCCResultType(XType), N0, N1, CC);
++        TLI.isOperationLegal(ISD::SETCC, getSetCCResultType(XType))) {
++      SDValue Res = DAG.getSetCC(DL, getSetCCResultType(XType), N0, N1, CC);
        if (Res.getValueType() != VT)
          Res = DAG.getNode(ISD::ZERO_EXTEND, DL, VT, Res);
        return Res;
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp	2014-08-14 16:49:36.696557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp	2012-10-24 22:55:11.000000000 +0530
-@@ -57,10 +57,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp	2012-10-24 22:55:11.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeDAG.cpp	2014-08-18 16:28:17.000000000 +0530
+@@ -57,6 +57,10 @@
    /// LegalizedNodes - The set of nodes which have already been legalized.
    SmallPtrSet<SDNode *, 16> LegalizedNodes;
  
--  EVT getSetCCResultType(EVT VT) const {
--    return TLI.getSetCCResultType(*DAG.getContext(), VT);
--  }
--
++  EVT getSetCCResultType(EVT VT) const {
++    return TLI.getSetCCResultType(*DAG.getContext(), VT);
++  }
++
    // Libcall insertion helpers.
  
  public:
-@@ -607,8 +603,7 @@
+@@ -603,7 +607,7 @@
                           false, false, 0);
    // Load the updated vector.
    return DAG.getLoad(VT, dl, Ch, StackPtr,
--// D2_OPENCL
--                     MachinePointerInfo::getFixedStack(SPFI), false, false,
-+                     MachinePointerInfo::getFixedStack(SPFI), false, false, 
+-                     MachinePointerInfo::getFixedStack(SPFI), false, false, 
++                     MachinePointerInfo::getFixedStack(SPFI), false, false,
                       false, 0);
  }
  
-@@ -1543,7 +1538,7 @@
+@@ -1538,7 +1542,7 @@
      }
    }
    // Now get the sign bit proper, by seeing whether the value is negative.
--  SignBit = DAG.getSetCC(dl, getSetCCResultType(SignBit.getValueType()),
-+  SignBit = DAG.getSetCC(dl, TLI.getSetCCResultType(SignBit.getValueType()),
+-  SignBit = DAG.getSetCC(dl, TLI.getSetCCResultType(SignBit.getValueType()),
++  SignBit = DAG.getSetCC(dl, getSetCCResultType(SignBit.getValueType()),
                           SignBit, DAG.getConstant(0, SignBit.getValueType()),
                           ISD::SETLT);
    // Get the absolute value of the result.
-@@ -1604,22 +1599,17 @@
+@@ -1599,17 +1603,22 @@
      // Nothing to do.
      break;
    case TargetLowering::Expand: {
--    ISD::CondCode InvCC = ISD::getSetCCSwappedOperands(CCCode);
--    if (TLI.isCondCodeLegal(InvCC, OpVT)) {
--      std::swap(LHS, RHS);
--      CC = DAG.getCondCode(InvCC);
--      return;
--    }
++    ISD::CondCode InvCC = ISD::getSetCCSwappedOperands(CCCode);
++    if (TLI.isCondCodeLegal(InvCC, OpVT)) {
++      std::swap(LHS, RHS);
++      CC = DAG.getCondCode(InvCC);
++      return;
++    }
      ISD::CondCode CC1 = ISD::SETCC_INVALID, CC2 = ISD::SETCC_INVALID;
-+    ISD::CondCode InvCC = ISD::SETCC_INVALID;
+-    ISD::CondCode InvCC = ISD::SETCC_INVALID;
      unsigned Opc = 0;
      switch (CCCode) {
      default: llvm_unreachable("Don't know how to expand this condition!");
--    case ISD::SETO:
-+    case ISD::SETO: 
+-    case ISD::SETO: 
++    case ISD::SETO:
          assert(TLI.getCondCodeAction(ISD::SETOEQ, OpVT)
              == TargetLowering::Legal
              && "If SETO is expanded, SETOEQ must be legal!");
          CC1 = ISD::SETOEQ; CC2 = ISD::SETOEQ; Opc = ISD::AND; break;
--    case ISD::SETUO:
-+    case ISD::SETUO:  
+-    case ISD::SETUO:  
++    case ISD::SETUO:
          assert(TLI.getCondCodeAction(ISD::SETUNE, OpVT)
              == TargetLowering::Legal
              && "If SETUO is expanded, SETUNE must be legal!");
-@@ -1629,7 +1619,7 @@
+@@ -1619,7 +1628,7 @@
      case ISD::SETOGE:
      case ISD::SETOLT:
      case ISD::SETOLE:
--    case ISD::SETONE:
-+    case ISD::SETONE: 
+-    case ISD::SETONE: 
++    case ISD::SETONE:
      case ISD::SETUEQ: 
      case ISD::SETUNE: 
      case ISD::SETUGT: 
-@@ -1652,9 +1642,16 @@
+@@ -1642,16 +1651,9 @@
      case ISD::SETLT:
      case ISD::SETNE:
      case ISD::SETEQ:
--      // We only support using the inverted operation, which is computed above
--      // and not a different manner of supporting expanding these cases.
--      llvm_unreachable("Don't know how to expand this condition!");
-+      InvCC = ISD::getSetCCSwappedOperands(CCCode);
-+      if (TLI.getCondCodeAction(InvCC, OpVT) == TargetLowering::Expand) {
-+        // We only support using the inverted operation and not a
-+        // different manner of supporting expanding these cases.
-+        llvm_unreachable("Don't know how to expand this condition!");
-+      }
-+      LHS = DAG.getSetCC(dl, VT, RHS, LHS, InvCC);
-+      RHS = SDValue();
-+      CC = SDValue();
-+      return;
+-      InvCC = ISD::getSetCCSwappedOperands(CCCode);
+-      if (TLI.getCondCodeAction(InvCC, OpVT) == TargetLowering::Expand) {
+-        // We only support using the inverted operation and not a
+-        // different manner of supporting expanding these cases.
+-        llvm_unreachable("Don't know how to expand this condition!");
+-      }
+-      LHS = DAG.getSetCC(dl, VT, RHS, LHS, InvCC);
+-      RHS = SDValue();
+-      CC = SDValue();
+-      return;
++      // We only support using the inverted operation, which is computed above
++      // and not a different manner of supporting expanding these cases.
++      llvm_unreachable("Don't know how to expand this condition!");
      }
      
      SDValue SetCC1, SetCC2;
-@@ -2210,7 +2207,7 @@
+@@ -2207,7 +2209,7 @@
        // select.  We happen to get lucky and machinesink does the right
        // thing most of the time.  This would be a good candidate for a
        //pseudo-op, or, even better, for whole-function isel.
--      SDValue SignBitTest = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
-+      SDValue SignBitTest = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
+-      SDValue SignBitTest = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
++      SDValue SignBitTest = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
          Op0, DAG.getConstant(0, MVT::i64), ISD::SETLT);
        return DAG.getNode(ISD::SELECT, dl, MVT::f32, SignBitTest, Slow, Fast);
      }
-@@ -2223,10 +2220,10 @@
+@@ -2220,10 +2222,10 @@
           DAG.getConstant(UINT64_C(0x800), MVT::i64));
      SDValue And2 = DAG.getNode(ISD::AND, dl, MVT::i64, Op0,
           DAG.getConstant(UINT64_C(0x7ff), MVT::i64));
--    SDValue Ne = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
-+    SDValue Ne = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
+-    SDValue Ne = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
++    SDValue Ne = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
                     And2, DAG.getConstant(UINT64_C(0), MVT::i64), ISD::SETNE);
      SDValue Sel = DAG.getNode(ISD::SELECT, dl, MVT::i64, Ne, Or, Op0);
--    SDValue Ge = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
-+    SDValue Ge = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
+-    SDValue Ge = DAG.getSetCC(dl, TLI.getSetCCResultType(MVT::i64),
++    SDValue Ge = DAG.getSetCC(dl, getSetCCResultType(MVT::i64),
                     Op0, DAG.getConstant(UINT64_C(0x0020000000000000), MVT::i64),
                     ISD::SETUGE);
      SDValue Sel2 = DAG.getNode(ISD::SELECT, dl, MVT::i64, Ge, Sel, Op0);
-@@ -2248,7 +2245,7 @@
+@@ -2245,7 +2247,7 @@
  
    SDValue Tmp1 = DAG.getNode(ISD::SINT_TO_FP, dl, DestVT, Op0);
  
--  SDValue SignSet = DAG.getSetCC(dl, getSetCCResultType(Op0.getValueType()),
-+  SDValue SignSet = DAG.getSetCC(dl, TLI.getSetCCResultType(Op0.getValueType()),
+-  SDValue SignSet = DAG.getSetCC(dl, TLI.getSetCCResultType(Op0.getValueType()),
++  SDValue SignSet = DAG.getSetCC(dl, getSetCCResultType(Op0.getValueType()),
                                   Op0, DAG.getConstant(0, Op0.getValueType()),
                                   ISD::SETLT);
    SDValue Zero = DAG.getIntPtrConstant(0), Four = DAG.getIntPtrConstant(4);
-@@ -2808,7 +2805,7 @@
+@@ -2805,7 +2807,7 @@
      APInt x = APInt::getSignBit(NVT.getSizeInBits());
      (void)apf.convertFromAPInt(x, false, APFloat::rmNearestTiesToEven);
      Tmp1 = DAG.getConstantFP(apf, VT);
--    Tmp2 = DAG.getSetCC(dl, getSetCCResultType(VT),
-+    Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(VT),
+-    Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(VT),
++    Tmp2 = DAG.getSetCC(dl, getSetCCResultType(VT),
                          Node->getOperand(0),
                          Tmp1, ISD::SETLT);
      True = DAG.getNode(ISD::FP_TO_SINT, dl, NVT, Node->getOperand(0));
-@@ -3026,7 +3023,7 @@
+@@ -3023,7 +3025,7 @@
      EVT VT = Node->getValueType(0);
      Tmp1 = Node->getOperand(0);
      Tmp2 = DAG.getConstantFP(0.0, VT);
--    Tmp2 = DAG.getSetCC(dl, getSetCCResultType(Tmp1.getValueType()),
-+    Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(Tmp1.getValueType()),
+-    Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(Tmp1.getValueType()),
++    Tmp2 = DAG.getSetCC(dl, getSetCCResultType(Tmp1.getValueType()),
                          Tmp1, Tmp2, ISD::SETUGT);
      Tmp3 = DAG.getNode(ISD::FNEG, dl, VT, Tmp1);
      Tmp1 = DAG.getNode(ISD::SELECT, dl, VT, Tmp2, Tmp1, Tmp3);
-@@ -3386,10 +3383,10 @@
+@@ -3383,10 +3385,10 @@
        Tmp1 = DAG.getConstant(VT.getSizeInBits() - 1,
                               TLI.getShiftAmountTy(BottomHalf.getValueType()));
        Tmp1 = DAG.getNode(ISD::SRA, dl, VT, BottomHalf, Tmp1);
--      TopHalf = DAG.getSetCC(dl, getSetCCResultType(VT), TopHalf, Tmp1,
-+      TopHalf = DAG.getSetCC(dl, TLI.getSetCCResultType(VT), TopHalf, Tmp1,
+-      TopHalf = DAG.getSetCC(dl, TLI.getSetCCResultType(VT), TopHalf, Tmp1,
++      TopHalf = DAG.getSetCC(dl, getSetCCResultType(VT), TopHalf, Tmp1,
                               ISD::SETNE);
      } else {
--      TopHalf = DAG.getSetCC(dl, getSetCCResultType(VT), TopHalf,
-+      TopHalf = DAG.getSetCC(dl, TLI.getSetCCResultType(VT), TopHalf,
+-      TopHalf = DAG.getSetCC(dl, TLI.getSetCCResultType(VT), TopHalf,
++      TopHalf = DAG.getSetCC(dl, getSetCCResultType(VT), TopHalf,
                               DAG.getConstant(0, VT), ISD::SETNE);
      }
      Results.push_back(BottomHalf);
-@@ -3501,7 +3498,7 @@
+@@ -3498,7 +3500,7 @@
      Tmp4 = Node->getOperand(3);   // False
      SDValue CC = Node->getOperand(4);
  
--    LegalizeSetCCCondCode(getSetCCResultType(Tmp1.getValueType()),
-+    LegalizeSetCCCondCode(TLI.getSetCCResultType(Tmp1.getValueType()),
+-    LegalizeSetCCCondCode(TLI.getSetCCResultType(Tmp1.getValueType()),
++    LegalizeSetCCCondCode(getSetCCResultType(Tmp1.getValueType()),
                            Tmp1, Tmp2, CC, dl);
  
      assert(!Tmp2.getNode() && "Can't legalize SELECT_CC with legal condition!");
-@@ -3518,7 +3515,7 @@
+@@ -3515,7 +3517,7 @@
      Tmp3 = Node->getOperand(3);              // RHS
      Tmp4 = Node->getOperand(1);              // CC
  
--    LegalizeSetCCCondCode(getSetCCResultType(Tmp2.getValueType()),
-+    LegalizeSetCCCondCode(TLI.getSetCCResultType(Tmp2.getValueType()),
+-    LegalizeSetCCCondCode(TLI.getSetCCResultType(Tmp2.getValueType()),
++    LegalizeSetCCCondCode(getSetCCResultType(Tmp2.getValueType()),
                            Tmp2, Tmp3, Tmp4, dl);
  
      assert(!Tmp3.getNode() && "Can't legalize BR_CC with legal condition!");
-@@ -3600,7 +3597,7 @@
+@@ -3597,7 +3599,7 @@
      Tmp1 = DAG.getNode(Node->getOpcode(), dl, NVT, Tmp1);
      if (Node->getOpcode() == ISD::CTTZ) {
        // FIXME: This should set a bit in the zero extended value instead.
--      Tmp2 = DAG.getSetCC(dl, getSetCCResultType(NVT),
-+      Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT),
+-      Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT),
++      Tmp2 = DAG.getSetCC(dl, getSetCCResultType(NVT),
                            Tmp1, DAG.getConstant(NVT.getSizeInBits(), NVT),
                            ISD::SETEQ);
        Tmp1 = DAG.getNode(ISD::SELECT, dl, NVT, Tmp2,
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp	2014-08-14 16:49:36.696557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp	2012-10-11 12:52:01.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp	2012-10-11 12:52:01.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp	2014-08-02 14:43:37.000000000 +0530
 @@ -683,10 +683,10 @@
    NewRHS = DAG.getConstant(0, RetVT);
    CCCode = TLI.getCmpLibcallCC(LC1);
    if (LC2 != RTLIB::UNKNOWN_LIBCALL) {
--    SDValue Tmp = DAG.getNode(ISD::SETCC, dl, getSetCCResultType(RetVT),
-+    SDValue Tmp = DAG.getNode(ISD::SETCC, dl, TLI.getSetCCResultType(RetVT),
+-    SDValue Tmp = DAG.getNode(ISD::SETCC, dl, TLI.getSetCCResultType(RetVT),
++    SDValue Tmp = DAG.getNode(ISD::SETCC, dl, getSetCCResultType(RetVT),
                                  NewLHS, NewRHS, DAG.getCondCode(CCCode));
      NewLHS = MakeLibCall(LC2, RetVT, Ops, 2, false/*sign irrelevant*/, dl);
--    NewLHS = DAG.getNode(ISD::SETCC, dl, getSetCCResultType(RetVT), NewLHS,
-+    NewLHS = DAG.getNode(ISD::SETCC, dl, TLI.getSetCCResultType(RetVT), NewLHS,
+-    NewLHS = DAG.getNode(ISD::SETCC, dl, TLI.getSetCCResultType(RetVT), NewLHS,
++    NewLHS = DAG.getNode(ISD::SETCC, dl, getSetCCResultType(RetVT), NewLHS,
                           NewRHS, DAG.getCondCode(TLI.getCmpLibcallCC(LC2)));
      NewLHS = DAG.getNode(ISD::OR, dl, Tmp.getValueType(), Tmp, NewLHS);
      NewRHS = SDValue();
@@ -1868,30 +1122,30 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeFloatTypes.cpp /home/amd/
    //         FCMPU crN, lo1, lo2
    // The following can be improved, but not that much.
    SDValue Tmp1, Tmp2, Tmp3;
--  Tmp1 = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
-+  Tmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
+-  Tmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
++  Tmp1 = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
                        LHSHi, RHSHi, ISD::SETOEQ);
--  Tmp2 = DAG.getSetCC(dl, getSetCCResultType(LHSLo.getValueType()),
-+  Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSLo.getValueType()),
+-  Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSLo.getValueType()),
++  Tmp2 = DAG.getSetCC(dl, getSetCCResultType(LHSLo.getValueType()),
                        LHSLo, RHSLo, CCCode);
    Tmp3 = DAG.getNode(ISD::AND, dl, Tmp1.getValueType(), Tmp1, Tmp2);
--  Tmp1 = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
-+  Tmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
+-  Tmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
++  Tmp1 = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
                        LHSHi, RHSHi, ISD::SETUNE);
--  Tmp2 = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
-+  Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
+-  Tmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
++  Tmp2 = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
                        LHSHi, RHSHi, CCCode);
    Tmp1 = DAG.getNode(ISD::AND, dl, Tmp1.getValueType(), Tmp1, Tmp2);
    NewLHS = DAG.getNode(ISD::OR, dl, Tmp1.getValueType(), Tmp1, Tmp3);
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp	2014-08-14 16:49:36.696557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp	2012-10-24 22:55:11.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp	2012-10-24 22:55:11.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp	2014-08-02 14:45:04.000000000 +0530
 @@ -492,7 +492,7 @@
    EVT OpTy = N->getOperand(1).getValueType();
  
    // Promote all the way up to the canonical SetCC type.
--  Mask = PromoteTargetBoolean(Mask, getSetCCResultType(OpTy));
-+  Mask = PromoteTargetBoolean(Mask, TLI.getSetCCResultType(OpTy));
+-  Mask = PromoteTargetBoolean(Mask, TLI.getSetCCResultType(OpTy));
++  Mask = PromoteTargetBoolean(Mask, getSetCCResultType(OpTy));
    SDValue LHS = GetPromotedInteger(N->getOperand(1));
    SDValue RHS = GetPromotedInteger(N->getOperand(2));
    return DAG.getNode(ISD::VSELECT, N->getDebugLoc(),
@@ -1899,8 +1153,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
  }
  
  SDValue DAGTypeLegalizer::PromoteIntRes_SETCC(SDNode *N) {
--  EVT SVT = getSetCCResultType(N->getOperand(0).getValueType());
-+  EVT SVT = TLI.getSetCCResultType(N->getOperand(0).getValueType());
+-  EVT SVT = TLI.getSetCCResultType(N->getOperand(0).getValueType());
++  EVT SVT = getSetCCResultType(N->getOperand(0).getValueType());
  
    EVT NVT = TLI.getTypeToTransformTo(*DAG.getContext(), N->getValueType(0));
  
@@ -1908,8 +1162,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    assert(OpNo == 1 && "only know how to promote condition");
  
    // Promote all the way up to the canonical SetCC type.
--  EVT SVT = getSetCCResultType(MVT::Other);
-+  EVT SVT = TLI.getSetCCResultType(MVT::Other);
+-  EVT SVT = TLI.getSetCCResultType(MVT::Other);
++  EVT SVT = getSetCCResultType(MVT::Other);
    SDValue Cond = PromoteTargetBoolean(N->getOperand(1), SVT);
  
    // The chain (Op#0) and basic block destination (Op#2) are always legal types.
@@ -1917,8 +1171,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    EVT OpTy = N->getOperand(1).getValueType();
  
    // Promote all the way up to the canonical SetCC type.
--  EVT SVT = getSetCCResultType(N->getOpcode() == ISD::SELECT ?
-+  EVT SVT = TLI.getSetCCResultType(N->getOpcode() == ISD::SELECT ?
+-  EVT SVT = TLI.getSetCCResultType(N->getOpcode() == ISD::SELECT ?
++  EVT SVT = getSetCCResultType(N->getOpcode() == ISD::SELECT ?
                                     OpTy.getScalarType() : OpTy);
    Cond = PromoteTargetBoolean(Cond, SVT);
  
@@ -1926,8 +1180,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    SDValue NVBitsNode = DAG.getConstant(NVTBits, ShTy);
    SDValue AmtExcess = DAG.getNode(ISD::SUB, dl, ShTy, Amt, NVBitsNode);
    SDValue AmtLack = DAG.getNode(ISD::SUB, dl, ShTy, NVBitsNode, Amt);
--  SDValue isShort = DAG.getSetCC(dl, getSetCCResultType(ShTy),
-+  SDValue isShort = DAG.getSetCC(dl, TLI.getSetCCResultType(ShTy),
+-  SDValue isShort = DAG.getSetCC(dl, TLI.getSetCCResultType(ShTy),
++  SDValue isShort = DAG.getSetCC(dl, getSetCCResultType(ShTy),
                                   Amt, NVBitsNode, ISD::SETULT);
  
    SDValue LoS, HiS, LoL, HiL;
@@ -1935,14 +1189,14 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    if (N->getOpcode() == ISD::ADD) {
      Lo = DAG.getNode(ISD::ADD, dl, NVT, LoOps, 2);
      Hi = DAG.getNode(ISD::ADD, dl, NVT, HiOps, 2);
--    SDValue Cmp1 = DAG.getSetCC(dl, getSetCCResultType(NVT), Lo, LoOps[0],
-+    SDValue Cmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Lo, LoOps[0],
+-    SDValue Cmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Lo, LoOps[0],
++    SDValue Cmp1 = DAG.getSetCC(dl, getSetCCResultType(NVT), Lo, LoOps[0],
                                  ISD::SETULT);
      SDValue Carry1 = DAG.getNode(ISD::SELECT, dl, NVT, Cmp1,
                                   DAG.getConstant(1, NVT),
                                   DAG.getConstant(0, NVT));
--    SDValue Cmp2 = DAG.getSetCC(dl, getSetCCResultType(NVT), Lo, LoOps[1],
-+    SDValue Cmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Lo, LoOps[1],
+-    SDValue Cmp2 = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Lo, LoOps[1],
++    SDValue Cmp2 = DAG.getSetCC(dl, getSetCCResultType(NVT), Lo, LoOps[1],
                                  ISD::SETULT);
      SDValue Carry2 = DAG.getNode(ISD::SELECT, dl, NVT, Cmp2,
                                   DAG.getConstant(1, NVT), Carry1);
@@ -1950,8 +1204,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
      Lo = DAG.getNode(ISD::SUB, dl, NVT, LoOps, 2);
      Hi = DAG.getNode(ISD::SUB, dl, NVT, HiOps, 2);
      SDValue Cmp =
--      DAG.getSetCC(dl, getSetCCResultType(LoOps[0].getValueType()),
-+      DAG.getSetCC(dl, TLI.getSetCCResultType(LoOps[0].getValueType()),
+-      DAG.getSetCC(dl, TLI.getSetCCResultType(LoOps[0].getValueType()),
++      DAG.getSetCC(dl, getSetCCResultType(LoOps[0].getValueType()),
                     LoOps[0], LoOps[1], ISD::SETULT);
      SDValue Borrow = DAG.getNode(ISD::SELECT, dl, NVT, Cmp,
                                   DAG.getConstant(1, NVT),
@@ -1959,8 +1213,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    GetExpandedInteger(N->getOperand(0), Lo, Hi);
    EVT NVT = Lo.getValueType();
  
--  SDValue HiNotZero = DAG.getSetCC(dl, getSetCCResultType(NVT), Hi,
-+  SDValue HiNotZero = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Hi,
+-  SDValue HiNotZero = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Hi,
++  SDValue HiNotZero = DAG.getSetCC(dl, getSetCCResultType(NVT), Hi,
                                     DAG.getConstant(0, NVT), ISD::SETNE);
  
    SDValue LoLZ = DAG.getNode(N->getOpcode(), dl, NVT, Lo);
@@ -1968,8 +1222,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    GetExpandedInteger(N->getOperand(0), Lo, Hi);
    EVT NVT = Lo.getValueType();
  
--  SDValue LoNotZero = DAG.getSetCC(dl, getSetCCResultType(NVT), Lo,
-+  SDValue LoNotZero = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Lo,
+-  SDValue LoNotZero = DAG.getSetCC(dl, TLI.getSetCCResultType(NVT), Lo,
++  SDValue LoNotZero = DAG.getSetCC(dl, getSetCCResultType(NVT), Lo,
                                     DAG.getConstant(0, NVT), ISD::SETNE);
  
    SDValue LoLZ = DAG.getNode(ISD::CTTZ_ZERO_UNDEF, dl, NVT, Lo);
@@ -1977,8 +1231,8 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
  
      // A divide for UMULO will be faster than a function call. Select to
      // make sure we aren't using 0.
--    SDValue isZero = DAG.getSetCC(dl, getSetCCResultType(VT),
-+    SDValue isZero = DAG.getSetCC(dl, TLI.getSetCCResultType(VT),
+-    SDValue isZero = DAG.getSetCC(dl, TLI.getSetCCResultType(VT),
++    SDValue isZero = DAG.getSetCC(dl, getSetCCResultType(VT),
                                    RHS, DAG.getConstant(0, VT), ISD::SETEQ);
      SDValue NotZero = DAG.getNode(ISD::SELECT, dl, VT, isZero,
                                    DAG.getConstant(1, VT), RHS);
@@ -1986,20 +1240,20 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
    // this identity: (B1 ? B2 : B3) --> (B1 & B2)|(!B1&B3)
    TargetLowering::DAGCombinerInfo DagCombineInfo(DAG, false, true, true, NULL);
    SDValue Tmp1, Tmp2;
--  Tmp1 = TLI.SimplifySetCC(getSetCCResultType(LHSLo.getValueType()),
-+  Tmp1 = TLI.SimplifySetCC(TLI.getSetCCResultType(LHSLo.getValueType()),
+-  Tmp1 = TLI.SimplifySetCC(TLI.getSetCCResultType(LHSLo.getValueType()),
++  Tmp1 = TLI.SimplifySetCC(getSetCCResultType(LHSLo.getValueType()),
                             LHSLo, RHSLo, LowCC, false, DagCombineInfo, dl);
    if (!Tmp1.getNode())
--    Tmp1 = DAG.getSetCC(dl, getSetCCResultType(LHSLo.getValueType()),
-+    Tmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSLo.getValueType()),
+-    Tmp1 = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSLo.getValueType()),
++    Tmp1 = DAG.getSetCC(dl, getSetCCResultType(LHSLo.getValueType()),
                          LHSLo, RHSLo, LowCC);
--  Tmp2 = TLI.SimplifySetCC(getSetCCResultType(LHSHi.getValueType()),
-+  Tmp2 = TLI.SimplifySetCC(TLI.getSetCCResultType(LHSHi.getValueType()),
+-  Tmp2 = TLI.SimplifySetCC(TLI.getSetCCResultType(LHSHi.getValueType()),
++  Tmp2 = TLI.SimplifySetCC(getSetCCResultType(LHSHi.getValueType()),
                             LHSHi, RHSHi, CCCode, false, DagCombineInfo, dl);
    if (!Tmp2.getNode())
      Tmp2 = DAG.getNode(ISD::SETCC, dl,
--                       getSetCCResultType(LHSHi.getValueType()),
-+                       TLI.getSetCCResultType(LHSHi.getValueType()),
+-                       TLI.getSetCCResultType(LHSHi.getValueType()),
++                       getSetCCResultType(LHSHi.getValueType()),
                         LHSHi, RHSHi, DAG.getCondCode(CCCode));
  
    ConstantSDNode *Tmp1C = dyn_cast<ConstantSDNode>(Tmp1.getNode());
@@ -2007,13 +1261,13 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
      return;
    }
  
--  NewLHS = TLI.SimplifySetCC(getSetCCResultType(LHSHi.getValueType()),
-+  NewLHS = TLI.SimplifySetCC(TLI.getSetCCResultType(LHSHi.getValueType()),
+-  NewLHS = TLI.SimplifySetCC(TLI.getSetCCResultType(LHSHi.getValueType()),
++  NewLHS = TLI.SimplifySetCC(getSetCCResultType(LHSHi.getValueType()),
                               LHSHi, RHSHi, ISD::SETEQ, false,
                               DagCombineInfo, dl);
    if (!NewLHS.getNode())
--    NewLHS = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
-+    NewLHS = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
+-    NewLHS = DAG.getSetCC(dl, TLI.getSetCCResultType(LHSHi.getValueType()),
++    NewLHS = DAG.getSetCC(dl, getSetCCResultType(LHSHi.getValueType()),
                            LHSHi, RHSHi, ISD::SETEQ);
    NewLHS = DAG.getNode(ISD::SELECT, dl, Tmp1.getValueType(),
                         NewLHS, Tmp1, Tmp2);
@@ -2021,749 +1275,672 @@ diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeIntegerTypes.cpp /home/am
      SDValue Lo, Hi;
      GetExpandedInteger(Op, Lo, Hi);
      SDValue SignSet = DAG.getSetCC(dl,
--                                   getSetCCResultType(Hi.getValueType()),
-+                                   TLI.getSetCCResultType(Hi.getValueType()),
+-                                   TLI.getSetCCResultType(Hi.getValueType()),
++                                   getSetCCResultType(Hi.getValueType()),
                                     Hi, DAG.getConstant(0, Hi.getValueType()),
                                     ISD::SETLT);
  
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeTypes.h /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeTypes.h
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeTypes.h	2014-08-14 16:49:36.696557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeTypes.h	2012-10-10 22:02:15.000000000 +0530
-@@ -73,10 +73,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeTypes.h llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeTypes.h
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeTypes.h	2012-10-10 22:02:15.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeTypes.h	2014-08-02 14:41:38.000000000 +0530
+@@ -73,6 +73,10 @@
      return TLI.getTypeAction(*DAG.getContext(), VT) == TargetLowering::TypeLegal;
    }
  
--  EVT getSetCCResultType(EVT VT) const {
--    return TLI.getSetCCResultType(*DAG.getContext(), VT);
--  }
--
++  EVT getSetCCResultType(EVT VT) const {
++    return TLI.getSetCCResultType(*DAG.getContext(), VT);
++  }
++
    /// IgnoreNodeResults - Pretend all of this node's results are legal.
    bool IgnoreNodeResults(SDNode *N) const {
      return N->getOpcode() == ISD::TargetConstant;
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp	2014-08-14 16:49:36.696557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp	2012-09-02 17:51:50.000000000 +0530
-@@ -467,7 +467,10 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp	2012-09-02 17:51:50.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorOps.cpp	2014-08-02 14:48:32.000000000 +0530
+@@ -467,10 +467,7 @@
      return DAG.UnrollVectorOp(Op.getNode());
  
    // Generate a mask operand.
--  EVT MaskTy = VT.changeVectorElementTypeToInteger();
-+  EVT MaskTy = TLI.getSetCCResultType(VT);
-+  assert(MaskTy.isVector() && "Invalid CC type");
-+  assert(MaskTy.getSizeInBits() == Op1.getValueType().getSizeInBits()
-+         && "Invalid mask size");
+-  EVT MaskTy = TLI.getSetCCResultType(VT);
+-  assert(MaskTy.isVector() && "Invalid CC type");
+-  assert(MaskTy.getSizeInBits() == Op1.getValueType().getSizeInBits()
+-         && "Invalid mask size");
++  EVT MaskTy = VT.changeVectorElementTypeToInteger();
  
    // What is the size of each element in the vector mask.
    EVT BitTy = MaskTy.getScalarType();
-@@ -600,8 +603,7 @@
+@@ -603,7 +600,8 @@
                                    DAG.getIntPtrConstant(i));
      SDValue RHSElem = DAG.getNode(ISD::EXTRACT_VECTOR_ELT, dl, TmpEltVT, RHS,
                                    DAG.getIntPtrConstant(i));
--    Ops[i] = DAG.getNode(ISD::SETCC, dl,
--                         TLI.getSetCCResultType(*DAG.getContext(), TmpEltVT),
-+    Ops[i] = DAG.getNode(ISD::SETCC, dl, TLI.getSetCCResultType(TmpEltVT),
+-    Ops[i] = DAG.getNode(ISD::SETCC, dl, TLI.getSetCCResultType(TmpEltVT),
++    Ops[i] = DAG.getNode(ISD::SETCC, dl,
++                         TLI.getSetCCResultType(*DAG.getContext(), TmpEltVT),
                           LHSElem, RHSElem, CC);
      Ops[i] = DAG.getNode(ISD::SELECT, dl, EltVT, Ops[i],
                           DAG.getConstant(APInt::getAllOnesValue
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp	2014-08-14 16:49:36.696557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp	2012-10-10 22:02:15.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp	2012-10-10 22:02:15.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp	2014-08-02 14:49:22.000000000 +0530
 @@ -2251,7 +2251,7 @@
  
    // Get a new SETCC node to compare the newly widened operands.
    // Only some of the compared elements are legal.
--  EVT SVT = TLI.getSetCCResultType(*DAG.getContext(), InOp0.getValueType());
-+  EVT SVT = TLI.getSetCCResultType(InOp0.getValueType());
+-  EVT SVT = TLI.getSetCCResultType(InOp0.getValueType());
++  EVT SVT = TLI.getSetCCResultType(*DAG.getContext(), InOp0.getValueType());
    SDValue WideSETCC = DAG.getNode(ISD::SETCC, N->getDebugLoc(),
                       SVT, InOp0, InOp1, N->getOperand(2));
  
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp	2014-08-14 16:49:36.700557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp	2012-11-02 05:19:58.000000000 +0530
-@@ -1701,9 +1701,7 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp	2012-11-02 05:19:58.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp	2014-08-02 14:52:56.000000000 +0530
+@@ -1701,7 +1701,9 @@
    // for the switch statement if the value being switched on exceeds the largest
    // case in the switch.
    SDValue CMP = DAG.getSetCC(getCurDebugLoc(),
--                             TLI.getSetCCResultType(*DAG.getContext(),
--                                                    Sub.getValueType()),
--			     Sub,
-+                             TLI.getSetCCResultType(Sub.getValueType()), Sub,
+-                             TLI.getSetCCResultType(Sub.getValueType()), Sub,
++                             TLI.getSetCCResultType(*DAG.getContext(),
++                                                    Sub.getValueType()),
++			     Sub,
                               DAG.getConstant(JTH.Last-JTH.First,VT),
                               ISD::SETUGT);
  
-@@ -1738,8 +1736,7 @@
+@@ -1736,7 +1738,8 @@
  
    // Check range
    SDValue RangeCmp = DAG.getSetCC(getCurDebugLoc(),
--                                  TLI.getSetCCResultType(*DAG.getContext(),
--                                                         Sub.getValueType()),
-+                                  TLI.getSetCCResultType(Sub.getValueType()),
+-                                  TLI.getSetCCResultType(Sub.getValueType()),
++                                  TLI.getSetCCResultType(*DAG.getContext(),
++                                                         Sub.getValueType()),
                                    Sub, DAG.getConstant(B.Range, VT),
                                    ISD::SETUGT);
  
-@@ -1805,14 +1802,14 @@
+@@ -1802,14 +1805,14 @@
      // Testing for a single bit; just compare the shift count with what it
      // would need to be to shift a 1 bit in that position.
      Cmp = DAG.getSetCC(getCurDebugLoc(),
--                       TLI.getSetCCResultType(*DAG.getContext(), VT),
-+                       TLI.getSetCCResultType(VT),
+-                       TLI.getSetCCResultType(VT),
++                       TLI.getSetCCResultType(*DAG.getContext(), VT),
                         ShiftOp,
                         DAG.getConstant(CountTrailingZeros_64(B.Mask), VT),
                         ISD::SETEQ);
    } else if (PopCount == BB.Range) {
      // There is only one zero bit in the range, test for it directly.
      Cmp = DAG.getSetCC(getCurDebugLoc(),
--                       TLI.getSetCCResultType(*DAG.getContext(), VT),
-+                       TLI.getSetCCResultType(VT),
+-                       TLI.getSetCCResultType(VT),
++                       TLI.getSetCCResultType(*DAG.getContext(), VT),
                         ShiftOp,
                         DAG.getConstant(CountTrailingOnes_64(B.Mask), VT),
                         ISD::SETNE);
-@@ -1825,7 +1822,7 @@
+@@ -1822,7 +1825,7 @@
      SDValue AndOp = DAG.getNode(ISD::AND, getCurDebugLoc(),
                                  VT, SwitchVal, DAG.getConstant(B.Mask, VT));
      Cmp = DAG.getSetCC(getCurDebugLoc(),
--                      TLI.getSetCCResultType(*DAG.getContext(), VT),
-+                       TLI.getSetCCResultType(VT),
+-                       TLI.getSetCCResultType(VT),
++                      TLI.getSetCCResultType(*DAG.getContext(), VT),
                         AndOp, DAG.getConstant(0, VT),
                         ISD::SETNE);
    }
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAG.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAG.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAG.cpp	2014-08-14 16:49:36.700557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAG.cpp	2012-11-01 14:44:31.000000000 +0530
-@@ -948,16 +948,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAG.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAG.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/SelectionDAG.cpp	2012-11-01 14:44:31.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/SelectionDAG.cpp	2014-08-18 16:29:25.000000000 +0530
+@@ -948,6 +948,14 @@
      getNode(ISD::TRUNCATE, DL, VT, Op);
  }
  
--#if defined(AMD_OPENCL) || 1
--SDValue SelectionDAG::getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT) {
--  if (VT.bitsLE(Op.getValueType()))
--    return getNode(ISD::TRUNCATE, SL, VT, Op);
--
--  TargetLowering::BooleanContent BType = TLI.getBooleanContents(VT.isVector());
--  return getNode(TLI.getExtendForContent(BType), SL, VT, Op);
--}
--#endif
--
++SDValue SelectionDAG::getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT) {
++  if (VT.bitsLE(Op.getValueType()))
++    return getNode(ISD::TRUNCATE, SL, VT, Op);
++
++  TargetLowering::BooleanContent BType = TLI.getBooleanContents(VT.isVector());
++  return getNode(TLI.getExtendForContent(BType), SL, VT, Op);
++}
++
  SDValue SelectionDAG::getZeroExtendInReg(SDValue Op, DebugLoc DL, EVT VT) {
    assert(!VT.isVector() &&
           "getZeroExtendInReg should use the vector element type instead of "
-@@ -1661,12 +1651,7 @@
+@@ -1651,7 +1659,12 @@
        }
      } else {
        // Ensure that the constant occurs on the RHS.
--      ISD::CondCode SwappedCond = ISD::getSetCCSwappedOperands(Cond);
--      MVT CompVT = N1.getValueType().getSimpleVT();
--      if (!TM.getTargetLowering()->isCondCodeLegal(SwappedCond, CompVT))
--        return SDValue();
--
--      return getSetCC(dl, VT, N2, N1, SwappedCond);
-+      return getSetCC(dl, VT, N2, N1, ISD::getSetCCSwappedOperands(Cond));
+-      return getSetCC(dl, VT, N2, N1, ISD::getSetCCSwappedOperands(Cond));
++      ISD::CondCode SwappedCond = ISD::getSetCCSwappedOperands(Cond);
++      MVT CompVT = N1.getValueType().getSimpleVT();
++      if (!TM.getTargetLowering()->isCondCodeLegal(SwappedCond, CompVT))
++        return SDValue();
++
++      return getSetCC(dl, VT, N2, N1, SwappedCond);
      }
    }
  
-diff -ur llvm-3.2.src/lib/CodeGen/SelectionDAG/TargetLowering.cpp /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/TargetLowering.cpp
---- llvm-3.2.src/lib/CodeGen/SelectionDAG/TargetLowering.cpp	2014-08-14 16:49:36.704557844 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/TargetLowering.cpp	2012-11-02 05:19:58.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/TargetLowering.cpp llvm-3.2.src/lib/CodeGen/SelectionDAG/TargetLowering.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/CodeGen/SelectionDAG/TargetLowering.cpp	2012-11-02 05:19:58.000000000 +0530
++++ llvm-3.2.src/lib/CodeGen/SelectionDAG/TargetLowering.cpp	2014-08-18 16:29:09.000000000 +0530
 @@ -904,7 +904,7 @@
    return NULL;
  }
  
--EVT TargetLowering::getSetCCResultType(LLVMContext &, EVT VT) const {
-+EVT TargetLowering::getSetCCResultType(EVT VT) const {
+-EVT TargetLowering::getSetCCResultType(EVT VT) const {
++EVT TargetLowering::getSetCCResultType(LLVMContext &, EVT VT) const {
    assert(!VT.isVector() && "No default SetCC type for vectors!");
    return getPointerTy(0).SimpleTy;
  }
-@@ -1923,12 +1923,8 @@
+@@ -1923,8 +1923,11 @@
  
    // Ensure that the constant occurs on the RHS, and fold constant
    // comparisons.
--//D2_OPENCL
--  ISD::CondCode SwappedCC = ISD::getSetCCSwappedOperands(Cond);
--  if (isa<ConstantSDNode>(N0.getNode()) &&
--      (DCI.isBeforeLegalizeOps() ||
--       isCondCodeLegal(SwappedCC, N0.getValueType())))
--    return DAG.getSetCC(dl, VT, N1, N0, SwappedCC);
-+  if (isa<ConstantSDNode>(N0.getNode()))
-+    return DAG.getSetCC(dl, VT, N1, N0, ISD::getSetCCSwappedOperands(Cond));
+-  if (isa<ConstantSDNode>(N0.getNode()))
+-    return DAG.getSetCC(dl, VT, N1, N0, ISD::getSetCCSwappedOperands(Cond));
++  ISD::CondCode SwappedCC = ISD::getSetCCSwappedOperands(Cond);
++  if (isa<ConstantSDNode>(N0.getNode()) &&
++      (DCI.isBeforeLegalizeOps() ||
++       isCondCodeLegal(SwappedCC, N0.getValueType())))
++    return DAG.getSetCC(dl, VT, N1, N0, SwappedCC);
  
    if (ConstantSDNode *N1C = dyn_cast<ConstantSDNode>(N1.getNode())) {
      const APInt &C1 = N1C->getAPIntValue();
-@@ -2115,20 +2111,10 @@
+@@ -2111,10 +2114,14 @@
          EVT newVT = N0.getOperand(0).getValueType();
          if (DCI.isBeforeLegalizeOps() ||
              (isOperationLegal(ISD::SETCC, newVT) &&
--             getCondCodeAction(Cond, newVT)==Legal)) {
--#if defined(AMD_OPENCL) || 1
--          EVT NewSetCCVT = getSetCCResultType(*DAG.getContext(), newVT);
--          SDValue NewConst = DAG.getConstant(C1.trunc(InSize), newVT);
--
--          SDValue NewSetCC = DAG.getSetCC(dl, NewSetCCVT, N0.getOperand(0),
--                                          NewConst, Cond);
--          return DAG.getBoolExtOrTrunc(NewSetCC, dl, VT);
--#else
-+              getCondCodeAction(Cond, newVT)==Legal))
-           return DAG.getSetCC(dl, VT, N0.getOperand(0),
-                               DAG.getConstant(C1.trunc(InSize), newVT),
-                               Cond);
--#endif
--	}
+-              getCondCodeAction(Cond, newVT)==Legal))
+-          return DAG.getSetCC(dl, VT, N0.getOperand(0),
+-                              DAG.getConstant(C1.trunc(InSize), newVT),
+-                              Cond);
++             getCondCodeAction(Cond, newVT)==Legal)) {
++          	EVT NewSetCCVT = getSetCCResultType(*DAG.getContext(), newVT);
++	        SDValue NewConst = DAG.getConstant(C1.trunc(InSize), newVT);
++
++          	SDValue NewSetCC = DAG.getSetCC(dl, NewSetCCVT, N0.getOperand(0),
++                                          NewConst, Cond);
++          	return DAG.getBoolExtOrTrunc(NewSetCC, dl, VT);
++	}
          break;
        }
        default:
-@@ -2176,10 +2162,7 @@
+@@ -2162,7 +2169,9 @@
          ISD::CondCode CC = cast<CondCodeSDNode>(N0.getOperand(2))->get();
          CC = ISD::getSetCCInverse(CC,
                                    N0.getOperand(0).getValueType().isInteger());
--// D2_OPENCL
--        if (DCI.isBeforeLegalizeOps() ||
--            isCondCodeLegal(CC, N0.getOperand(0).getValueType()))
--          return DAG.getSetCC(dl, VT, N0.getOperand(0), N0.getOperand(1), CC);
-+        return DAG.getSetCC(dl, VT, N0.getOperand(0), N0.getOperand(1), CC);
+-        return DAG.getSetCC(dl, VT, N0.getOperand(0), N0.getOperand(1), CC);
++        if (DCI.isBeforeLegalizeOps() ||
++            isCondCodeLegal(CC, N0.getOperand(0).getValueType()))
++          return DAG.getSetCC(dl, VT, N0.getOperand(0), N0.getOperand(1), CC);
        }
  
        if ((N0.getOpcode() == ISD::XOR ||
-@@ -2610,24 +2593,16 @@
+@@ -2593,16 +2602,22 @@
        if (N0.getOperand(0) == N1 || N0.getOperand(1) == N1) {
          if (ValueHasExactlyOneBitSet(N1, DAG)) {
            Cond = ISD::getSetCCInverse(Cond, /*isInteger=*/true);
--//D2_OPENCL
--          if (DCI.isBeforeLegalizeOps() ||
--              isCondCodeLegal(Cond, N0.getValueType())) {
--            SDValue Zero = DAG.getConstant(0, N1.getValueType());
--            return DAG.getSetCC(dl, VT, N0, Zero, Cond);
--          }
-+          SDValue Zero = DAG.getConstant(0, N1.getValueType());
-+          return DAG.getSetCC(dl, VT, N0, Zero, Cond);
+-          SDValue Zero = DAG.getConstant(0, N1.getValueType());
+-          return DAG.getSetCC(dl, VT, N0, Zero, Cond);
++          if (DCI.isBeforeLegalizeOps() ||
++              isCondCodeLegal(Cond, N0.getValueType())) {
++            SDValue Zero = DAG.getConstant(0, N1.getValueType());
++            return DAG.getSetCC(dl, VT, N0, Zero, Cond);
++          }
          }
        }
      if (N1.getOpcode() == ISD::AND)
        if (N1.getOperand(0) == N0 || N1.getOperand(1) == N0) {
          if (ValueHasExactlyOneBitSet(N0, DAG)) {
            Cond = ISD::getSetCCInverse(Cond, /*isInteger=*/true);
--//D2_OPENCL
--          if (DCI.isBeforeLegalizeOps() ||
--              isCondCodeLegal(Cond, N1.getValueType())) {
--            SDValue Zero = DAG.getConstant(0, N0.getValueType());
--            return DAG.getSetCC(dl, VT, N1, Zero, Cond);
--          }
-+          SDValue Zero = DAG.getConstant(0, N0.getValueType());
-+          return DAG.getSetCC(dl, VT, N1, Zero, Cond);
+-          SDValue Zero = DAG.getConstant(0, N0.getValueType());
+-          return DAG.getSetCC(dl, VT, N1, Zero, Cond);
++          if (DCI.isBeforeLegalizeOps() ||
++              isCondCodeLegal(Cond, N1.getValueType())) {
++            SDValue Zero = DAG.getConstant(0, N0.getValueType());
++            return DAG.getSetCC(dl, VT, N1, Zero, Cond);
++          }
          }
        }
    }
 Only in llvm-3.2.src/lib/Linker: AMDResolveLinker.cpp
-diff -ur llvm-3.2.src/lib/Linker/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/lib/Linker/CMakeLists.txt
---- llvm-3.2.src/lib/Linker/CMakeLists.txt	2014-08-14 16:49:36.712557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Linker/CMakeLists.txt	2011-11-30 00:55:30.000000000 +0530
-@@ -3,5 +3,4 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Linker/CMakeLists.txt llvm-3.2.src/lib/Linker/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/lib/Linker/CMakeLists.txt	2011-11-30 00:55:30.000000000 +0530
++++ llvm-3.2.src/lib/Linker/CMakeLists.txt	2014-07-24 17:06:05.000000000 +0530
+@@ -3,4 +3,5 @@
    LinkItems.cpp
    LinkModules.cpp
    Linker.cpp
--  AMDResolveLinker.cpp
++  AMDResolveLinker.cpp
    )
-diff -ur llvm-3.2.src/lib/Linker/LinkModules.cpp /home/amd/Prakash/llvm-3.2.org/lib/Linker/LinkModules.cpp
---- llvm-3.2.src/lib/Linker/LinkModules.cpp	2014-08-14 16:49:36.712557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Linker/LinkModules.cpp	2012-08-03 06:00:35.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Linker/LinkModules.cpp llvm-3.2.src/lib/Linker/LinkModules.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/Linker/LinkModules.cpp	2012-08-03 06:00:35.000000000 +0530
++++ llvm-3.2.src/lib/Linker/LinkModules.cpp	2014-08-18 16:38:44.000000000 +0530
 @@ -180,7 +180,7 @@
      if (DATy->getNumElements() != cast<ArrayType>(SrcTy)->getNumElements())
        return false;
    } else if (VectorType *DVTy = dyn_cast<VectorType>(DstTy)) {
--    if (DVTy->getNumElements() != cast<VectorType>(SrcTy)->getNumElements())
-+    if (DVTy->getNumElements() != cast<ArrayType>(SrcTy)->getNumElements())
+-    if (DVTy->getNumElements() != cast<ArrayType>(SrcTy)->getNumElements())
++    if (DVTy->getNumElements() != cast<VectorType>(SrcTy)->getNumElements())
        return false;
    }
  
-@@ -372,11 +372,7 @@
+@@ -372,7 +372,9 @@
      
      // Set of items not to link in from source.
      SmallPtrSet<const Value*, 16> DoNotLinkFromSource;
--
--#if defined(AMD_OPENCL) || 1
--    std::map<const Value*, bool> *pReferenceMap;
--#endif
--
-+    
+-    
++
++    std::map<const Value*, bool> *pReferenceMap;
++
      // Vector of functions to lazily link in.
      std::vector<Function*> LazilyLinkFunctions;
      
-@@ -384,20 +380,8 @@
+@@ -380,8 +382,16 @@
      std::string ErrorMsg;
      
      ModuleLinker(Module *dstM, Module *srcM, unsigned mode)
--      : DstM(dstM), SrcM(srcM), Mode(mode)
--#if defined(AMD_OPENCL) || 1
--      , pReferenceMap(0)
--#endif
--    {}
--
--#if defined(AMD_OPENCL) || 1
--    ModuleLinker(Module *dstM, Module *srcM, unsigned mode,
--                 std::map<const Value*, bool> *pRefMap
--                 )
--      : DstM(dstM), SrcM(srcM), Mode(mode), pReferenceMap(pRefMap)
--    { }
--#endif
--
-+      : DstM(dstM), SrcM(srcM), Mode(mode) { }
-+    
+-      : DstM(dstM), SrcM(srcM), Mode(mode) { }
+-    
++      : DstM(dstM), SrcM(srcM), Mode(mode)
++      , pReferenceMap(0)
++    {}
++
++    ModuleLinker(Module *dstM, Module *srcM, unsigned mode,
++                 std::map<const Value*, bool> *pRefMap
++                 )
++      : DstM(dstM), SrcM(srcM), Mode(mode), pReferenceMap(pRefMap)
++    { }
++
      bool run();
      
    private:
-@@ -656,15 +640,7 @@
+@@ -640,7 +650,13 @@
    }
  
    // Don't bother incorporating aliases, they aren't generally typed well.
--#if 1 || defined(AMD_OPENCL)
--  // Assume aliaser and aliasee's types are exactly the same
--  for (Module::alias_iterator I = SrcM->alias_begin(), E = SrcM->alias_end();
--       I != E; ++I) {
--    if (GlobalValue *DGV = getLinkedToGlobal(I))
--      TypeMap.addTypeMapping(DGV->getType(), I->getType());
--  }
--#endif  
--
-+  
+-  
++  // Assume aliaser and aliasee's types are exactly the same
++  for (Module::alias_iterator I = SrcM->alias_begin(), E = SrcM->alias_end();
++       I != E; ++I) {
++    if (GlobalValue *DGV = getLinkedToGlobal(I))
++      TypeMap.addTypeMapping(DGV->getType(), I->getType());
++  }
++
    // Now that we have discovered all of the type equivalences, get a body for
    // any 'opaque' types in the dest module that are now resolved. 
    TypeMap.linkDefinedTypeBodies();
-@@ -986,10 +962,6 @@
+@@ -962,6 +978,8 @@
  void ModuleLinker::linkAliasBodies() {
    for (Module::alias_iterator I = SrcM->alias_begin(), E = SrcM->alias_end();
         I != E; ++I) {
--#if defined(AMD_OPENCL) || 1
--    if (pReferenceMap && !(*pReferenceMap)[I])
--      continue;
--#endif
++    if (pReferenceMap && !(*pReferenceMap)[I])
++      continue;
      if (DoNotLinkFromSource.count(I))
        continue;
      if (Constant *Aliasee = I->getAliasee()) {
-@@ -1244,25 +1216,14 @@
+@@ -1216,14 +1234,21 @@
    // all of the global values that may be referenced are available in our
    // ValueMap.
    for (Module::iterator I = SrcM->begin(), E = SrcM->end(); I != E; ++I)
--  {
--#if defined(AMD_OPENCL) || 1
--    if (pReferenceMap && !(*pReferenceMap)[I])
--      continue;
--#endif
++  {
++    if (pReferenceMap && !(*pReferenceMap)[I])
++      continue;
      if (linkFunctionProto(I))
        return true;
--  }
++  }
  
    // If there were any aliases, link them now.
    for (Module::alias_iterator I = SrcM->alias_begin(),
--       E = SrcM->alias_end(); I != E; ++I) {
--#if defined(AMD_OPENCL) || 1
--    if (pReferenceMap && !(*pReferenceMap)[I])
--      continue;
--#endif
-+       E = SrcM->alias_end(); I != E; ++I)
+-       E = SrcM->alias_end(); I != E; ++I)
++       E = SrcM->alias_end(); I != E; ++I) {
++    if (pReferenceMap && !(*pReferenceMap)[I])
++      continue;
      if (linkAliasProto(I))
        return true;
--  }
++  }
  
    for (unsigned i = 0, e = AppendingVars.size(); i != e; ++i)
      linkAppendingVarInit(AppendingVars[i]);
-@@ -1274,12 +1235,6 @@
+@@ -1235,6 +1260,10 @@
    // Link in the function bodies that are defined in the source module into
    // DstM.
    for (Module::iterator SF = SrcM->begin(), E = SrcM->end(); SF != E; ++SF) {
--
--#if defined(AMD_OPENCL) || 1
--    if (pReferenceMap && !(*pReferenceMap)[SF])
--      continue;
--#endif
--
++
++    if (pReferenceMap && !(*pReferenceMap)[SF])
++      continue;
++
      // Skip if not linking from source.
      if (DoNotLinkFromSource.count(SF)) continue;
      
-@@ -1383,16 +1338,16 @@
+@@ -1338,16 +1367,14 @@
    return false;
  }
  
--#if defined(AMD_OPENCL) || 1
--bool Linker::LinkModules(Module *Dest, Module *Src, unsigned Mode,
--                         std::map<const Value*, bool> *ReferenceMap,
--                         std::string *ErrorMsg) {
--  ModuleLinker TheLinker(Dest, Src, Mode, ReferenceMap);
--  if (TheLinker.run()) {
--    if (ErrorMsg) *ErrorMsg = TheLinker.ErrorMsg;
--    return true;
--  }
-+//===----------------------------------------------------------------------===//
-+// C API.
-+//===----------------------------------------------------------------------===//
+-//===----------------------------------------------------------------------===//
+-// C API.
+-//===----------------------------------------------------------------------===//
++bool Linker::LinkModules(Module *Dest, Module *Src, unsigned Mode,
++                         std::map<const Value*, bool> *ReferenceMap,
++                         std::string *ErrorMsg) {
++  ModuleLinker TheLinker(Dest, Src, Mode, ReferenceMap);
++  if (TheLinker.run()) {
++    if (ErrorMsg) *ErrorMsg = TheLinker.ErrorMsg;
++    return true;
++  }
  
--  return false;
-+LLVMBool LLVMLinkModules(LLVMModuleRef Dest, LLVMModuleRef Src,
-+                         LLVMLinkerMode Mode, char **OutMessages) {
-+  std::string Messages;
-+  LLVMBool Result = Linker::LinkModules(unwrap(Dest), unwrap(Src),
-+                                        Mode, OutMessages? &Messages : 0);
-+  if (OutMessages)
-+    *OutMessages = strdup(Messages.c_str());
-+  return Result;
+-LLVMBool LLVMLinkModules(LLVMModuleRef Dest, LLVMModuleRef Src,
+-                         LLVMLinkerMode Mode, char **OutMessages) {
+-  std::string Messages;
+-  LLVMBool Result = Linker::LinkModules(unwrap(Dest), unwrap(Src),
+-                                        Mode, OutMessages? &Messages : 0);
+-  if (OutMessages)
+-    *OutMessages = strdup(Messages.c_str());
+-  return Result;
++  return false;
  }
--#endif
-diff -ur llvm-3.2.src/lib/MC/MCELFStreamer.cpp /home/amd/Prakash/llvm-3.2.org/lib/MC/MCELFStreamer.cpp
---- llvm-3.2.src/lib/MC/MCELFStreamer.cpp	2014-08-14 16:49:36.716557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/MC/MCELFStreamer.cpp	2012-10-15 21:13:14.000000000 +0530
-@@ -11,7 +11,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/MC/MCELFStreamer.cpp llvm-3.2.src/lib/MC/MCELFStreamer.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/MC/MCELFStreamer.cpp	2012-10-15 21:13:14.000000000 +0530
++++ llvm-3.2.src/lib/MC/MCELFStreamer.cpp	2014-07-21 15:59:42.000000000 +0530
+@@ -11,6 +11,7 @@
  //
  //===----------------------------------------------------------------------===//
  
--#include "llvm/MC/MCELFStreamer.h"
++#include "llvm/MC/MCELFStreamer.h"
  #include "MCELF.h"
  #include "llvm/ADT/SmallPtrSet.h"
  #include "llvm/ADT/StringExtras.h"
-@@ -36,6 +35,119 @@
+@@ -35,119 +36,6 @@
  
  using namespace llvm;
  
-+namespace {
-+class MCELFStreamer : public MCObjectStreamer {
-+public:
-+  MCELFStreamer(MCContext &Context, MCAsmBackend &TAB,
-+                  raw_ostream &OS, MCCodeEmitter *Emitter)
-+    : MCObjectStreamer(Context, TAB, OS, Emitter) {}
-+
-+  MCELFStreamer(MCContext &Context, MCAsmBackend &TAB,
-+                raw_ostream &OS, MCCodeEmitter *Emitter,
-+                MCAssembler *Assembler)
-+    : MCObjectStreamer(Context, TAB, OS, Emitter, Assembler) {}
-+
-+
-+  ~MCELFStreamer() {}
-+
-+  /// @name MCStreamer Interface
-+  /// @{
-+
-+  virtual void InitSections();
-+  virtual void ChangeSection(const MCSection *Section);
-+  virtual void EmitLabel(MCSymbol *Symbol);
-+  virtual void EmitAssemblerFlag(MCAssemblerFlag Flag);
-+  virtual void EmitThumbFunc(MCSymbol *Func);
-+  virtual void EmitAssignment(MCSymbol *Symbol, const MCExpr *Value);
-+  virtual void EmitWeakReference(MCSymbol *Alias, const MCSymbol *Symbol);
-+  virtual void EmitSymbolAttribute(MCSymbol *Symbol, MCSymbolAttr Attribute);
-+  virtual void EmitSymbolDesc(MCSymbol *Symbol, unsigned DescValue) {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+  virtual void EmitCommonSymbol(MCSymbol *Symbol, uint64_t Size,
-+                                unsigned ByteAlignment);
-+  virtual void BeginCOFFSymbolDef(const MCSymbol *Symbol) {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+
-+  virtual void EmitCOFFSymbolStorageClass(int StorageClass) {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+
-+  virtual void EmitCOFFSymbolType(int Type) {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+
-+  virtual void EndCOFFSymbolDef() {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+
-+  virtual void EmitELFSize(MCSymbol *Symbol, const MCExpr *Value) {
-+     MCSymbolData &SD = getAssembler().getOrCreateSymbolData(*Symbol);
-+     SD.setSize(Value);
-+  }
-+
-+  virtual void EmitLocalCommonSymbol(MCSymbol *Symbol, uint64_t Size,
-+                                     unsigned ByteAlignment);
-+
-+  virtual void EmitZerofill(const MCSection *Section, MCSymbol *Symbol = 0,
-+                            uint64_t Size = 0, unsigned ByteAlignment = 0) {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+  virtual void EmitTBSSSymbol(const MCSection *Section, MCSymbol *Symbol,
-+                              uint64_t Size, unsigned ByteAlignment = 0) {
-+    llvm_unreachable("ELF doesn't support this directive");
-+  }
-+  virtual void EmitValueImpl(const MCExpr *Value, unsigned Size,
-+                             unsigned AddrSpace);
-+
-+  virtual void EmitFileDirective(StringRef Filename);
-+
-+  virtual void EmitTCEntry(const MCSymbol &S);
-+
-+  virtual void FinishImpl();
-+
-+private:
-+  virtual void EmitInstToFragment(const MCInst &Inst);
-+  virtual void EmitInstToData(const MCInst &Inst);
-+
-+  void fixSymbolsInTLSFixups(const MCExpr *expr);
-+
-+  struct LocalCommon {
-+    MCSymbolData *SD;
-+    uint64_t Size;
-+    unsigned ByteAlignment;
-+  };
-+  std::vector<LocalCommon> LocalCommons;
-+
-+  SmallPtrSet<MCSymbol *, 16> BindingExplicitlySet;
-+  /// @}
-+  void SetSection(StringRef Section, unsigned Type, unsigned Flags,
-+                  SectionKind Kind) {
-+    SwitchSection(getContext().getELFSection(Section, Type, Flags, Kind));
-+  }
-+
-+  void SetSectionData() {
-+    SetSection(".data", ELF::SHT_PROGBITS,
-+               ELF::SHF_WRITE |ELF::SHF_ALLOC,
-+               SectionKind::getDataRel());
-+    EmitCodeAlignment(4, 0);
-+  }
-+  void SetSectionText() {
-+    SetSection(".text", ELF::SHT_PROGBITS,
-+               ELF::SHF_EXECINSTR |
-+               ELF::SHF_ALLOC, SectionKind::getText());
-+    EmitCodeAlignment(4, 0);
-+  }
-+  void SetSectionBss() {
-+    SetSection(".bss", ELF::SHT_NOBITS,
-+               ELF::SHF_WRITE |
-+               ELF::SHF_ALLOC, SectionKind::getBSS());
-+    EmitCodeAlignment(4, 0);
-+  }
-+};
-+}
-+
+-namespace {
+-class MCELFStreamer : public MCObjectStreamer {
+-public:
+-  MCELFStreamer(MCContext &Context, MCAsmBackend &TAB,
+-                  raw_ostream &OS, MCCodeEmitter *Emitter)
+-    : MCObjectStreamer(Context, TAB, OS, Emitter) {}
+-
+-  MCELFStreamer(MCContext &Context, MCAsmBackend &TAB,
+-                raw_ostream &OS, MCCodeEmitter *Emitter,
+-                MCAssembler *Assembler)
+-    : MCObjectStreamer(Context, TAB, OS, Emitter, Assembler) {}
+-
+-
+-  ~MCELFStreamer() {}
+-
+-  /// @name MCStreamer Interface
+-  /// @{
+-
+-  virtual void InitSections();
+-  virtual void ChangeSection(const MCSection *Section);
+-  virtual void EmitLabel(MCSymbol *Symbol);
+-  virtual void EmitAssemblerFlag(MCAssemblerFlag Flag);
+-  virtual void EmitThumbFunc(MCSymbol *Func);
+-  virtual void EmitAssignment(MCSymbol *Symbol, const MCExpr *Value);
+-  virtual void EmitWeakReference(MCSymbol *Alias, const MCSymbol *Symbol);
+-  virtual void EmitSymbolAttribute(MCSymbol *Symbol, MCSymbolAttr Attribute);
+-  virtual void EmitSymbolDesc(MCSymbol *Symbol, unsigned DescValue) {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-  virtual void EmitCommonSymbol(MCSymbol *Symbol, uint64_t Size,
+-                                unsigned ByteAlignment);
+-  virtual void BeginCOFFSymbolDef(const MCSymbol *Symbol) {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-
+-  virtual void EmitCOFFSymbolStorageClass(int StorageClass) {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-
+-  virtual void EmitCOFFSymbolType(int Type) {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-
+-  virtual void EndCOFFSymbolDef() {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-
+-  virtual void EmitELFSize(MCSymbol *Symbol, const MCExpr *Value) {
+-     MCSymbolData &SD = getAssembler().getOrCreateSymbolData(*Symbol);
+-     SD.setSize(Value);
+-  }
+-
+-  virtual void EmitLocalCommonSymbol(MCSymbol *Symbol, uint64_t Size,
+-                                     unsigned ByteAlignment);
+-
+-  virtual void EmitZerofill(const MCSection *Section, MCSymbol *Symbol = 0,
+-                            uint64_t Size = 0, unsigned ByteAlignment = 0) {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-  virtual void EmitTBSSSymbol(const MCSection *Section, MCSymbol *Symbol,
+-                              uint64_t Size, unsigned ByteAlignment = 0) {
+-    llvm_unreachable("ELF doesn't support this directive");
+-  }
+-  virtual void EmitValueImpl(const MCExpr *Value, unsigned Size,
+-                             unsigned AddrSpace);
+-
+-  virtual void EmitFileDirective(StringRef Filename);
+-
+-  virtual void EmitTCEntry(const MCSymbol &S);
+-
+-  virtual void FinishImpl();
+-
+-private:
+-  virtual void EmitInstToFragment(const MCInst &Inst);
+-  virtual void EmitInstToData(const MCInst &Inst);
+-
+-  void fixSymbolsInTLSFixups(const MCExpr *expr);
+-
+-  struct LocalCommon {
+-    MCSymbolData *SD;
+-    uint64_t Size;
+-    unsigned ByteAlignment;
+-  };
+-  std::vector<LocalCommon> LocalCommons;
+-
+-  SmallPtrSet<MCSymbol *, 16> BindingExplicitlySet;
+-  /// @}
+-  void SetSection(StringRef Section, unsigned Type, unsigned Flags,
+-                  SectionKind Kind) {
+-    SwitchSection(getContext().getELFSection(Section, Type, Flags, Kind));
+-  }
+-
+-  void SetSectionData() {
+-    SetSection(".data", ELF::SHT_PROGBITS,
+-               ELF::SHF_WRITE |ELF::SHF_ALLOC,
+-               SectionKind::getDataRel());
+-    EmitCodeAlignment(4, 0);
+-  }
+-  void SetSectionText() {
+-    SetSection(".text", ELF::SHT_PROGBITS,
+-               ELF::SHF_EXECINSTR |
+-               ELF::SHF_ALLOC, SectionKind::getText());
+-    EmitCodeAlignment(4, 0);
+-  }
+-  void SetSectionBss() {
+-    SetSection(".bss", ELF::SHT_NOBITS,
+-               ELF::SHF_WRITE |
+-               ELF::SHF_ALLOC, SectionKind::getBSS());
+-    EmitCodeAlignment(4, 0);
+-  }
+-};
+-}
+-
  void MCELFStreamer::InitSections() {
    // This emulates the same behavior of GNU as. This makes it easier
    // to compare the output as the major sections are in the same order.
-diff -ur llvm-3.2.src/lib/Support/Triple.cpp /home/amd/Prakash/llvm-3.2.org/lib/Support/Triple.cpp
---- llvm-3.2.src/lib/Support/Triple.cpp	2014-08-14 16:49:36.728557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Support/Triple.cpp	2012-11-16 02:54:48.000000000 +0530
-@@ -42,11 +42,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Support/Triple.cpp llvm-3.2.src/lib/Support/Triple.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/Support/Triple.cpp	2012-11-16 02:54:48.000000000 +0530
++++ llvm-3.2.src/lib/Support/Triple.cpp	2014-08-19 14:20:52.000000000 +0530
+@@ -41,7 +41,9 @@
+   case nvptx:   return "nvptx";
    case nvptx64: return "nvptx64";
    case le32:    return "le32";
-   case amdil:   return "amdil";
--#if defined(AMD_OPENCL) || 1
--  case amdil64: return "amdil64";
--  case hsail:   return "hsail";
--  case hsail_64:return "hsail64";
--#endif
+-  case amdil:   return "amdil";
++  case hsail:   return "hsail";
++  case hsail_64:return "hsail64";
++  case amdil:	return "amdil";
    case spir:    return "spir";
    case spir64:  return "spir64";
    }
-@@ -90,11 +85,6 @@
+@@ -84,7 +86,9 @@
+   case nvptx:   return "nvptx";
    case nvptx64: return "nvptx";
    case le32:    return "le32";
-   case amdil:   return "amdil";
--#if defined(AMD_OPENCL) || 1
--  case amdil64: return "amdil";
--  case hsail:   return "hsail";
--  case hsail_64:return "hsail64";
--#endif
+-  case amdil:   return "amdil";
++  case hsail:   return "hsail";
++  case hsail_64:return "hsail64";
++  case amdil:	return "amdil";
    case spir:    return "spir";
    case spir64:  return "spir";
    }
-@@ -157,7 +147,6 @@
-   case MachO: return "macho";
-   case Android: return "android";
-   case ELF: return "elf";
--  case AMDOpenCL: return "amdopencl";
-   }
- 
-   llvm_unreachable("Invalid EnvironmentType!");
-@@ -189,11 +178,6 @@
+@@ -177,6 +181,8 @@
+     .Case("nvptx", nvptx)
      .Case("nvptx64", nvptx64)
      .Case("le32", le32)
++    .Case("hsail", hsail)
++    .Case("hsail64", hsail_64)
      .Case("amdil", amdil)
--#if defined(AMD_OPENCL) || 1
--    .Case("amdil64", amdil64)
--    .Case("hsail", hsail)
--    .Case("hsail64", hsail_64)
--#endif
      .Case("spir", spir)
      .Case("spir64", spir64)
-     .Default(UnknownArch);
-@@ -220,11 +204,6 @@
+@@ -203,6 +209,8 @@
+     .Case("nvptx", "nvptx")
      .Case("nvptx64", "nvptx64")
      .Case("le32", "le32")
++    .Case("hsail", "hsail")
++    .Case("hsail64", "hsail_64")
      .Case("amdil", "amdil")
--#if defined(AMD_OPENCL) || 1
--    .Case("amdil64", "amdil64")
--    .Case("hsail", "hsail")
--    .Case("hsail64", "hsail_64")
--#endif
      .Case("spir", "spir")
      .Case("spir64", "spir64")
-     .Default(NULL);
-@@ -261,11 +240,6 @@
+@@ -239,6 +247,8 @@
+     .Case("nvptx", Triple::nvptx)
      .Case("nvptx64", Triple::nvptx64)
      .Case("le32", Triple::le32)
++    .Case("hsail", Triple::hsail)
++    .Case("hsail64", Triple::hsail_64)
      .Case("amdil", Triple::amdil)
--#if defined(AMD_OPENCL) || 1
--    .Case("amdil64", Triple::amdil64)
--    .Case("hsail", Triple::hsail)
--    .Case("hsail64", Triple::hsail_64)
--#endif
      .Case("spir", Triple::spir)
      .Case("spir64", Triple::spir64)
-     .Default(Triple::UnknownArch);
-@@ -319,7 +293,6 @@
-     .StartsWith("macho", Triple::MachO)
-     .StartsWith("android", Triple::Android)
-     .StartsWith("elf", Triple::ELF)
--    .StartsWith("amdopencl", Triple::AMDOpenCL)
-     .Default(Triple::UnknownEnvironment);
- }
- 
-@@ -332,7 +305,7 @@
-       Arch(parseArch(getArchName())),
-       Vendor(parseVendor(getVendorName())),
-       OS(parseOS(getOSName())),
--      Environment(parseEnvironment(getEnvironmentName())){
-+      Environment(parseEnvironment(getEnvironmentName())) {
- }
- 
- /// \brief Construct a triple from string representations of the architecture,
-@@ -705,13 +678,8 @@
+@@ -678,8 +688,10 @@
    case llvm::Triple::x86:
    case llvm::Triple::xcore:
    case llvm::Triple::spir:
--  case llvm::Triple::hsail:
++  case llvm::Triple::hsail:
      return 32;
  
--#if defined(AMD_OPENCL) || 1
--  case llvm::Triple::amdil64:
--  case llvm::Triple::hsail_64:
--#endif
++  case llvm::Triple::hsail_64:
    case llvm::Triple::mips64:
    case llvm::Triple::mips64el:
    case llvm::Triple::nvptx64:
-@@ -761,16 +729,9 @@
+@@ -729,9 +741,11 @@
    case Triple::thumb:
    case Triple::x86:
    case Triple::xcore:
--#if defined(AMD_OPENCL) || 1
--  case Triple::hsail:
--#endif
++  case Triple::hsail:
      // Already 32-bit.
      break;
  
--#if defined(AMD_OPENCL) || 1
--  case Triple::amdil64:   T.setArch(Triple::amdil); break;
--  case Triple::hsail_64:  T.setArch(Triple::hsail); break;
--#endif
++  case Triple::hsail_64:  T.setArch(Triple::hsail); break;
    case Triple::mips64:    T.setArch(Triple::mips);    break;
    case Triple::mips64el:  T.setArch(Triple::mipsel);  break;
    case Triple::nvptx64:   T.setArch(Triple::nvptx);   break;
-@@ -786,6 +747,7 @@
+@@ -747,7 +761,6 @@
    Triple T(*this);
    switch (getArch()) {
    case Triple::UnknownArch:
-+  case Triple::amdil:
+-  case Triple::amdil:
    case Triple::arm:
    case Triple::cellspu:
    case Triple::hexagon:
-@@ -800,10 +762,6 @@
+@@ -762,6 +775,7 @@
      break;
  
    case Triple::spir64:
--#if defined(AMD_OPENCL) || 1
--  case Triple::amdil64:
--  case Triple::hsail_64:
--#endif
++  case Triple::hsail_64:
    case Triple::mips64:
    case Triple::mips64el:
    case Triple::nvptx64:
-@@ -813,10 +771,6 @@
+@@ -771,6 +785,7 @@
      // Already 64-bit.
      break;
  
--  case Triple::amdil:   T.setArch(Triple::amdil64);   break;
--#if defined(AMD_OPENCL) || 1
--  case Triple::hsail:   T.setArch(Triple::hsail_64);  break;
--#endif
++  case Triple::hsail:   T.setArch(Triple::hsail_64);  break;
    case Triple::mips:    T.setArch(Triple::mips64);    break;
    case Triple::mipsel:  T.setArch(Triple::mips64el);  break;
    case Triple::nvptx:   T.setArch(Triple::nvptx64);   break;
-@@ -827,4 +781,3 @@
+@@ -781,3 +796,4 @@
    }
    return T;
  }
--
-diff -ur llvm-3.2.src/lib/TableGen/Record.cpp /home/amd/Prakash/llvm-3.2.org/lib/TableGen/Record.cpp
---- llvm-3.2.src/lib/TableGen/Record.cpp	2014-08-14 16:49:36.732557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/TableGen/Record.cpp	2012-10-26 02:03:17.000000000 +0530
-@@ -904,7 +904,6 @@
++
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/TableGen/Record.cpp llvm-3.2.src/lib/TableGen/Record.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/TableGen/Record.cpp	2012-10-26 02:03:17.000000000 +0530
++++ llvm-3.2.src/lib/TableGen/Record.cpp	2014-07-21 17:48:01.000000000 +0530
+@@ -904,6 +904,7 @@
  
      break;
    }
--  case ADD:
++  case ADD:
    case SHL:
    case SRA:
    case SRL: {
-@@ -915,7 +914,6 @@
+@@ -914,6 +915,7 @@
        int64_t Result;
        switch (getOpcode()) {
        default: llvm_unreachable("Bad opcode!");
--      case ADD: Result = LHSv +  RHSv; break;
++      case ADD: Result = LHSv +  RHSv; break;
        case SHL: Result = LHSv << RHSv; break;
        case SRA: Result = LHSv >> RHSv; break;
        case SRL: Result = (uint64_t)LHSv >> (uint64_t)RHSv; break;
-@@ -941,7 +939,6 @@
+@@ -939,6 +941,7 @@
    std::string Result;
    switch (Opc) {
    case CONCAT: Result = "!con"; break;
--  case ADD: Result = "!add"; break;
++  case ADD: Result = "!add"; break;
    case SHL: Result = "!shl"; break;
    case SRA: Result = "!sra"; break;
    case SRL: Result = "!srl"; break;
-diff -ur llvm-3.2.src/lib/TableGen/TGLexer.cpp /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.cpp
---- llvm-3.2.src/lib/TableGen/TGLexer.cpp	2014-08-14 16:49:36.732557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.cpp	2012-02-22 21:39:41.000000000 +0530
-@@ -463,7 +463,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.cpp llvm-3.2.src/lib/TableGen/TGLexer.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.cpp	2012-02-22 21:39:41.000000000 +0530
++++ llvm-3.2.src/lib/TableGen/TGLexer.cpp	2014-07-21 17:48:26.000000000 +0530
+@@ -463,6 +463,7 @@
      .Case("head", tgtok::XHead)
      .Case("tail", tgtok::XTail)
      .Case("con", tgtok::XConcat)
--    .Case("add", tgtok::XADD)
++    .Case("add", tgtok::XADD)
      .Case("shl", tgtok::XSHL)
      .Case("sra", tgtok::XSRA)
      .Case("srl", tgtok::XSRL)
-diff -ur llvm-3.2.src/lib/TableGen/TGLexer.h /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.h
---- llvm-3.2.src/lib/TableGen/TGLexer.h	2014-08-14 16:49:36.732557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.h	2012-02-22 21:39:41.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.h llvm-3.2.src/lib/TableGen/TGLexer.h
+--- /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGLexer.h	2012-02-22 21:39:41.000000000 +0530
++++ llvm-3.2.src/lib/TableGen/TGLexer.h	2014-07-21 17:48:26.000000000 +0530
 @@ -46,7 +46,7 @@
      MultiClass, String,
      
      // !keywords.
--    XConcat, XADD, XSRA, XSRL, XSHL, XStrConcat, XCast, XSubst,
-+    XConcat, XSRA, XSRL, XSHL, XStrConcat, XCast, XSubst,
+-    XConcat, XSRA, XSRL, XSHL, XStrConcat, XCast, XSubst,
++    XConcat, XADD, XSRA, XSRL, XSHL, XStrConcat, XCast, XSubst,
      XForEach, XHead, XTail, XEmpty, XIf, XEq,
  
      // Integer value.
-diff -ur llvm-3.2.src/lib/TableGen/TGParser.cpp /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGParser.cpp
---- llvm-3.2.src/lib/TableGen/TGParser.cpp	2014-08-14 16:49:36.732557845 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGParser.cpp	2012-10-11 01:54:47.000000000 +0530
-@@ -918,7 +918,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGParser.cpp llvm-3.2.src/lib/TableGen/TGParser.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/TableGen/TGParser.cpp	2012-10-11 01:54:47.000000000 +0530
++++ llvm-3.2.src/lib/TableGen/TGParser.cpp	2014-07-21 17:48:34.000000000 +0530
+@@ -918,6 +918,7 @@
    }
  
    case tgtok::XConcat:
--  case tgtok::XADD:
++  case tgtok::XADD:
    case tgtok::XSRA:
    case tgtok::XSRL:
    case tgtok::XSHL:
-@@ -934,7 +933,6 @@
+@@ -933,6 +934,7 @@
      switch (OpTok) {
      default: llvm_unreachable("Unhandled code!");
      case tgtok::XConcat: Code = BinOpInit::CONCAT;Type = DagRecTy::get(); break;
--    case tgtok::XADD:    Code = BinOpInit::ADD;   Type = IntRecTy::get(); break;
++    case tgtok::XADD:    Code = BinOpInit::ADD;   Type = IntRecTy::get(); break;
      case tgtok::XSRA:    Code = BinOpInit::SRA;   Type = IntRecTy::get(); break;
      case tgtok::XSRL:    Code = BinOpInit::SRL;   Type = IntRecTy::get(); break;
      case tgtok::XSHL:    Code = BinOpInit::SHL;   Type = IntRecTy::get(); break;
-@@ -1403,7 +1401,6 @@
+@@ -1401,6 +1403,7 @@
    case tgtok::XEmpty:
    case tgtok::XCast:  // Value ::= !unop '(' Value ')'
    case tgtok::XConcat:
--  case tgtok::XADD:
++  case tgtok::XADD:
    case tgtok::XSRA:
    case tgtok::XSRL:
    case tgtok::XSHL:
@@ -2772,16 +1949,15 @@ Only in /home/amd/Prakash/llvm-3.2.org/lib/Target: CellSPU
 Only in /home/amd/Prakash/llvm-3.2.org/lib/Target: CppBackend
 Only in /home/amd/Prakash/llvm-3.2.org/lib/Target: Hexagon
 Only in llvm-3.2.src/lib/Target: HSAIL
-Only in llvm-3.2.src/lib/Target: HSAIL.tar
-diff -ur llvm-3.2.src/lib/Target/LLVMBuild.txt /home/amd/Prakash/llvm-3.2.org/lib/Target/LLVMBuild.txt
---- llvm-3.2.src/lib/Target/LLVMBuild.txt	2014-08-14 16:49:36.748557846 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Target/LLVMBuild.txt	2012-07-16 23:49:46.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Target/LLVMBuild.txt llvm-3.2.src/lib/Target/LLVMBuild.txt
+--- /home/amd/Prakash/llvm-3.2.org/lib/Target/LLVMBuild.txt	2012-07-16 23:49:46.000000000 +0530
++++ llvm-3.2.src/lib/Target/LLVMBuild.txt	2014-07-21 15:59:42.000000000 +0530
 @@ -16,7 +16,7 @@
  ;===------------------------------------------------------------------------===;
  
  [common]
--subdirectories = X86 HSAIL
-+subdirectories = ARM CellSPU CppBackend Hexagon MBlaze MSP430 NVPTX Mips PowerPC Sparc X86 XCore
+-subdirectories = ARM CellSPU CppBackend Hexagon MBlaze MSP430 NVPTX Mips PowerPC Sparc X86 XCore
++subdirectories = X86 HSAIL
  
  ; This is a special group whose required libraries are extended (by llvm-build)
  ; with the best execution engine (the native JIT, if available, or the
@@ -2795,462 +1971,383 @@ Only in /home/amd/Prakash/llvm-3.2.org/lib/Target: Sparc
 Only in /home/amd/Prakash/llvm-3.2.org/lib/Target: XCore
 Only in llvm-3.2.src/lib/Transforms/IPO: AMDSymbolLinkage.cpp
 Only in llvm-3.2.src/lib/Transforms/IPO: AMDSymbolName.h
-diff -ur llvm-3.2.src/lib/Transforms/IPO/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/CMakeLists.txt
---- llvm-3.2.src/lib/Transforms/IPO/CMakeLists.txt	2014-08-14 16:49:36.768557846 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/CMakeLists.txt	2012-10-18 13:35:46.000000000 +0530
-@@ -20,7 +20,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/CMakeLists.txt llvm-3.2.src/lib/Transforms/IPO/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/CMakeLists.txt	2012-10-18 13:35:46.000000000 +0530
++++ llvm-3.2.src/lib/Transforms/IPO/CMakeLists.txt	2014-07-28 21:10:44.000000000 +0530
+@@ -20,6 +20,7 @@
    PruneEH.cpp
    StripDeadPrototypes.cpp
    StripSymbols.cpp
--  AMDSymbolLinkage.cpp
++  AMDSymbolLinkage.cpp
    )
  
  add_dependencies(LLVMipo intrinsics_gen)
-diff -ur llvm-3.2.src/lib/Transforms/IPO/IPO.cpp /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/IPO.cpp
---- llvm-3.2.src/lib/Transforms/IPO/IPO.cpp	2014-08-14 16:49:36.768557846 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/IPO.cpp	2012-10-27 00:17:48.000000000 +0530
-@@ -44,9 +44,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/IPO.cpp llvm-3.2.src/lib/Transforms/IPO/IPO.cpp
+--- /home/amd/Prakash/llvm-3.2.org/lib/Transforms/IPO/IPO.cpp	2012-10-27 00:17:48.000000000 +0530
++++ llvm-3.2.src/lib/Transforms/IPO/IPO.cpp	2014-08-18 16:40:44.000000000 +0530
+@@ -44,6 +44,7 @@
    initializeStripDebugDeclarePass(Registry);
    initializeStripDeadDebugInfoPass(Registry);
    initializeStripNonDebugSymbolsPass(Registry);
--#if 1 || defined(AMD_OPENCL)
--  initializeAMDSymbolLinkagePass(Registry);
--#endif // 1 || defined(AMD_OPENCL)
++  initializeAMDSymbolLinkagePass(Registry);
  }
  
  void LLVMInitializeIPO(LLVMPassRegistryRef R) {
-Only in /home/amd/Prakash/llvm-3.2.org/test/Analysis: LoopDependenceAnalysis
-Only in /home/amd/Prakash/llvm-3.2.org/test/CodeGen: R600
-Only in /home/amd/Prakash/llvm-3.2.org/test/Object: COFF
-Only in /home/amd/Prakash/llvm-3.2.org/test/Scripts: common_dump.pyc
-diff -ur llvm-3.2.src/tools/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/tools/CMakeLists.txt
---- llvm-3.2.src/tools/CMakeLists.txt	2014-08-14 16:49:37.132557855 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/tools/CMakeLists.txt	2012-11-01 04:54:13.000000000 +0530
-@@ -11,8 +11,7 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/tools/CMakeLists.txt llvm-3.2.src/tools/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/tools/CMakeLists.txt	2012-11-01 04:54:13.000000000 +0530
++++ llvm-3.2.src/tools/CMakeLists.txt	2014-09-03 10:34:35.631248915 +0530
+@@ -11,7 +11,7 @@
  add_subdirectory(opt)
  add_subdirectory(llvm-as)
  add_subdirectory(llvm-dis)
--# D2_OPENCL_HSA
--#add_subdirectory(llvm-mc)
-+add_subdirectory(llvm-mc)
+-add_subdirectory(llvm-mc)
++#add_subdirectory(llvm-mc)
  
  add_subdirectory(llc)
  add_subdirectory(llvm-ranlib)
-@@ -28,8 +27,7 @@
+@@ -27,7 +27,7 @@
  add_subdirectory(llvm-extract)
  add_subdirectory(llvm-diff)
  add_subdirectory(macho-dump)
--# D2_OPENCL_HSA
--#add_subdirectory(llvm-objdump)
-+add_subdirectory(llvm-objdump)
+-add_subdirectory(llvm-objdump)
++#add_subdirectory(llvm-objdump)
  add_subdirectory(llvm-readobj)
  add_subdirectory(llvm-rtdyld)
  add_subdirectory(llvm-dwarfdump)
-diff -ur llvm-3.2.src/tools/llc/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/tools/llc/CMakeLists.txt
---- llvm-3.2.src/tools/llc/CMakeLists.txt	2014-08-14 16:49:37.136557855 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/tools/llc/CMakeLists.txt	2010-09-14 05:29:48.000000000 +0530
-@@ -1,13 +1,5 @@
--set (USEDLIBS LLVMLibHSAIL.a)
+diff -ur /home/amd/Prakash/llvm-3.2.org/tools/llc/CMakeLists.txt llvm-3.2.src/tools/llc/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/tools/llc/CMakeLists.txt	2010-09-14 05:29:48.000000000 +0530
++++ llvm-3.2.src/tools/llc/CMakeLists.txt	2014-07-29 11:17:09.000000000 +0530
+@@ -1,5 +1,13 @@
++set (USEDLIBS LLVMLibHSAIL.a)
  set(LLVM_LINK_COMPONENTS ${LLVM_TARGETS_TO_BUILD} bitreader asmparser)
  
--add_library(LIBHSAIL STATIC IMPORTED)
--add_library(LIBHSAIL64 STATIC IMPORTED)
--set_property(TARGET LIBHSAIL64 PROPERTY IMPORTED_LOCATION /home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/build_linux_opt_m64/libhsail.a)
--
++add_library(LIBHSAIL STATIC IMPORTED)
++add_library(LIBHSAIL64 STATIC IMPORTED)
++set_property(TARGET LIBHSAIL64 PROPERTY IMPORTED_LOCATION /home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/build_linux_opt_m64/libhsail.a)
++
  add_llvm_tool(llc
--          llc.cpp
--            )
--
--target_link_libraries(llc LIBHSAIL64)
--
-+  llc.cpp
-+  )
-diff -ur llvm-3.2.src/tools/llc/llc.cpp /home/amd/Prakash/llvm-3.2.org/tools/llc/llc.cpp
---- llvm-3.2.src/tools/llc/llc.cpp	2014-08-14 16:49:37.136557855 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/tools/llc/llc.cpp	2012-10-19 04:52:48.000000000 +0530
-@@ -124,8 +124,7 @@
+-  llc.cpp
+-  )
++          llc.cpp
++            )
++
++target_link_libraries(llc LIBHSAIL64)
++
+diff -ur /home/amd/Prakash/llvm-3.2.org/tools/llc/llc.cpp llvm-3.2.src/tools/llc/llc.cpp
+--- /home/amd/Prakash/llvm-3.2.org/tools/llc/llc.cpp	2012-10-19 04:52:48.000000000 +0530
++++ llvm-3.2.src/tools/llc/llc.cpp	2014-08-18 16:50:53.000000000 +0530
+@@ -124,7 +124,7 @@
    }
  
    // Decide if we need "binary" output.
--// D2_OPENCL_HSA
--  bool Binary = true;
-+  bool Binary = false;
+-  bool Binary = false;
++  bool Binary = true;
    switch (FileType) {
    case TargetMachine::CGFT_AssemblyFile:
      break;
-diff -ur llvm-3.2.src/tools/LLVMBuild.txt /home/amd/Prakash/llvm-3.2.org/tools/LLVMBuild.txt
---- llvm-3.2.src/tools/LLVMBuild.txt	2014-08-14 16:49:37.132557855 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/tools/LLVMBuild.txt	2012-11-01 04:54:13.000000000 +0530
+diff -ur /home/amd/Prakash/llvm-3.2.org/tools/LLVMBuild.txt llvm-3.2.src/tools/LLVMBuild.txt
+--- /home/amd/Prakash/llvm-3.2.org/tools/LLVMBuild.txt	2012-11-01 04:54:13.000000000 +0530
++++ llvm-3.2.src/tools/LLVMBuild.txt	2014-07-21 15:59:42.000000000 +0530
 @@ -16,7 +16,7 @@
  ;===------------------------------------------------------------------------===;
  
  [common]
--subdirectories = bugpoint llc lli llvm-ar llvm-as llvm-bcanalyzer llvm-cov llvm-diff llvm-dis llvm-dwarfdump llvm-extract llvm-link llvm-nm llvm-objdump llvm-prof llvm-ranlib llvm-rtdyld llvm-size macho-dump opt llvm-mcmarkup
-+subdirectories = bugpoint llc lli llvm-ar llvm-as llvm-bcanalyzer llvm-cov llvm-diff llvm-dis llvm-dwarfdump llvm-extract llvm-link llvm-mc llvm-nm llvm-objdump llvm-prof llvm-ranlib llvm-rtdyld llvm-size macho-dump opt llvm-mcmarkup
+-subdirectories = bugpoint llc lli llvm-ar llvm-as llvm-bcanalyzer llvm-cov llvm-diff llvm-dis llvm-dwarfdump llvm-extract llvm-link llvm-mc llvm-nm llvm-objdump llvm-prof llvm-ranlib llvm-rtdyld llvm-size macho-dump opt llvm-mcmarkup
++subdirectories = bugpoint llc lli llvm-ar llvm-as llvm-bcanalyzer llvm-cov llvm-diff llvm-dis llvm-dwarfdump llvm-extract llvm-link llvm-nm llvm-objdump llvm-prof llvm-ranlib llvm-rtdyld llvm-size macho-dump opt llvm-mcmarkup
  
  [component_0]
  type = Group
-diff -ur llvm-3.2.src/tools/llvm-link/llvm-link.cpp /home/amd/Prakash/llvm-3.2.org/tools/llvm-link/llvm-link.cpp
---- llvm-3.2.src/tools/llvm-link/llvm-link.cpp	2014-08-14 16:49:37.136557855 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/tools/llvm-link/llvm-link.cpp	2011-10-16 10:17:35.000000000 +0530
-@@ -25,11 +25,7 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/tools/llvm-link/llvm-link.cpp llvm-3.2.src/tools/llvm-link/llvm-link.cpp
+--- /home/amd/Prakash/llvm-3.2.org/tools/llvm-link/llvm-link.cpp	2011-10-16 10:17:35.000000000 +0530
++++ llvm-3.2.src/tools/llvm-link/llvm-link.cpp	2014-08-18 16:50:30.000000000 +0530
+@@ -25,7 +25,9 @@
  #include "llvm/Support/IRReader.h"
  #include "llvm/Support/Signals.h"
  #include "llvm/Support/Path.h"
--#if defined(AMD_OPENCL) || 1
--#include "llvm/AMDResolveLinker.h"
--#endif // AMD_OPENCL
++#include "llvm/AMDResolveLinker.h"
  #include <memory>
--
++
  using namespace llvm;
  
  static cl::list<std::string>
-@@ -53,20 +49,6 @@
+@@ -49,6 +51,17 @@
  static cl::opt<bool>
  DumpAsm("d", cl::desc("Print assembly as linked"), cl::Hidden);
  
--#if defined(AMD_OPENCL) || 1
--static cl::opt<bool>
--PreLinkOpt("prelink-opt", cl::desc("Enable pre-link optimizations"));
--
--static cl::opt<bool>
--EnableWholeProgram("whole", cl::desc("Enable whole program mode"));
--
--static cl::list<std::string> Libraries("l", cl::Prefix,
--                                       cl::desc("Specify libraries to link to"),
--                                       cl::value_desc("library prefix"));
--
--#endif // AMD_OPENCL
--
--
++static cl::opt<bool>
++PreLinkOpt("prelink-opt", cl::desc("Enable pre-link optimizations"));
++
++static cl::opt<bool>
++EnableWholeProgram("whole", cl::desc("Enable whole program mode"));
++
++static cl::list<std::string> Libraries("l", cl::Prefix,
++                                       cl::desc("Specify libraries to link to"),
++                                       cl::value_desc("library prefix"));
++
++
  // LoadFile - Read the specified bitcode file in and return it.  This routine
  // searches the link path for the specified file to try to find it...
  //
-@@ -132,49 +114,6 @@
+@@ -114,6 +127,32 @@
    // TODO: Iterate over the -l list and link in any modules containing
    // global symbols that have not been resolved so far.
  
--#if defined(AMD_OPENCL) || 1
--
--  // Link unresolved symbols from libraries
--  std::vector<Module*> Libs;
--  for (std::vector<std::string>::iterator i = Libraries.begin(),
--       e = Libraries.end(); i != e; ++i) {
--    std::auto_ptr<Module> M(LoadFile(argv[0], *i, Context));
--    if (M.get() == 0) {
--      SMDiagnostic Err(*i, SourceMgr::DK_Error, "error loading file");
--      Err.print(argv[0], errs());
--      return 1;
--    }
--    if (Verbose) errs() << "Linking in '" << *i << "'\n";
--    Libs.push_back(M.get());
--    M.release();
--  }
--
--  if (Libs.size() > 0) {
--    // The first member in the list of libraries is assumed to be
--    // representative of the target device.
--// D2_OPENCL_HSA
--#if 0
--    fixUpModule(Composite.get(), Libs[0]->getTargetTriple(),
--               Libs[0]->getDataLayout());
--
--    if (PreLinkOpt) {
--      AMDPrelinkOpt(Composite.get(), EnableWholeProgram, true,
--                 true, NULL /*UseNative*/,
--                 false);
--    }
--#endif
--
--    std::string ErrorMsg;
--    if (resolveLink(Composite.get(), Libs, &ErrorMsg)) {
--      SMDiagnostic Err(InputFilenames[BaseArg], SourceMgr::DK_Error, ErrorMsg);
--      Err.print(argv[0], errs());
--      return 1;
--    }
--  }
--
--#endif // AMD_OPENCL
--
--
++
++  // Link unresolved symbols from libraries
++  std::vector<Module*> Libs;
++  for (std::vector<std::string>::iterator i = Libraries.begin(),
++       e = Libraries.end(); i != e; ++i) {
++    std::auto_ptr<Module> M(LoadFile(argv[0], *i, Context));
++    if (M.get() == 0) {
++      SMDiagnostic Err(*i, SourceMgr::DK_Error, "error loading file");
++      Err.print(argv[0], errs());
++      return 1;
++    }
++    if (Verbose) errs() << "Linking in '" << *i << "'\n";
++    Libs.push_back(M.get());
++    M.release();
++  }
++
++  if (Libs.size() > 0) {
++    std::string ErrorMsg;
++    if (resolveLink(Composite.get(), Libs, &ErrorMsg)) {
++      SMDiagnostic Err(InputFilenames[BaseArg], SourceMgr::DK_Error, ErrorMsg);
++      Err.print(argv[0], errs());
++      return 1;
++    }
++  }
++
++
    if (DumpAsm) errs() << "Here's the assembly:\n" << *Composite;
  
    std::string ErrorInfo;
-Only in /home/amd/Prakash/llvm-3.2.org/tools: llvm-stub
-diff -ur llvm-3.2.src/tools/opt/opt.cpp /home/amd/Prakash/llvm-3.2.org/tools/opt/opt.cpp
---- llvm-3.2.src/tools/opt/opt.cpp	2014-08-14 16:49:37.144557855 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/tools/opt/opt.cpp	2012-10-24 23:25:53.000000000 +0530
-@@ -156,15 +156,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/tools/opt/opt.cpp llvm-3.2.src/tools/opt/opt.cpp
+--- /home/amd/Prakash/llvm-3.2.org/tools/opt/opt.cpp	2012-10-24 23:25:53.000000000 +0530
++++ llvm-3.2.src/tools/opt/opt.cpp	2014-08-18 16:51:25.000000000 +0530
+@@ -156,6 +156,12 @@
            cl::desc("data layout string to use if not specified by module"),
            cl::value_desc("layout-string"), cl::init(""));
  
--// D2_OPENCL_HSA
--#if defined(AMD_OPENCL) || 1
--static cl::opt<bool>
--EnableWholeProgram("whole", cl::desc("Enable whole program mode"));
--
--static cl::opt<bool>
--EnableGPUOpt("gpu", cl::desc("Enable optimization for GPU"));
--#endif
--
++static cl::opt<bool>
++EnableWholeProgram("whole", cl::desc("Enable whole program mode"));
++
++static cl::opt<bool>
++EnableGPUOpt("gpu", cl::desc("Enable optimization for GPU"));
++
  // ---------- Define Printers for module and function passes ------------
  namespace {
  
-@@ -451,14 +442,6 @@
+@@ -442,6 +448,13 @@
    } else {
      Builder.Inliner = createAlwaysInlinerPass();
    }
--
--
--//D2_OPENCL_HSA - Add these passes too for HSAIL
--  MPM.add(createAMDSymbolLinkagePass(EnableWholeProgram));
--  MPM.add(createAlwaysInlinerPass());
--  MPM.add(createGlobalOptimizerPass());     // Optimize out global vars
--  MPM.add(createGlobalDCEPass());         // Remove dead fns and globals.
--
++
++
++  MPM.add(createAMDSymbolLinkagePass(EnableWholeProgram));
++  MPM.add(createAlwaysInlinerPass());
++  MPM.add(createGlobalOptimizerPass());     // Optimize out global vars
++  MPM.add(createGlobalDCEPass());         // Remove dead fns and globals.
++
    Builder.DisableUnitAtATime = !UnitAtATime;
    Builder.DisableUnrollLoops = OptLevel == 0;
    Builder.DisableSimplifyLibCalls = DisableSimplifyLibCalls;
-@@ -724,16 +707,6 @@
+@@ -707,6 +720,11 @@
        StandardLinkOpts = false;
      }
  
--#if defined(AMD_OPENCL) || 1
--// D2_OPENCL_HSA- Always add
--//  if (OptLevelO0) {
--    Passes.add(createAMDSymbolLinkagePass(EnableWholeProgram));
--    Passes.add(createAlwaysInlinerPass());
--    Passes.add(createGlobalOptimizerPass());     // Optimize out global vars
--    Passes.add(createGlobalDCEPass());         // Remove dead fns and globals.
--//  }
--#endif
--
++    Passes.add(createAMDSymbolLinkagePass(EnableWholeProgram));
++    Passes.add(createAlwaysInlinerPass());
++    Passes.add(createGlobalOptimizerPass());     // Optimize out global vars
++    Passes.add(createGlobalDCEPass());         // Remove dead fns and globals.
++
      if (OptLevelO1 && OptLevelO1.getPosition() < PassList.getPosition(i)) {
        AddOptimizationPasses(Passes, *FPasses, 1, 0);
        OptLevelO1 = false;
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: __init__.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: LitConfig.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: LitFormats.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: main.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: ProgressBar.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: ShCommands.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: ShUtil.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: TestFormats.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: TestingConfig.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: Test.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: TestRunner.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/lit/lit: Util.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild: componentinfo.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild: configutil.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild: __init__.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild: main.pyc
-Only in /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild: util.pyc
+Binary files /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild/componentinfo.pyc and llvm-3.2.src/utils/llvm-build/llvmbuild/componentinfo.pyc differ
+Binary files /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild/configutil.pyc and llvm-3.2.src/utils/llvm-build/llvmbuild/configutil.pyc differ
+Binary files /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild/__init__.pyc and llvm-3.2.src/utils/llvm-build/llvmbuild/__init__.pyc differ
+Binary files /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild/main.pyc and llvm-3.2.src/utils/llvm-build/llvmbuild/main.pyc differ
+Binary files /home/amd/Prakash/llvm-3.2.org/utils/llvm-build/llvmbuild/util.pyc and llvm-3.2.src/utils/llvm-build/llvmbuild/util.pyc differ
 Only in llvm-3.2.src/utils/TableGen: AMDBRIGLoweringEmitter.cpp
 Only in llvm-3.2.src/utils/TableGen: AMDBRIGLoweringEmitter.h
 Only in llvm-3.2.src/utils/TableGen: AMDDAGWalker.cpp
 Only in llvm-3.2.src/utils/TableGen: AMDDAGWalker.h
 Only in llvm-3.2.src/utils/TableGen: AMDHSAILVecMapEmiter.cpp
 Only in llvm-3.2.src/utils/TableGen: AMDHSAILVecMapEmiter.h
-diff -ur llvm-3.2.src/utils/TableGen/AsmWriterEmitter.cpp /home/amd/Prakash/llvm-3.2.org/utils/TableGen/AsmWriterEmitter.cpp
---- llvm-3.2.src/utils/TableGen/AsmWriterEmitter.cpp	2014-08-14 16:49:37.152557856 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/utils/TableGen/AsmWriterEmitter.cpp	2012-10-26 02:03:17.000000000 +0530
-@@ -78,28 +78,15 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/utils/TableGen/AsmWriterEmitter.cpp llvm-3.2.src/utils/TableGen/AsmWriterEmitter.cpp
+--- /home/amd/Prakash/llvm-3.2.org/utils/TableGen/AsmWriterEmitter.cpp	2012-10-26 02:03:17.000000000 +0530
++++ llvm-3.2.src/utils/TableGen/AsmWriterEmitter.cpp	2014-08-18 16:49:12.000000000 +0530
+@@ -78,15 +78,18 @@
  
  /// EmitInstructions - Emit the last instruction in the vector and any other
  /// instructions that are suitably similar to it.
--
--#if defined(AMD_OPENCL) || 1
--// This fix for a performance issue does not have any HSAIL dependencies.
--// However we want to be sure this change is properly marked.
--static void EmitInstructions(std::vector<AsmWriterInst*> &Insts,
--                             raw_ostream &O) {
--  AsmWriterInst &FirstInst = *Insts.back();
--#else
- static void EmitInstructions(std::vector<AsmWriterInst> &Insts,
+-static void EmitInstructions(std::vector<AsmWriterInst> &Insts,
++
++// This fix for a performance issue does not have any HSAIL dependencies.
++// However we want to be sure this change is properly marked.
++static void EmitInstructions(std::vector<AsmWriterInst*> &Insts,
                               raw_ostream &O) {
-   AsmWriterInst FirstInst = Insts.back();
--#endif // AMD_OPENCL
+-  AsmWriterInst FirstInst = Insts.back();
++  AsmWriterInst &FirstInst = *Insts.back();
    Insts.pop_back();
  
    std::vector<AsmWriterInst> SimilarInsts;
    unsigned DifferingOperand = ~0;
    for (unsigned i = Insts.size(); i != 0; --i) {
--#if defined(AMD_OPENCL) || 1
--    unsigned DiffOp = Insts[i-1]->MatchesAllButOneOp(FirstInst);
--#else
-     unsigned DiffOp = Insts[i-1].MatchesAllButOneOp(FirstInst);
--#endif
+-    unsigned DiffOp = Insts[i-1].MatchesAllButOneOp(FirstInst);
++    unsigned DiffOp = Insts[i-1]->MatchesAllButOneOp(FirstInst);
      if (DiffOp != ~1U) {
        if (DifferingOperand == ~0U)  // First match!
          DifferingOperand = DiffOp;
-@@ -107,11 +94,7 @@
+@@ -94,7 +97,7 @@
        // If this differs in the same operand as the rest of the instructions in
        // this class, move it to the SimilarInsts list.
        if (DifferingOperand == DiffOp || DiffOp == ~0U) {
--#if defined(AMD_OPENCL) || 1
--        SimilarInsts.push_back(*Insts[i-1]);
--#else
-         SimilarInsts.push_back(Insts[i-1]);
--#endif
+-        SimilarInsts.push_back(Insts[i-1]);
++        SimilarInsts.push_back(*Insts[i-1]);
          Insts.erase(Insts.begin()+i-1);
        }
      }
-@@ -457,11 +440,7 @@
+@@ -440,7 +443,7 @@
    }
  
    // Emit the string itself.
--#if defined (AMD_OPENCL) || 1
--  O << "  static const char AsmStrs[] = {\n";
--#else
-   O << "  const char AsmStrs[] = {\n";
--#endif
+-  O << "  const char AsmStrs[] = {\n";
++  O << "  static const char AsmStrs[] = {\n";
    StringTable.emit(O, printChar);
    O << "  };\n\n";
  
-@@ -524,18 +503,6 @@
+@@ -503,31 +506,26 @@
      BitsLeft -= NumBits;
    }
  
--#if defined(AMD_OPENCL) || 1
--  // Create a reversed vector of pointers to the instructions, while filtering
--  // out those without operand info.
--  std::vector<AsmWriterInst*> InstPtrs;
--  for (std::vector<AsmWriterInst>::reverse_iterator it = Instructions.rbegin(); 
--  	   it != Instructions.rend(); ++it)
--  {
--    if (!it->Operands.empty()) {
--      InstPtrs.push_back(&(*it));
--    }
--  }
--#else
-   // Okay, delete instructions with no operand info left.
-   for (unsigned i = 0, e = Instructions.size(); i != e; ++i) {
-     // Entire instruction has been emitted?
-@@ -551,26 +518,16 @@
-   // elements in the vector.
-   std::reverse(Instructions.begin(), Instructions.end());
+-  // Okay, delete instructions with no operand info left.
+-  for (unsigned i = 0, e = Instructions.size(); i != e; ++i) {
+-    // Entire instruction has been emitted?
+-    AsmWriterInst &Inst = Instructions[i];
+-    if (Inst.Operands.empty()) {
+-      Instructions.erase(Instructions.begin()+i);
+-      --i; --e;
++  // Create a reversed vector of pointers to the instructions, while filtering
++  // out those without operand info.
++  std::vector<AsmWriterInst*> InstPtrs;
++  for (std::vector<AsmWriterInst>::reverse_iterator it = Instructions.rbegin(); 
++  	   it != Instructions.rend(); ++it)
++  {
++    if (!it->Operands.empty()) {
++      InstPtrs.push_back(&(*it));
+     }
+   }
  
--#endif
 -
- 
+-  // Because this is a vector, we want to emit from the end.  Reverse all of the
+-  // elements in the vector.
+-  std::reverse(Instructions.begin(), Instructions.end());
+-
+-
    // Now that we've emitted all of the operand info that fit into 32 bits, emit
    // information for those instructions that are left.  This is a less dense
    // encoding, but we expect the main 32-bit table to handle the majority of
    // instructions.
--#if defined(AMD_OPENCL) || 1
--  if (!InstPtrs.empty()) {
--    // Find the opcode # of inline asm.
--    O << "  switch (MI->getOpcode()) {\n";
--    while (!InstPtrs.empty())
--      EmitInstructions(InstPtrs, O);
--#else
-   if (!Instructions.empty()) {
+-  if (!Instructions.empty()) {
++  if (!InstPtrs.empty()) {
      // Find the opcode # of inline asm.
      O << "  switch (MI->getOpcode()) {\n";
-     while (!Instructions.empty())
-       EmitInstructions(Instructions, O);
--#endif
+-    while (!Instructions.empty())
+-      EmitInstructions(Instructions, O);
++    while (!InstPtrs.empty())
++      EmitInstructions(InstPtrs, O);
  
      O << "  }\n";
      O << "  return;\n";
-diff -ur llvm-3.2.src/utils/TableGen/CMakeLists.txt /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CMakeLists.txt
---- llvm-3.2.src/utils/TableGen/CMakeLists.txt	2014-08-14 16:49:37.152557856 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CMakeLists.txt	2012-10-26 02:03:17.000000000 +0530
-@@ -33,7 +33,4 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CMakeLists.txt llvm-3.2.src/utils/TableGen/CMakeLists.txt
+--- /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CMakeLists.txt	2012-10-26 02:03:17.000000000 +0530
++++ llvm-3.2.src/utils/TableGen/CMakeLists.txt	2014-07-21 15:59:42.000000000 +0530
+@@ -33,4 +33,7 @@
    X86DisassemblerTables.cpp
    X86ModRMFilters.cpp
    X86RecognizableInstr.cpp
--  AMDBRIGLoweringEmitter.cpp
--  AMDHSAILVecMapEmiter.cpp
--  AMDDAGWalker.cpp
++  AMDBRIGLoweringEmitter.cpp
++  AMDHSAILVecMapEmiter.cpp
++  AMDDAGWalker.cpp
    )
-diff -ur llvm-3.2.src/utils/TableGen/CodeGenInstruction.cpp /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.cpp
---- llvm-3.2.src/utils/TableGen/CodeGenInstruction.cpp	2014-08-14 16:49:37.156557856 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.cpp	2012-10-26 02:03:17.000000000 +0530
-@@ -328,16 +328,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.cpp llvm-3.2.src/utils/TableGen/CodeGenInstruction.cpp
+--- /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.cpp	2012-10-26 02:03:17.000000000 +0530
++++ llvm-3.2.src/utils/TableGen/CodeGenInstruction.cpp	2014-08-18 16:48:03.000000000 +0530
+@@ -328,6 +328,14 @@
    ImplicitDefs = R->getValueAsListOfDefs("Defs");
    ImplicitUses = R->getValueAsListOfDefs("Uses");
  
--#if defined(AMD_OPENCL) || 1
--  if( ( needSpecialProcessing = R->getValue("needSpecialProcessing") ) ) {
--    needSpecialProcessing = R->getValueAsBit("needSpecialProcessing");
--  }
--  if ((isImageInst = R->getValue("isImageInst")))
--    isImageInst = R->getValueAsBit("isImageInst");
--  if ((isCrossLaneInst = R->getValue("isCrossLaneInst")))
--    isCrossLaneInst = R->getValueAsBit("isCrossLaneInst");
--#endif
--
++  if( ( needSpecialProcessing = R->getValue("needSpecialProcessing") ) ) {
++    needSpecialProcessing = R->getValueAsBit("needSpecialProcessing");
++  }
++  if ((isImageInst = R->getValue("isImageInst")))
++    isImageInst = R->getValueAsBit("isImageInst");
++  if ((isCrossLaneInst = R->getValue("isCrossLaneInst")))
++    isCrossLaneInst = R->getValueAsBit("isCrossLaneInst");
++
    if (neverHasSideEffects + hasSideEffects > 1)
      PrintFatalError(R->getName() + ": multiple conflicting side-effect flags set!");
  
-diff -ur llvm-3.2.src/utils/TableGen/CodeGenInstruction.h /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.h
---- llvm-3.2.src/utils/TableGen/CodeGenInstruction.h	2014-08-14 16:49:37.156557856 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.h	2012-10-26 02:03:17.000000000 +0530
-@@ -270,11 +270,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.h llvm-3.2.src/utils/TableGen/CodeGenInstruction.h
+--- /home/amd/Prakash/llvm-3.2.org/utils/TableGen/CodeGenInstruction.h	2012-10-26 02:03:17.000000000 +0530
++++ llvm-3.2.src/utils/TableGen/CodeGenInstruction.h	2014-08-18 16:49:38.000000000 +0530
+@@ -270,6 +270,9 @@
      /// include text from the specified variant, returning the new string.
      static std::string FlattenAsmStringVariants(StringRef AsmString,
                                                  unsigned Variant);
--#if defined(AMD_OPENCL) || 1
--    bool needSpecialProcessing;
--    bool isImageInst;
--    bool isCrossLaneInst;
--#endif
++    bool needSpecialProcessing;
++    bool isImageInst;
++    bool isCrossLaneInst;
    };
  
  
-diff -ur llvm-3.2.src/utils/TableGen/TableGenBackends.h /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGenBackends.h
---- llvm-3.2.src/utils/TableGen/TableGenBackends.h	2014-08-14 16:49:37.160557856 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGenBackends.h	2012-10-25 21:24:06.000000000 +0530
-@@ -75,9 +75,5 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGenBackends.h llvm-3.2.src/utils/TableGen/TableGenBackends.h
+--- /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGenBackends.h	2012-10-25 21:24:06.000000000 +0530
++++ llvm-3.2.src/utils/TableGen/TableGenBackends.h	2014-08-18 16:46:45.000000000 +0530
+@@ -75,5 +75,7 @@
  void EmitRegisterInfo(RecordKeeper &RK, raw_ostream &OS);
  void EmitSubtarget(RecordKeeper &RK, raw_ostream &OS);
  void EmitMapTable(RecordKeeper &RK, raw_ostream &OS);
--#if defined(AMD_OPENCL) || 1
--void EmitBrigWriter(RecordKeeper &RK, raw_ostream &OS);
--void EmitHSAILVecMap(RecordKeeper &RK, raw_ostream &OS);
--#endif
++void EmitBrigWriter(RecordKeeper &RK, raw_ostream &OS);
++void EmitHSAILVecMap(RecordKeeper &RK, raw_ostream &OS);
  
  } // End llvm namespace
-diff -ur llvm-3.2.src/utils/TableGen/TableGen.cpp /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGen.cpp
---- llvm-3.2.src/utils/TableGen/TableGen.cpp	2014-08-14 16:49:37.160557856 +0530
-+++ /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGen.cpp	2012-10-04 02:59:19.000000000 +0530
-@@ -42,10 +42,6 @@
+diff -ur /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGen.cpp llvm-3.2.src/utils/TableGen/TableGen.cpp
+--- /home/amd/Prakash/llvm-3.2.org/utils/TableGen/TableGen.cpp	2012-10-04 02:59:19.000000000 +0530
++++ llvm-3.2.src/utils/TableGen/TableGen.cpp	2014-08-18 16:46:27.000000000 +0530
+@@ -41,7 +41,9 @@
+   GenTgtIntrinsic,
    GenEDInfo,
    PrintEnums,
-   PrintSets
--#if defined(AMD_OPENCL) || 1
--  ,GenBrigWriter
--  ,GenHSAILVecMap
--#endif
+-  PrintSets
++  PrintSets,
++  GenBrigWriter,
++  GenHSAILVecMap
  };
  
  namespace {
-@@ -87,12 +83,6 @@
+@@ -83,6 +85,10 @@
                                 "Print enum values for a class"),
                      clEnumValN(PrintSets, "print-sets",
                                 "Print expanded sets for testing DAG exprs"),
--#if defined(AMD_OPENCL) || 1
--                    clEnumValN(GenBrigWriter, "gen-brig-writer",
--                               "Generate BRIG writer"),
--                    clEnumValN(GenHSAILVecMap, "gen-hsail-vec-map",
--                               "Generate HSAIL scalar to vector map"),
--#endif
++                    clEnumValN(GenBrigWriter, "gen-brig-writer",
++                               "Generate BRIG writer"),
++                    clEnumValN(GenHSAILVecMap, "gen-hsail-vec-map",
++                               "Generate HSAIL scalar to vector map"),
                      clEnumValEnd));
  
    cl::opt<std::string>
-@@ -172,14 +162,6 @@
+@@ -162,6 +168,12 @@
      }
      break;
    }
--#if defined(AMD_OPENCL) || 1
--  case GenBrigWriter:
--    EmitBrigWriter(Records, OS);
--    break;
--  case GenHSAILVecMap:
--    EmitHSAILVecMap(Records,OS);
--    break;
--#endif
++  case GenBrigWriter:
++    EmitBrigWriter(Records, OS);
++    break;
++  case GenHSAILVecMap:
++    EmitHSAILVecMap(Records,OS);
++    break;
    }
  
    return false;
