@@ -40,3 +40,7 @@ It is the output of
 
 diff -ur llvm-3.2.src/ ~llvm-3.2.org/ > diff
 
+Sept 03, 3014
+-------------
+
+Updated with some cleanup in LLVM core sources. Updated the binaries too after testing.
