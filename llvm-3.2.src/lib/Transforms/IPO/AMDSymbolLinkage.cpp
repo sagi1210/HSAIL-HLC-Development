@@ -7,7 +7,7 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Analysis/AMDOpenCLSymbols.h"
+#include "llvm/Analysis/AMDKernelSymbols.h"
 #include <set>
 
 using namespace llvm;
@@ -32,7 +32,7 @@ namespace {
     bool runOnModule(Module &M);
 
     void getAnalysisUsage(AnalysisUsage &AU) const {
-      AU.addRequired<OpenCLSymbols>();
+      AU.addRequired<KernelSymbols>();
       AU.setPreservesAll();
     }
 
@@ -43,7 +43,7 @@ namespace {
 
 char AMDSymbolLinkage::ID = 0;
 INITIALIZE_PASS_BEGIN(AMDSymbolLinkage, "amdfunctionlinkage", "Mark non-kernel functions with InternalLinkage", false, false)
-INITIALIZE_AG_DEPENDENCY(OpenCLSymbols)
+INITIALIZE_AG_DEPENDENCY(KernelSymbols)
 INITIALIZE_PASS_END(AMDSymbolLinkage, "amdfunctionlinkage", "Mark non-kernel functions with InternalLinkage", false, false)
 
 ModulePass *
@@ -59,7 +59,7 @@ bool AMDSymbolLinkage::runOnModule(Module &M) {
   if (!wholeProgram)
     return Changed;
 
-  const OpenCLSymbols &OCLS = getAnalysis<OpenCLSymbols>();
+  const KernelSymbols &OCLS = getAnalysis<KernelSymbols>();
   for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) {
     Function *F = (Function *)I;
 

@@ -373,9 +373,7 @@ namespace {
     // Set of items not to link in from source.
     SmallPtrSet<const Value*, 16> DoNotLinkFromSource;
 
-#if defined(AMD_OPENCL) || 1
     std::map<const Value*, bool> *pReferenceMap;
-#endif
 
     // Vector of functions to lazily link in.
     std::vector<Function*> LazilyLinkFunctions;
@@ -385,18 +383,14 @@ namespace {
     
     ModuleLinker(Module *dstM, Module *srcM, unsigned mode)
       : DstM(dstM), SrcM(srcM), Mode(mode)
-#if defined(AMD_OPENCL) || 1
       , pReferenceMap(0)
-#endif
     {}
 
-#if defined(AMD_OPENCL) || 1
     ModuleLinker(Module *dstM, Module *srcM, unsigned mode,
                  std::map<const Value*, bool> *pRefMap
                  )
       : DstM(dstM), SrcM(srcM), Mode(mode), pReferenceMap(pRefMap)
     { }
-#endif
 
     bool run();
     
@@ -656,14 +650,12 @@ void ModuleLinker::computeTypeMapping() {
   }
 
   // Don't bother incorporating aliases, they aren't generally typed well.
-#if 1 || defined(AMD_OPENCL)
   // Assume aliaser and aliasee's types are exactly the same
   for (Module::alias_iterator I = SrcM->alias_begin(), E = SrcM->alias_end();
        I != E; ++I) {
     if (GlobalValue *DGV = getLinkedToGlobal(I))
       TypeMap.addTypeMapping(DGV->getType(), I->getType());
   }
-#endif  
 
   // Now that we have discovered all of the type equivalences, get a body for
   // any 'opaque' types in the dest module that are now resolved. 
@@ -986,10 +978,8 @@ void ModuleLinker::linkFunctionBody(Function *Dst, Function *Src) {
 void ModuleLinker::linkAliasBodies() {
   for (Module::alias_iterator I = SrcM->alias_begin(), E = SrcM->alias_end();
        I != E; ++I) {
-#if defined(AMD_OPENCL) || 1
     if (pReferenceMap && !(*pReferenceMap)[I])
       continue;
-#endif
     if (DoNotLinkFromSource.count(I))
       continue;
     if (Constant *Aliasee = I->getAliasee()) {
@@ -1245,10 +1235,8 @@ bool ModuleLinker::run() {
   // ValueMap.
   for (Module::iterator I = SrcM->begin(), E = SrcM->end(); I != E; ++I)
   {
-#if defined(AMD_OPENCL) || 1
     if (pReferenceMap && !(*pReferenceMap)[I])
       continue;
-#endif
     if (linkFunctionProto(I))
       return true;
   }
@@ -1256,10 +1244,8 @@ bool ModuleLinker::run() {
   // If there were any aliases, link them now.
   for (Module::alias_iterator I = SrcM->alias_begin(),
        E = SrcM->alias_end(); I != E; ++I) {
-#if defined(AMD_OPENCL) || 1
     if (pReferenceMap && !(*pReferenceMap)[I])
       continue;
-#endif
     if (linkAliasProto(I))
       return true;
   }
@@ -1275,10 +1261,8 @@ bool ModuleLinker::run() {
   // DstM.
   for (Module::iterator SF = SrcM->begin(), E = SrcM->end(); SF != E; ++SF) {
 
-#if defined(AMD_OPENCL) || 1
     if (pReferenceMap && !(*pReferenceMap)[SF])
       continue;
-#endif
 
     // Skip if not linking from source.
     if (DoNotLinkFromSource.count(SF)) continue;
@@ -1383,7 +1367,6 @@ bool Linker::LinkModules(Module *Dest, Module *Src, unsigned Mode,
   return false;
 }
 
-#if defined(AMD_OPENCL) || 1
 bool Linker::LinkModules(Module *Dest, Module *Src, unsigned Mode,
                          std::map<const Value*, bool> *ReferenceMap,
                          std::string *ErrorMsg) {
@@ -1395,4 +1378,3 @@ bool Linker::LinkModules(Module *Dest, Module *Src, unsigned Mode,
 
   return false;
 }
-#endif

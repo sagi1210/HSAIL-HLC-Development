@@ -24,10 +24,6 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Recycler.h"
 
-#if 1 || defined(AMD_OPENCL)
-#include "llvm/ADT/DenseMap.h"
-#endif
-
 namespace llvm {
 
 class Value;
@@ -430,12 +426,6 @@ public:
   /// base.
   MCSymbol *getPICBaseSymbol() const;
 
-#if 1 || defined(AMD_OPENCL)
-  // ** Hack to get around of debugging issues **
-  // Debug use only, this will be set during ISEL lowering
-  // of dbg_declare intrinisic
-  DenseMap<const MDNode *, const Value *>  DIVToValueMap;
-#endif
 };
 
 //===--------------------------------------------------------------------===//

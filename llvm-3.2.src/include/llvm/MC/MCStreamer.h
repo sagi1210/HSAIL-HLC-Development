@@ -63,19 +63,6 @@ namespace llvm {
     void EnsureValidW64UnwindInfo();
 
     MCSymbol* LastSymbol;
-#if 1 || defined(AMD_OPENCL)
-  public:
-    enum MCStreamerKind {
-      // currently we need to support pseudo-RTTI operations only with BRIGDwarfStreamer
-      UnknownStreamer,
-      BRIGDwarfStreamer
-    };
-  public:
-    virtual MCStreamerKind getStreamerKind() const {
-      return UnknownStreamer;
-    }
-#endif
-
 
     /// SectionStack - This is stack of current and previous section
     /// values saved by PushSection.
@@ -105,11 +92,7 @@ namespace llvm {
     MCContext &getContext() const { return Context; }
 
     unsigned getNumFrameInfos() {
-      return
-#if defined(AMD_OPENCL) || 1
-        (unsigned)
-#endif
-        FrameInfos.size();
+      return FrameInfos.size();
     }
 
     const MCDwarfFrameInfo &getFrameInfo(unsigned i) {
@@ -121,11 +104,7 @@ namespace llvm {
     }
 
     unsigned getNumW64UnwindInfos() {
-      return
-#if defined(AMD_OPENCL) || 1
-        (unsigned)
-#endif
-        W64UnwindInfos.size();
+      return W64UnwindInfos.size();
     }
 
     MCWin64EHUnwindInfo &getW64UnwindInfo(unsigned i) {

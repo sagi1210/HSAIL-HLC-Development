@@ -79,27 +79,17 @@ static void PrintCases(std::vector<std::pair<std::string,
 /// EmitInstructions - Emit the last instruction in the vector and any other
 /// instructions that are suitably similar to it.
 
-#if defined(AMD_OPENCL) || 1
 // This fix for a performance issue does not have any HSAIL dependencies.
 // However we want to be sure this change is properly marked.
 static void EmitInstructions(std::vector<AsmWriterInst*> &Insts,
                              raw_ostream &O) {
   AsmWriterInst &FirstInst = *Insts.back();
-#else
-static void EmitInstructions(std::vector<AsmWriterInst> &Insts,
-                             raw_ostream &O) {
-  AsmWriterInst FirstInst = Insts.back();
-#endif // AMD_OPENCL
   Insts.pop_back();
 
   std::vector<AsmWriterInst> SimilarInsts;
   unsigned DifferingOperand = ~0;
   for (unsigned i = Insts.size(); i != 0; --i) {
-#if defined(AMD_OPENCL) || 1
     unsigned DiffOp = Insts[i-1]->MatchesAllButOneOp(FirstInst);
-#else
-    unsigned DiffOp = Insts[i-1].MatchesAllButOneOp(FirstInst);
-#endif
     if (DiffOp != ~1U) {
       if (DifferingOperand == ~0U)  // First match!
         DifferingOperand = DiffOp;
@@ -107,11 +97,7 @@ static void EmitInstructions(std::vector<AsmWriterInst> &Insts,
       // If this differs in the same operand as the rest of the instructions in
       // this class, move it to the SimilarInsts list.
       if (DifferingOperand == DiffOp || DiffOp == ~0U) {
-#if defined(AMD_OPENCL) || 1
         SimilarInsts.push_back(*Insts[i-1]);
-#else
-        SimilarInsts.push_back(Insts[i-1]);
-#endif
         Insts.erase(Insts.begin()+i-1);
       }
     }
@@ -457,11 +443,7 @@ void AsmWriterEmitter::EmitPrintInstruction(raw_ostream &O) {
   }
 
   // Emit the string itself.
-#if defined (AMD_OPENCL) || 1
   O << "  static const char AsmStrs[] = {\n";
-#else
-  O << "  const char AsmStrs[] = {\n";
-#endif
   StringTable.emit(O, printChar);
   O << "  };\n\n";
 
@@ -524,7 +506,6 @@ void AsmWriterEmitter::EmitPrintInstruction(raw_ostream &O) {
     BitsLeft -= NumBits;
   }
 
-#if defined(AMD_OPENCL) || 1
   // Create a reversed vector of pointers to the instructions, while filtering
   // out those without operand info.
   std::vector<AsmWriterInst*> InstPtrs;
@@ -535,42 +516,16 @@ void AsmWriterEmitter::EmitPrintInstruction(raw_ostream &O) {
       InstPtrs.push_back(&(*it));
     }
   }
-#else
-  // Okay, delete instructions with no operand info left.
-  for (unsigned i = 0, e = Instructions.size(); i != e; ++i) {
-    // Entire instruction has been emitted?
-    AsmWriterInst &Inst = Instructions[i];
-    if (Inst.Operands.empty()) {
-      Instructions.erase(Instructions.begin()+i);
-      --i; --e;
-    }
-  }
-
-
-  // Because this is a vector, we want to emit from the end.  Reverse all of the
-  // elements in the vector.
-  std::reverse(Instructions.begin(), Instructions.end());
-
-#endif
-
 
   // Now that we've emitted all of the operand info that fit into 32 bits, emit
   // information for those instructions that are left.  This is a less dense
   // encoding, but we expect the main 32-bit table to handle the majority of
   // instructions.
-#if defined(AMD_OPENCL) || 1
   if (!InstPtrs.empty()) {
     // Find the opcode # of inline asm.
     O << "  switch (MI->getOpcode()) {\n";
     while (!InstPtrs.empty())
       EmitInstructions(InstPtrs, O);
-#else
-  if (!Instructions.empty()) {
-    // Find the opcode # of inline asm.
-    O << "  switch (MI->getOpcode()) {\n";
-    while (!Instructions.empty())
-      EmitInstructions(Instructions, O);
-#endif
 
     O << "  }\n";
     O << "  return;\n";

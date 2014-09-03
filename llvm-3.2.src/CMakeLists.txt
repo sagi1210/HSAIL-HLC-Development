@@ -13,12 +13,10 @@ set(CMAKE_MODULE_PATH
 set(LLVM_VERSION_MAJOR 3)
 set(LLVM_VERSION_MINOR 2)
 
-# D2_OPENCL_HSA
 set(LLVM_REQUIRES_EH ON)
 set(LLVM_REQUIRES_RTTI ON)
 add_definitions(-DANDROID)
 
-# D2_OPENCL_HSA
 include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL)
 include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/libBRIGDwarf)
 include_directories(/home/amd/Prakash/Git/HSAIL-Tools-private/libHSAIL/libHSAIL/generated)
@@ -382,7 +380,6 @@ if( ${CMAKE_SYSTEM_NAME} MATCHES SunOS )
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include llvm/Support/Solaris.h")
 endif( ${CMAKE_SYSTEM_NAME} MATCHES SunOS )
 
-# D2_OPENCL_HSA
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include(AddLLVM)

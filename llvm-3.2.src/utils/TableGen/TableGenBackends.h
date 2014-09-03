@@ -75,9 +75,7 @@ void EmitPseudoLowering(RecordKeeper &RK, raw_ostream &OS);
 void EmitRegisterInfo(RecordKeeper &RK, raw_ostream &OS);
 void EmitSubtarget(RecordKeeper &RK, raw_ostream &OS);
 void EmitMapTable(RecordKeeper &RK, raw_ostream &OS);
-#if defined(AMD_OPENCL) || 1
 void EmitBrigWriter(RecordKeeper &RK, raw_ostream &OS);
 void EmitHSAILVecMap(RecordKeeper &RK, raw_ostream &OS);
-#endif
 
 } // End llvm namespace

@@ -20,12 +20,8 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/OwningPtr.h"
 
-#if defined (AMD_OPENCL) || 1
 // HSA need some functions to be redefined in BRIGDwarfCompileUnit class
 #define VIRTUAL_D virtual
-#else
-#define VIRTUAL_D 
-#endif
 
 namespace llvm {
 
@@ -85,22 +81,6 @@ class CompileUnit {
   /// need DW_AT_containing_type attribute. This attribute points to a DIE that
   /// corresponds to the MDNode mapped with the subprogram DIE.
   DenseMap<DIE *, const MDNode *> ContainingTypeMap;
-
-public:
-
-#if defined(AMD_OPENCL) || 1
-  /// Discriminator for LLVM-style RTTI (dyn_cast<>)
-  /// Required for HSA debug information
-  enum CUKind {
-    DwarfCompileUnit = 1, // regular compile unit
-    BRIGDwarfCompileUnit  // BRIG DWARF compile unit
-  };
-  CompileUnit::CUKind getCUKind() const;
-protected:
-  CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, DwarfDebug *DW, CUKind scid);
-private:
-  const CUKind SubclassID;   // Subclass identifier (for isa/dyn_cast)
-#endif
 
 public:
   CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, DwarfDebug *DW);
@@ -349,24 +329,10 @@ public:
 
   /// createMemberDIE - Create new member DIE.
   DIE *createMemberDIE(DIDerivedType DT);
-#if defined(AMD_OPENCL) || 1
 protected:
   // make DIEValueAllocator protected - to access it from BRIGDwarfCompileUnit.
   BumpPtrAllocator DIEValueAllocator;
 
-  /// adds an address of global variable to block
-  ///
-  virtual void addGVLabelToBlock(DIEBlock* block, const DIGlobalVariable* GV);
-
-  /// adds debug location offset to the DIE
-  ///
-  virtual void addDebugLocOffset(const DbgVariable* dbgv, DIE* VariableDie, unsigned int Offset);
-
-#else
-private:
-  // DIEValueAllocator - All DIEValues are allocated through this allocator.
-  BumpPtrAllocator DIEValueAllocator;
-#endif // AMD_OPENCL
 private:
   DIEInteger *DIEIntegerOne;
 };

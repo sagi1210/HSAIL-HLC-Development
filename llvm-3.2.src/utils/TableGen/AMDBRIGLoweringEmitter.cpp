@@ -1,4 +1,3 @@
-#if defined(AMD_OPENCL) || 1
 //===- BRIGLoweringEmitter.cpp - Generate the BRIG lowering code -----------------===//
 //
 //                     
@@ -205,7 +204,6 @@ void BRIGLoweringEmitter::EmitPrintInstruction(raw_ostream &O) {
   O << "  HSAIL_ASM::Inst inst = HSAIL_ASM::parseMnemo(AsmStrs+(Bits & "<< (1 << AsmStrBits)-1 <<")-1, brigantine);\n";
   O << "  switch(MI->getOpcode()) {\n";
 
-#if defined(AMD_OPENCL) || 1
   // needSpecialProcessing defined only under this macro
   HSAILVecMapEmiter vec_map(Records);
 
@@ -257,7 +255,6 @@ void BRIGLoweringEmitter::EmitPrintInstruction(raw_ostream &O) {
       BrigOperands[sOperands].push_back(i);
     }
   }
-#endif // AMD_OPENCL
 
   std::map<std::string, std::vector<unsigned> >::const_iterator it = BrigOperands.begin();
   std::map<std::string, std::vector<unsigned> >::const_iterator en = BrigOperands.end();
@@ -517,4 +514,3 @@ void EmitBrigWriter(RecordKeeper &RK, raw_ostream &OS) {
 
 } // End llvm namespace
 
-#endif // AMD_OPENCL

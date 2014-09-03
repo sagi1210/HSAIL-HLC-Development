@@ -328,7 +328,6 @@ CodeGenInstruction::CodeGenInstruction(Record *R)
   ImplicitDefs = R->getValueAsListOfDefs("Defs");
   ImplicitUses = R->getValueAsListOfDefs("Uses");
 
-#if defined(AMD_OPENCL) || 1
   if( ( needSpecialProcessing = R->getValue("needSpecialProcessing") ) ) {
     needSpecialProcessing = R->getValueAsBit("needSpecialProcessing");
   }
@@ -336,7 +335,6 @@ CodeGenInstruction::CodeGenInstruction(Record *R)
     isImageInst = R->getValueAsBit("isImageInst");
   if ((isCrossLaneInst = R->getValue("isCrossLaneInst")))
     isCrossLaneInst = R->getValueAsBit("isCrossLaneInst");
-#endif
 
   if (neverHasSideEffects + hasSideEffects > 1)
     PrintFatalError(R->getName() + ": multiple conflicting side-effect flags set!");

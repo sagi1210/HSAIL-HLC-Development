@@ -4,7 +4,7 @@ add_llvm_library(LLVMipa
   FindUsedTypes.cpp
   GlobalsModRef.cpp
   IPA.cpp
-  AMDOpenCLSymbols.cpp
+  AMDKernelSymbols.cpp 
   )
 
 add_dependencies(LLVMipa intrinsics_gen)

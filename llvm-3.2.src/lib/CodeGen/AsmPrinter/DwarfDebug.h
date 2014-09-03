@@ -191,10 +191,8 @@ public:
 };
 
 class DwarfDebug {
-#if defined(AMD_OPENCL) || 1
 // HSA requires relaxed abstraction
 protected:
-#endif
   /// Asm - Target of Dwarf emission.
   AsmPrinter *Asm;
 
@@ -458,26 +456,9 @@ private:
   /// beginning of or ending of a scope.
   void identifyScopeMarkers();
 
-#if defined(AMD_OPENCL) || 1
 protected:
   /// addCurrentFnArgument - If Var is an current function argument that add
-  /// it in CurrentFnArguments list. This method is declared virtual because
-  /// function arguments need special handling in BRIGDwarfDebug
-  virtual bool addCurrentFnArgument(const MachineFunction *MF,
-                                    DbgVariable *Var, LexicalScope *Scope);
-
-  /// collectVariableInfo - Populate LexicalScope entries with variables' info.
-  /// This method is declared virtual because private and group variables
-  /// require special handling in BRIGDwarfDebug
-  virtual void collectVariableInfo(const MachineFunction *,
-                                   SmallPtrSet<const MDNode *, 16> &ProcessedVars);
-
-private:
-
-#else
-
-  /// addCurrentFnArgument - If Var is an current function argument that add
-  /// it in CurrentFnArguments list.
+  /// it in CurrentFnArguments list. 
   bool addCurrentFnArgument(const MachineFunction *MF,
                             DbgVariable *Var, LexicalScope *Scope);
 
@@ -485,7 +466,8 @@ private:
   void collectVariableInfo(const MachineFunction *,
                            SmallPtrSet<const MDNode *, 16> &ProcessedVars);
 
-#endif // AMD_OPENCL
+private:
+
   /// collectVariableInfoFromMMITable - Collect variable information from
   /// side table maintained by MMI.
   void collectVariableInfoFromMMITable(const MachineFunction * MF,
@@ -506,36 +488,11 @@ private:
 
   /// getLabelAfterInsn - Return Label immediately following the instruction.
   const MCSymbol *getLabelAfterInsn(const MachineInstr *MI);
-#if defined(AMD_OPENCL) || 1
-protected:
-  /// createCompileUnitInstance - Returns target-specific instance of CompileUnit
-  virtual CompileUnit* createCompileUnit(unsigned int I, 
-                                         unsigned int L, DIE* D);
-
-  /// shouldCoalesceDbgValue - Returns true if MInst should be coalesced with History
-  virtual bool shouldCoalesceDbgValue(const SmallVectorImpl<const MachineInstr*> &History,
-                                      const MachineInstr* MInsn);
-
-  /// recordDebugLocsForVariable - records debug locations for variable
-  virtual void recordDebugLocsForVariable(const SmallVectorImpl<const MachineInstr*> &History,
-                                          DbgVariable *RegVar, LexicalScope *Scope);
-
-  virtual DIE *constructDIEsForFnArguments(CompileUnit *TheCU, LexicalScope *Scope,
-                                           SmallVector <DIE *, 8>& Children);
-
-  virtual DIE *constructDIEsForScopeVariables(CompileUnit *TheCU, LexicalScope *Scope,
-                                              SmallVector <DIE *, 8>& Children);
-
-  virtual void constructDIEsForNestedScopes(CompileUnit *TheCU, LexicalScope *Scope,
-                                            SmallVector <DIE *, 8>& Children);
-  
-#endif // AMD_OPENCL
 
 public:
   //===--------------------------------------------------------------------===//
   // Main entry points.
   //
-#if defined(AMD_OPENCL) || 1
 protected:
   // allow constructor call from either AsmPrinter or children
   // AsmPrinter must call beginModule() after just after instantiating DwarfDebug
@@ -544,11 +501,6 @@ protected:
 
 public:
   virtual ~DwarfDebug();
-#else
-
-  DwarfDebug(AsmPrinter *A, Module *M);
-  ~DwarfDebug();
-#endif // AMD_OPENCL
   /// collectInfoFromNamedMDNodes - Collect debug info from named mdnodes such
   /// as llvm.dbg.enum and llvm.dbg.ty
   void collectInfoFromNamedMDNodes(Module *M);
@@ -590,16 +542,6 @@ public:
   /// getStringPoolEntry - returns an entry into the string pool with the given
   /// string text.
   MCSymbol *getStringPoolEntry(StringRef Str);
-
-  // jgolds
-#if 1 || defined(AMD_OPENCL)
-  /// DbgVariableToAddrSpaceMap - Maps DbgVariable of pointer type
-  /// to the address space
-  DenseMap<const DbgVariable *, unsigned> DbgVariableToAddrSpaceMap;
-
-  /// DbgVariableToValueMap - Maps DbgVariable to Value
-  DenseMap<const DbgVariable *, const Value *> DbgVariableToValueMap;
-#endif
 
   /// useDarwinGDBCompat - returns whether or not to limit some of our debug
   /// output to the limitations of darwin gdb.

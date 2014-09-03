@@ -165,14 +165,6 @@ void HSAILModuleInfo::processModule(const Module *M,
     return;
   }
 
-// D2_OPENCL_HSA
-#if 0
-  if (isSPIRModule(*M))
-    parseMetadata(this, M);
-  else
-   parseEdgGlobalVariables(M, mTM);
-#endif
-
   // Make sure we only process the module once even though this function
   // is called everytime a MachineFunctionInfo object is instantiated.
   mProcessed = true;

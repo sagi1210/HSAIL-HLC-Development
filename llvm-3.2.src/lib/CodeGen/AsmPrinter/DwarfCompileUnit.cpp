@@ -28,45 +28,20 @@
 #include "llvm/Target/TargetRegisterInfo.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/Support/ErrorHandling.h"
-
-#if 1 || defined(AMD_OPENCL) 
-#include "llvm/AMDLLVMContextHook.h"
 #include "llvm/Module.h"
 #include "llvm/Function.h"
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineModuleInfo.h"
-#endif
 
 using namespace llvm;
 
-#if defined(AMD_OPENCL) || 1
 
 /// CompileUnit - Compile unit constructor.
 CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, 
-             DwarfDebug *DW, CUKind scid)
-  : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0), 
-    SubclassID(scid) {
-  DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
-}
-
-CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A, 
-             DwarfDebug *DW) 
-  : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0), 
-    SubclassID(DwarfCompileUnit) {
-  DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
-}
-
-CompileUnit::CUKind CompileUnit::getCUKind() const {
-  return SubclassID;
-}
-#else
-/// CompileUnit - Compile unit constructor.
-CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A,
                          DwarfDebug *DW)
   : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0) {
   DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
 }
-#endif // AMD_OPENCL
 
 /// ~CompileUnit - Destructor for compile unit.
 CompileUnit::~CompileUnit() {
@@ -83,16 +58,6 @@ DIEEntry *CompileUnit::createDIEEntry(DIE *Entry) {
 
 /// addFlag - Add a flag that is true.
 void CompileUnit::addFlag(DIE *Die, unsigned Attribute) {
-#if defined(AMD_OPENCL) || 1
-  // HSA expects DW_FORM_flag attribute
-  if (!AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple()) &&
-      !DD->useDarwinGDBCompat())
-#else
-  if (!DD->useDarwinGDBCompat())
-#endif // AMD_OPENCL
-      Die->addValue(Attribute, dwarf::DW_FORM_flag_present,
-                  DIEIntegerOne);
-  else
     addUInt(Die, Attribute, dwarf::DW_FORM_flag, 1);
 }
 
@@ -772,25 +737,17 @@ void CompileUnit::constructTypeDIE(DIE &Buffer, DIDerivedType DTy) {
     addString(&Buffer, dwarf::DW_AT_name, Name);
 
   // Add size if non-zero (derived types might be zero-sized.)
-#if defined(AMD_OPENCL) || 1
   // HSA Debugger is expecting DW_AT_byte_size for pointer type
   if (Size && 
-     (AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple()) ||
-      Tag != dwarf::DW_TAG_pointer_type))
-#else
-  if (Size && Tag != dwarf::DW_TAG_pointer_type)
-#endif
+      Tag != dwarf::DW_TAG_pointer_type)
     addUInt(&Buffer, dwarf::DW_AT_byte_size, 0, Size);
 
   // Add source line info if available and TyDesc is not a forward declaration.
   if (!DTy.isForwardDecl())
     addSourceLine(&Buffer, DTy);
 
-#if defined(AMD_OPENCL) || 1
   // Add the address space as an attribute
-  if (AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple()))
-    addUInt(&Buffer, dwarf::DW_AT_address_class, dwarf::DW_FORM_data4, DTy.getAddressSpace());
-#endif
+  addUInt(&Buffer, dwarf::DW_AT_address_class, dwarf::DW_FORM_data4, DTy.getAddressSpace());
 }
 
 /// constructTypeDIE - Construct type DIE from DICompositeType.
@@ -1236,27 +1193,6 @@ void CompileUnit::createGlobalVariableDIE(const MDNode *N) {
 
   // Add line number info.
   addSourceLine(VariableDIE, GV);
-#if 1 || defined(AMD_OPENCL) 
-  if (isGlobalVariable) {
-    const Module *M = Asm->MMI->getModule();
-    if (Value *V = M->getNamedGlobal(LinkageName)) {
-      if (PointerType *PT = dyn_cast<PointerType>(V->getType())) {
-        unsigned addressSpace = PT->getAddressSpace();
-        // Since the IR for a constant global designates it to be in the private address space,
-        // it needs to be converted to the constant address space.
-        addressSpace = Asm->correctDebugAS(addressSpace, V);
-        // We don't want to emit this information for the default address space.
-        if (addressSpace) {
-          addUInt(VariableDIE, dwarf::DW_AT_AMDIL_address_space, 0, addressSpace);
-        }
-        uint32_t RID;
-        if (Asm->getDebugResourceID(V, RID))
-          addUInt(VariableDIE, dwarf::DW_AT_AMDIL_resource, 0, RID);
-      }
-    }
-  }
-#endif
-
   // Add to context owner.
   DIDescriptor GVContext = GV.getContext();
   addToContextOwner(VariableDIE, GVContext);
@@ -1267,12 +1203,8 @@ void CompileUnit::createGlobalVariableDIE(const MDNode *N) {
     addToAccelTable = true;
     DIEBlock *Block = new (DIEValueAllocator) DIEBlock();
     addUInt(Block, 0, dwarf::DW_FORM_data1, dwarf::DW_OP_addr);
-#if defined(AMD_OPENCL) || 1
-    addGVLabelToBlock(Block, &GV);
-#else
     addLabel(Block, 0, dwarf::DW_FORM_udata,
              Asm->Mang->getSymbol(GV.getGlobal()));
-#endif
 
     // Do not create specification DIE if context is either compile unit
     // or a subprogram.
@@ -1419,52 +1351,7 @@ DIE *CompileUnit::constructVariableDIE(DbgVariable *DV, bool isScopeAbstract) {
     addString(VariableDie, dwarf::DW_AT_name, Name);
     addSourceLine(VariableDie, DV->getVariable());
     addType(VariableDie, DV->getType());
-#if defined(AMD_OPENCL) || 1
-    if (!AMDOptions::isTargetHSAIL(Asm->TM.getTargetTriple())) {
-      bool hasATSet = false;
-      DenseMap<const DbgVariable *, unsigned>::iterator DVASI =
-      DD->DbgVariableToAddrSpaceMap.find(DV);
-      if (DVASI != DD->DbgVariableToAddrSpaceMap.end()) {
-        unsigned addressSpace = DVASI->second;
-        addUInt(VariableDie, dwarf::DW_AT_AMDIL_address_space, 0, addressSpace );
-        hasATSet = true;
       }
-      //the resource ID for every kernel argument:
-      DenseMap<const DbgVariable *, const Value *>::iterator DVVALUE =
-      DD->DbgVariableToValueMap.find(DV);
-      if (DVVALUE != DD->DbgVariableToValueMap.end()) {
-        const Value *Val = DVVALUE->second;
-        uint32_t RID;
-        if (Asm->getDebugResourceID(Val, RID)) {
-          addUInt(VariableDie, dwarf::DW_AT_AMDIL_resource, 0, RID);
-          hasATSet = true;
-        }
-      }
-      if (!hasATSet) {
-        MDNode *MDN = &*DV->getVariable();
-        const MachineFunction *MF = Asm->MF;
-        DenseMap<const MDNode *, const Value*>::const_iterator II =
-          MF->DIVToValueMap.find(MDN);
-        if (II != MF->DIVToValueMap.end()) {
-          const Value *V = II->second;
-          PointerType *PTy = dyn_cast<PointerType>(V->getType());
-          assert(PTy && "DIVToValueMap[] should have value of pointer type");
-          if (PointerType *PT = dyn_cast<PointerType>(PTy->getElementType())) {
-            unsigned addressSpace = PT->getAddressSpace();
-            if (addressSpace > 0) {
-              addUInt(VariableDie, dwarf::DW_AT_AMDIL_address_space, 0, addressSpace);
-              hasATSet = true;
-
-              uint32_t RID;
-              if (Asm->getDebugResourceID(V, RID))
-                addUInt(VariableDie, dwarf::DW_AT_AMDIL_resource, 0, RID);
-            }
-          }
-        }
-      }
-    }
-#endif // AMD_OPENCL
-  }
 
   if (DV->isArtificial())
     addFlag(VariableDie, dwarf::DW_AT_artificial);
@@ -1478,13 +1365,9 @@ DIE *CompileUnit::constructVariableDIE(DbgVariable *DV, bool isScopeAbstract) {
 
   unsigned Offset = DV->getDotDebugLocOffset();
   if (Offset != ~0U) {
-#if defined(AMD_OPENCL) || 1
-    addDebugLocOffset(DV, VariableDie, Offset);
-#else
     addLabel(VariableDie, dwarf::DW_AT_location,
-                          dwarf::DW_FORM_data4,
-                          Asm->GetTempSymbol("debug_loc", Offset));
-#endif
+                         dwarf::DW_FORM_data4,
+                         Asm->GetTempSymbol("debug_loc", Offset));
 
     DV->setDIE(VariableDie);
     return VariableDie;
@@ -1666,15 +1549,3 @@ DIE *CompileUnit::createMemberDIE(DIDerivedType DT) {
   }
   return MemberDie;
 }
-#if defined(AMD_OPENCL) || 1
-void CompileUnit::addGVLabelToBlock(DIEBlock* block, const DIGlobalVariable* GV) {
-  addLabel(block, 0, dwarf::DW_FORM_udata, Asm->Mang->getSymbol(GV->getGlobal()));
-}
-
-void CompileUnit::addDebugLocOffset(const DbgVariable* dbgv, DIE* VariableDie, unsigned int Offset) {
-  addLabel(VariableDie, 
-           dwarf::DW_AT_location,
-           dwarf::DW_FORM_data4,
-           Asm->GetTempSymbol("debug_loc", Offset));
-}
-#endif

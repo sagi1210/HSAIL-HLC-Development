@@ -56,7 +56,7 @@ namespace llvm {
 
   BRIGDwarfCompileUnit::BRIGDwarfCompileUnit(unsigned I, 
     DIE *D, BRIGAsmPrinter *A, BRIGDwarfDebug *DW) :
-    CompileUnit(I, 0, D, A, DW, CompileUnit::BRIGDwarfCompileUnit), m_brigAP(A), m_brigDD(DW) {
+    CompileUnit(I, 0, D, A, DW), m_brigAP(A), m_brigDD(DW) {
   }
 
   BRIGDwarfCompileUnit::~BRIGDwarfCompileUnit() {

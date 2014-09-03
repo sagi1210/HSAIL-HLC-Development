@@ -187,7 +187,6 @@ public:
     return predictableSelectIsExpensive;
   }
 
-//D2_OPENCL
   /// getSetCCResultType - Return the ValueType of the result of SETCC
   /// operations.  Also used to obtain the target's preferred type for
   /// the condition operand of SELECT and BRCOND nodes.  In the case of

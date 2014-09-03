@@ -11,19 +11,6 @@ tablegen(LLVM HSAILGenIntrinsics.inc -gen-tgt-intrinsic)
 tablegen(LLVM HSAILGenBrigWriter.inc -gen-brig-writer)
 tablegen(LLVM HSAILGenVecMap.inc -gen-hsail-vec-map)
 
-# llvm_tablegen(HSAILGenAsmMatcher.inc -gen-asm-matcher)
-# llvm_tablegen(HSAILGenAsmWriter.inc -gen-asm-writer)
-# llvm_tablegen(HSAILGenCallingConv.inc -gen-callingconv)
-# llvm_tablegen(HSAILGenDAGISel.inc -gen-dag-isel)
-# llvm_tablegen(HSAILGenEDInfo.inc -gen-enhanced-disassembly-info)
-# llvm_tablegen(HSAILGenFastISel.inc -gen-fast-isel)
-# llvm_tablegen(HSAILGenInstrNames.inc -gen-instr-enums)
-# llvm_tablegen(HSAILGenInstrInfo.inc -gen-instr-desc)
-# llvm_tablegen(HSAILGenIntrinsics.inc -gen-tgt-intrinsic)
-# llvm_tablegen(HSAILGenRegisterInfo.inc -gen-register-desc)
-# llvm_tablegen(HSAILGenRegisterNames.inc -gen-register-enums)
-# llvm_tablegen(HSAILGenSubtarget.inc -gen-subtarget)
-
 add_public_tablegen_target(HSAILCommonTableGen)
 
 set(sources
@@ -36,7 +23,6 @@ set(sources
   BRIGDwarfStreamer.cpp 
   HSAILDevice.cpp
   HSAILDeviceInfo.cpp
-  HSAILEarlyCFGOpts.cpp
   HSAILELFObjectWriter.cpp
   HSAILELFTargetObjectFile.cpp
   HSAILELFWriterInfo.cpp
@@ -57,12 +43,8 @@ set(sources
   HSAILTargetMachine.cpp
   HSAILUtilityFunctions.cpp
   RawVectorOstream.cpp
-  HSAILControlDependencyAnalysis.cpp
-  HSAILResizePointer.cpp
-  HSAILOpaqueTypes.cpp
-  HSAILUniformOperations.cpp
   HSAILFastISel.cpp
-  HSAILMergeLoadStores.cpp
+  HSAILOpaqueTypes.cpp
   )
 
 if( CMAKE_CL_64 )

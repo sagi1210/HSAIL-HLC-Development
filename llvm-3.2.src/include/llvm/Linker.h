@@ -253,7 +253,7 @@ class Linker {
     bool LinkInModule(
       Module* Src,              ///< Module linked into \p Dest
       std::string* ErrorMsg = 0 /// Error/diagnostic string
-    ) { 
+    ) {
       return LinkModules(Composite, Src, Linker::DestroySource, ErrorMsg);
     }
 
@@ -269,11 +269,9 @@ class Linker {
     /// @returns True if an error occurs, false otherwise.
     /// @brief Generically link two modules together.
 
-#if defined(AMD_OPENCL) || 1
     static bool LinkModules(Module* Dest, Module* Src, unsigned Mode,
                             std::map<const Value*, bool>* ReferenceMap,
                             std::string* ErrorMsg);
-#endif
 
     static bool LinkModules(Module* Dest, Module* Src, unsigned Mode,
                             std::string* ErrorMsg);

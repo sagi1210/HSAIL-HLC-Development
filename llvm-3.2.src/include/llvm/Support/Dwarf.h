@@ -132,9 +132,7 @@ enum dwarf_constants {
   DW_TAG_GNU_formal_parameter_pack = 0x4108,
   DW_TAG_lo_user = 0x4080,
   DW_TAG_APPLE_property = 0x4200,
-#if defined(AMD_OPENCL) || 1
   DW_TAG_HSA_argument_scope = 0x8000,
-#endif
   DW_TAG_hi_user = 0xffff,
 
   // Children flag
@@ -258,13 +256,11 @@ enum dwarf_constants {
   DW_AT_GNU_vector = 0x2107,
   DW_AT_GNU_template_name = 0x2110,
   DW_AT_MIPS_assumed_size = 0x2011,
-#if defined(AMD_OPENCL) || 1
   DW_AT_HSA_is_kernel = 0x3000,
   DW_AT_HSA_is_outParam = 0x3001,
   DW_AT_HSA_workitemid_offset = 0x3002,
   DW_AT_HSA_isa_memory_region = 0x3003,
   DW_AT_HSA_brig_offset = 0x3004,
-#endif
   DW_AT_lo_user = 0x2000,
   DW_AT_hi_user = 0x3fff,
 
@@ -282,13 +278,8 @@ enum dwarf_constants {
   DW_AT_APPLE_property_attribute = 0x3feb,
   DW_AT_APPLE_objc_complete_type = 0x3fec,
   DW_AT_APPLE_property = 0x3fed,
-
-  // jgolds
-#if 1 || defined(AMD_OPENCL)
-  // AMDIL extensions.
   DW_AT_AMDIL_address_space = 0x3ff1,
   DW_AT_AMDIL_resource = 0x3ff2,
-#endif
 
   // Attribute form encodings
   DW_FORM_addr = 0x01,
@@ -547,9 +538,7 @@ enum dwarf_constants {
   DW_LANG_Python = 0x0014,
   DW_LANG_lo_user = 0x8000,
   DW_LANG_Mips_Assembler = 0x8001,
-#if defined(AMD_OPENCL) || 1
   DW_LANG_HSA_Assembly = 0x9000,
-#endif
   DW_LANG_hi_user = 0xffff,
 
   // Identifier case codes

@@ -11,7 +11,6 @@ endif()
 add_subdirectory(opt)
 add_subdirectory(llvm-as)
 add_subdirectory(llvm-dis)
-# D2_OPENCL_HSA
 #add_subdirectory(llvm-mc)
 
 add_subdirectory(llc)
@@ -28,7 +27,6 @@ add_subdirectory(lli)
 add_subdirectory(llvm-extract)
 add_subdirectory(llvm-diff)
 add_subdirectory(macho-dump)
-# D2_OPENCL_HSA
 #add_subdirectory(llvm-objdump)
 add_subdirectory(llvm-readobj)
 add_subdirectory(llvm-rtdyld)

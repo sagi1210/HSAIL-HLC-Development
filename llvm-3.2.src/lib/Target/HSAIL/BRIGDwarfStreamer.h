@@ -29,13 +29,11 @@ public:
   virtual void InitSections();
   virtual void Finish();
 
-  virtual MCStreamer::MCStreamerKind getStreamerKind() const;
-
   RawVectorOstream* getDwarfStream();
 
   //support for LLVM-style RTTI operations like dyn_cast
   inline static bool classof(const BRIGDwarfStreamer* ) { return true; }
-  inline static bool classof(const MCStreamer* streamer) { return streamer->getStreamerKind() == MCStreamer::BRIGDwarfStreamer; }
+  inline static bool classof(const MCStreamer* streamer) { return true; }
 };
 
 

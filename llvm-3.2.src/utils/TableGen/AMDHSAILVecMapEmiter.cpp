@@ -1,4 +1,3 @@
-#if defined(AMD_OPENCL) || 1
 #include "AMDHSAILVecMapEmiter.h"
 #include "CodeGenTarget.h"
 
@@ -117,4 +116,3 @@ namespace llvm {
   } 
 } // End llvm namespace
 
-#endif // AMD_OPENCL

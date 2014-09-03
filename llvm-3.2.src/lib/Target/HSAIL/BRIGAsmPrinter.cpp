@@ -1272,9 +1272,9 @@ HSAIL_ASM::Inst BRIGAsmPrinter::EmitInstructionImpl(const MachineInstr *II) {
 
 bool BRIGAsmPrinter::doFinalization(Module &M) {
 
+#if 0
   if (getDwarfDebug()) {
     // NamedRegionTimer T(DbgTimerName, DWARFGroupName, TimePassesIsEnabled);
-#if 0
     // Adjust size of fake .brigdirectives section to match actual size of
     // BRIG .directives section
     OutStreamer.SwitchSection(OutStreamer.getContext().getObjectFileInfo()->
@@ -1282,12 +1282,12 @@ bool BRIGAsmPrinter::doFinalization(Module &M) {
     OutStreamer.EmitZeros(brigantine.container().directives().size(), 0);
     // This is not needed at this time, because dwarflinker expects
     // .brigdirectives size to be zero
-#endif
     DwarfDebug *mDD = getDwarfDebug();
     mDD->endModule();
     delete mDD;
     setDwarfDebug(NULL);
   }
+#endif
 
   // LLVM Bug 9761. Nothing should be emitted after EmitEndOfAsmFile()
   OutStreamer.FinishImpl();
@@ -1506,11 +1506,13 @@ HSAIL_ASM::DirectiveVariable BRIGAsmPrinter::EmitLocalVariable(
 /// EmitFunctionBodyStart - Targets can override this to emit stuff before
 /// the first basic block in the function.
 void BRIGAsmPrinter::EmitFunctionBodyStart() {
+#if 0
   DwarfDebug *mDD = getDwarfDebug();
   if (mDD) {
     //NamedRegionTimer T(DbgTimerName, DWARFGroupName, TimePassesIsEnabled);
     mDD->beginFunction(MF);
   }
+#endif
 
   brigantine.startBody();
 
@@ -1932,20 +1934,6 @@ MachineLocation BRIGAsmPrinter::getDebugValueLocation(const MachineInstr *MI)
 /// encoding specified.
 unsigned BRIGAsmPrinter::getISAEncoding() {
   return 0;
-}
-
-DwarfDebug* BRIGAsmPrinter::CreateDwarfDebug(Module& M) {
-  BRIGDwarfDebug* BDW = new BRIGDwarfDebug(this, &M);
-  BDW->beginModule(&M);
-  // Emit named symbol in the beginning of .brigdirectives section
-  // DwarfDebug does not emit named symbol in the beginning of this section
-  // This symbol is used for generation of relocation table
-  const TargetLoweringObjectFile &TLOF = getObjFileLowering();
-  OutStreamer.SwitchSection(TLOF.getDataSection());
-  MCSymbol *TmpSym = GetTempSymbol("directives_begin");
-  OutStreamer.EmitLabel(TmpSym);
-
-  return BDW;
 }
 
 /// Returns true and the offset of %privateStack BRIG variable, or false

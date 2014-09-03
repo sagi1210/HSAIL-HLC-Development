@@ -116,15 +116,6 @@ namespace llvm {
   protected:
     explicit AsmPrinter(TargetMachine &TM, MCStreamer &Streamer);
 
-#if defined(AMD_OPENCL) || 1
-    // the target needs access to the DwarfDebug member so that it may
-    // call the DD begin* and end* functions itself at the appropriate time
-    DwarfDebug *getDwarfDebug() { return DD; };
-    void setDwarfDebug(DwarfDebug *nDD) { DD = nDD; };
-    // This function will be overloaded in HSAIL to create BRIGDwarfDebug object
-    virtual DwarfDebug *CreateDwarfDebug(Module &M);
-#endif
-
   public:
     virtual ~AsmPrinter();
 
@@ -235,13 +226,9 @@ namespace llvm {
     /// EmitBasicBlockStart - This method prints the label for the specified
     /// MachineBasicBlock, an alignment (if present) and a comment describing
     /// it if appropriate.
-#if  defined(AMD_OPENCL) || 1
     // BRIG LOWERING: we have to turn it to virtual and override to maintain 
     // BasicBlock entry label map.. and it IS NOT CONST anymore
     virtual void EmitBasicBlockStart(const MachineBasicBlock *MBB);
-#else
-    void EmitBasicBlockStart(const MachineBasicBlock *MBB) const;
-#endif // AMD_OPENCL
 
     /// EmitGlobalConstant - Print a general LLVM constant to the .s file.
     void EmitGlobalConstant(const Constant *CV, unsigned AddrSpace = 0);
@@ -417,13 +404,6 @@ namespace llvm {
     /// getDebugValueLocation - Get location information encoded by DBG_VALUE
     /// operands.
     virtual MachineLocation getDebugValueLocation(const MachineInstr *MI) const;
-
-#if 1 || defined(AMD_OPENCL)
-    /// getDebugResourceLocation - Get resource id information encoded in
-    /// target flags.
-    virtual bool getDebugResourceID(const Value *V, uint32_t& RID) const;
-    virtual unsigned correctDebugAS(unsigned a, const Value *) const { return a; }
-#endif
 
     /// getISAEncoding - Get the value for DW_AT_APPLE_isa. Zero if no isa
     /// encoding specified.

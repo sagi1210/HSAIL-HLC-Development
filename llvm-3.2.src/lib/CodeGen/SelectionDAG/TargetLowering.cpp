@@ -1923,7 +1923,6 @@ TargetLowering::SimplifySetCC(EVT VT, SDValue N0, SDValue N1,
 
   // Ensure that the constant occurs on the RHS, and fold constant
   // comparisons.
-//D2_OPENCL
   ISD::CondCode SwappedCC = ISD::getSetCCSwappedOperands(Cond);
   if (isa<ConstantSDNode>(N0.getNode()) &&
       (DCI.isBeforeLegalizeOps() ||
@@ -2116,18 +2115,12 @@ TargetLowering::SimplifySetCC(EVT VT, SDValue N0, SDValue N1,
         if (DCI.isBeforeLegalizeOps() ||
             (isOperationLegal(ISD::SETCC, newVT) &&
              getCondCodeAction(Cond, newVT)==Legal)) {
-#if defined(AMD_OPENCL) || 1
-          EVT NewSetCCVT = getSetCCResultType(*DAG.getContext(), newVT);
-          SDValue NewConst = DAG.getConstant(C1.trunc(InSize), newVT);
+          	EVT NewSetCCVT = getSetCCResultType(*DAG.getContext(), newVT);
+	        SDValue NewConst = DAG.getConstant(C1.trunc(InSize), newVT);
 
-          SDValue NewSetCC = DAG.getSetCC(dl, NewSetCCVT, N0.getOperand(0),
+          	SDValue NewSetCC = DAG.getSetCC(dl, NewSetCCVT, N0.getOperand(0),
                                           NewConst, Cond);
-          return DAG.getBoolExtOrTrunc(NewSetCC, dl, VT);
-#else
-          return DAG.getSetCC(dl, VT, N0.getOperand(0),
-                              DAG.getConstant(C1.trunc(InSize), newVT),
-                              Cond);
-#endif
+          	return DAG.getBoolExtOrTrunc(NewSetCC, dl, VT);
 	}
         break;
       }
@@ -2176,7 +2169,6 @@ TargetLowering::SimplifySetCC(EVT VT, SDValue N0, SDValue N1,
         ISD::CondCode CC = cast<CondCodeSDNode>(N0.getOperand(2))->get();
         CC = ISD::getSetCCInverse(CC,
                                   N0.getOperand(0).getValueType().isInteger());
-// D2_OPENCL
         if (DCI.isBeforeLegalizeOps() ||
             isCondCodeLegal(CC, N0.getOperand(0).getValueType()))
           return DAG.getSetCC(dl, VT, N0.getOperand(0), N0.getOperand(1), CC);
@@ -2610,7 +2602,6 @@ TargetLowering::SimplifySetCC(EVT VT, SDValue N0, SDValue N1,
       if (N0.getOperand(0) == N1 || N0.getOperand(1) == N1) {
         if (ValueHasExactlyOneBitSet(N1, DAG)) {
           Cond = ISD::getSetCCInverse(Cond, /*isInteger=*/true);
-//D2_OPENCL
           if (DCI.isBeforeLegalizeOps() ||
               isCondCodeLegal(Cond, N0.getValueType())) {
             SDValue Zero = DAG.getConstant(0, N1.getValueType());
@@ -2622,7 +2613,6 @@ TargetLowering::SimplifySetCC(EVT VT, SDValue N0, SDValue N1,
       if (N1.getOperand(0) == N0 || N1.getOperand(1) == N0) {
         if (ValueHasExactlyOneBitSet(N0, DAG)) {
           Cond = ISD::getSetCCInverse(Cond, /*isInteger=*/true);
-//D2_OPENCL
           if (DCI.isBeforeLegalizeOps() ||
               isCondCodeLegal(Cond, N1.getValueType())) {
             SDValue Zero = DAG.getConstant(0, N0.getValueType());

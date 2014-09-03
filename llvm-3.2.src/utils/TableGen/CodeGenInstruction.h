@@ -270,11 +270,9 @@ namespace llvm {
     /// include text from the specified variant, returning the new string.
     static std::string FlattenAsmStringVariants(StringRef AsmString,
                                                 unsigned Variant);
-#if defined(AMD_OPENCL) || 1
     bool needSpecialProcessing;
     bool isImageInst;
     bool isCrossLaneInst;
-#endif
   };
 
 

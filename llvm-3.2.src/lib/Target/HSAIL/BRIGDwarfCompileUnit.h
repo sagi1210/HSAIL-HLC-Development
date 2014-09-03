@@ -41,7 +41,7 @@ namespace llvm {
     } 
 
     static inline bool classof(const CompileUnit* CU) {
-      return CU->getCUKind() == CompileUnit::BRIGDwarfCompileUnit;
+     return true;
     }
 
   }; // class BRIGDwarfCompileUnit

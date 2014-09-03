@@ -45,10 +45,6 @@
 #include "llvm/Support/Timer.h"
 #include "llvm/Support/Path.h"
 
-#if defined(AMD_OPENCL) || 1
-#include "llvm/AMDLLVMContextHook.h"
-#endif // AMD_OPENCL
-
 using namespace llvm;
 
 static cl::opt<bool> DisableDebugInfoPrinting("disable-debug-info-print",
@@ -178,14 +174,6 @@ DwarfDebug::DwarfDebug(AsmPrinter *A, Module *M)
       hasDwarfAccelTables = false;
   } else
     hasDwarfAccelTables = DwarfAccelTables == Enable ? true : false;
-#if defined(AMD_OPENCL) || 1
-  // For HSA beginModule must be explicitly called by AsmPrinter
-  if (!AMDOptions::isTargetHSAIL(M->getTargetTriple()))
-#endif
-  {
-    NamedRegionTimer T(DbgTimerName, DWARFGroupName, TimePassesIsEnabled);
-    beginModule(M);
-  }
 }
 DwarfDebug::~DwarfDebug() {
 }
@@ -505,49 +493,6 @@ DIE *DwarfDebug::constructInlinedScopeDIE(CompileUnit *TheCU,
   return ScopeDIE;
 }
 
-#if defined(AMD_OPENCL) || 1
-
-DIE *DwarfDebug::constructDIEsForFnArguments(CompileUnit *TheCU, LexicalScope *Scope,
-                                             SmallVector <DIE *, 8>& Children) {
-  DIE *ObjectPointer = NULL;
-
-  // Collect arguments for current function.
-  if (LScopes.isCurrentFunctionScope(Scope))
-    for (unsigned i = 0, N = CurrentFnArguments.size(); i < N; ++i)
-      if (DbgVariable *ArgDV = CurrentFnArguments[i])
-        if (DIE *Arg = 
-            TheCU->constructVariableDIE(ArgDV, Scope->isAbstractScope())) {
-          Children.push_back(Arg);
-          if (ArgDV->isObjectPointer()) ObjectPointer = Arg;
-        }
-  return ObjectPointer;
-}
-
-DIE *DwarfDebug::constructDIEsForScopeVariables(CompileUnit *TheCU, LexicalScope *Scope,
-                                                SmallVector <DIE *, 8>& Children) {
-  DIE *ObjectPointer = NULL;
-
-  const SmallVector<DbgVariable *, 8> &Variables = ScopeVariables.lookup(Scope);
-  for (unsigned i = 0, N = Variables.size(); i < N; ++i)
-    if (DIE *Variable = 
-        TheCU->constructVariableDIE(Variables[i], Scope->isAbstractScope())) {
-      Children.push_back(Variable);
-      if (Variables[i]->isObjectPointer()) ObjectPointer = Variable;
-    }
-  return ObjectPointer;
-}
-
-void DwarfDebug::constructDIEsForNestedScopes(CompileUnit *TheCU, LexicalScope *Scope,
-                                              SmallVector <DIE *, 8>& Children) {
-  const SmallVector<LexicalScope *, 4> &Scopes = Scope->getChildren();
-  for (unsigned j = 0, M = Scopes.size(); j < M; ++j)
-    if (DIE *Nested = constructScopeDIE(TheCU, Scopes[j]))
-      Children.push_back(Nested);
-}
-
-
-#endif // AMD_OPENCL
-
 /// constructScopeDIE - Construct a DIE for this scope.
 DIE *DwarfDebug::constructScopeDIE(CompileUnit *TheCU, LexicalScope *Scope) {
   if (!Scope || !Scope->getScopeNode())
@@ -555,16 +500,12 @@ DIE *DwarfDebug::constructScopeDIE(CompileUnit *TheCU, LexicalScope *Scope) {
 
   SmallVector<DIE *, 8> Children;
   DIE *ObjectPointer = NULL;
-#if defined(AMD_OPENCL) || 1
-  ObjectPointer = constructDIEsForFnArguments(TheCU, Scope, Children);
-  ObjectPointer = constructDIEsForScopeVariables(TheCU, Scope, Children);
-  constructDIEsForNestedScopes(TheCU, Scope, Children);
-#else
+
   // Collect arguments for current function.
   if (LScopes.isCurrentFunctionScope(Scope))
     for (unsigned i = 0, N = CurrentFnArguments.size(); i < N; ++i)
       if (DbgVariable *ArgDV = CurrentFnArguments[i])
-        if (DIE *Arg = 
+        if (DIE *Arg =
             TheCU->constructVariableDIE(ArgDV, Scope->isAbstractScope())) {
           Children.push_back(Arg);
           if (ArgDV->isObjectPointer()) ObjectPointer = Arg;
@@ -573,7 +514,7 @@ DIE *DwarfDebug::constructScopeDIE(CompileUnit *TheCU, LexicalScope *Scope) {
   // Collect lexical scope children first.
   const SmallVector<DbgVariable *, 8> &Variables = ScopeVariables.lookup(Scope);
   for (unsigned i = 0, N = Variables.size(); i < N; ++i)
-    if (DIE *Variable = 
+    if (DIE *Variable =
         TheCU->constructVariableDIE(Variables[i], Scope->isAbstractScope())) {
       Children.push_back(Variable);
       if (Variables[i]->isObjectPointer()) ObjectPointer = Variable;
@@ -582,7 +523,6 @@ DIE *DwarfDebug::constructScopeDIE(CompileUnit *TheCU, LexicalScope *Scope) {
   for (unsigned j = 0, M = Scopes.size(); j < M; ++j)
     if (DIE *Nested = constructScopeDIE(TheCU, Scopes[j]))
       Children.push_back(Nested);
-#endif
   DIScope DS(Scope->getScopeNode());
   DIE *ScopeDIE = NULL;
   if (Scope->getInlinedAt())
@@ -604,7 +544,7 @@ DIE *DwarfDebug::constructScopeDIE(CompileUnit *TheCU, LexicalScope *Scope) {
       return NULL;
     ScopeDIE = constructLexicalScopeDIE(TheCU, Scope);
   }
-  
+
   if (!ScopeDIE) return NULL;
 
   // Add children
@@ -654,15 +594,6 @@ unsigned DwarfDebug::GetOrCreateSourceID(StringRef FileName,
   return SrcId;
 }
 
-#if defined(AMD_OPENCL) || 1
-/// createCompileUnitInstance - Returns target-specific instance of CompileUnit
-CompileUnit *DwarfDebug::createCompileUnit(unsigned int I, 
-                                                   unsigned int L,
-                                                   DIE* D) {
-  return new CompileUnit(I, L, D, Asm, this);
-}
-#endif
-
 /// constructCompileUnit - Create new CompileUnit for the given
 /// metadata node with tag DW_TAG_compile_unit.
 CompileUnit *DwarfDebug::constructCompileUnit(const MDNode *N) {
@@ -673,12 +604,8 @@ CompileUnit *DwarfDebug::constructCompileUnit(const MDNode *N) {
 
   DIE *Die = new DIE(dwarf::DW_TAG_compile_unit);
 
-#if defined(AMD_OPENCL) || 1
-  CompileUnit *NewCU = createCompileUnit(ID, DIUnit.getLanguage(), Die);
-#else
   CompileUnit *NewCU = new CompileUnit(ID, DIUnit.getLanguage(), Die,
                                        Asm, this);
-#endif
   NewCU->addString(Die, dwarf::DW_AT_producer, DIUnit.getProducer());
   NewCU->addUInt(Die, dwarf::DW_AT_language, dwarf::DW_FORM_data2,
                  DIUnit.getLanguage());
@@ -816,12 +743,9 @@ bool DwarfDebug::collectLegacyDebugInfo(Module *M) {
 /// content. Create global DIEs and emit initial debug info sections.
 /// This is invoked by the target AsmPrinter.
 void DwarfDebug::beginModule(Module *M) {
-#if defined(AMD_OPENCL) || 1
   // for HSA moved here from constructor
   NamedRegionTimer T(DbgTimerName, DWARFGroupName,
-                     TimePassesIsEnabled &&
-                       AMDOptions::isTargetHSAIL(M->getTargetTriple()));
-#endif
+                     TimePassesIsEnabled);
   if (DisableDebugInfoPrinting)
     return;
 
@@ -1099,60 +1023,6 @@ static DotDebugLocEntry getDebugLocEntry(AsmPrinter *Asm,
   llvm_unreachable("Unexpected 3 operand DBG_VALUE instruction!");
 }
 
-#if defined(AMD_OPENCL) || 1
-
-/// shouldCoalesceDbgValue - Returns true if MInst should be coalesced with History
-bool 
-DwarfDebug::shouldCoalesceDbgValue(const SmallVectorImpl<const MachineInstr*> &History,
-                                   const MachineInstr* MInsn) {
-  return History.size() <= 1 || 
-    (History.size() == 2 && MInsn->isIdenticalTo(History.back()));
-}
-
-/// recordDebugLocsForVariable - records debug locations for variable
-void DwarfDebug::recordDebugLocsForVariable(
-       const SmallVectorImpl<const MachineInstr*> &History,
-       DbgVariable *RegVar, LexicalScope *Scope) {
-  // handle multiple DBG_VALUE instructions describing one variable.
-  RegVar->setDotDebugLocOffset(DotDebugLocEntries.size());
-  for (SmallVectorImpl<const MachineInstr*>::const_iterator
-          HI = History.begin(), HE = History.end(); HI != HE; ++HI) {
-    const MachineInstr *Begin = *HI;
-    assert(Begin->isDebugValue() && "Invalid History entry");
-
-    // Check if DBG_VALUE is truncating a range.
-    if (Begin->getNumOperands() > 1 && Begin->getOperand(0).isReg()
-        && !Begin->getOperand(0).getReg())
-      continue;
-
-    // Compute the range for a register location.
-    const MCSymbol *FLabel = getLabelBeforeInsn(Begin);
-    const MCSymbol *SLabel = 0;
-
-    if (HI + 1 == HE)
-      // If Begin is the last instruction in History then its value is valid
-      // until the end of the function.
-      SLabel = FunctionEndSym;
-    else {
-      const MachineInstr *End = HI[1];
-      DEBUG(dbgs() << "DotDebugLoc Pair:\n" 
-            << "\t" << *Begin << "\t" << *End << "\n");
-      if (End->isDebugValue())
-        SLabel = getLabelBeforeInsn(End);
-      else {
-        // End is a normal instruction clobbering the range.
-        SLabel = getLabelAfterInsn(End);
-        assert(SLabel && "Forgot label after clobber instruction");
-        ++HI;
-      }
-    }
-
-    // The value is valid until the next DBG_VALUE or clobber.
-    DotDebugLocEntries.push_back(getDebugLocEntry(Asm, FLabel, SLabel, Begin));
-  }
-  DotDebugLocEntries.push_back(DotDebugLocEntry());
-}
-#endif // AMD_OPENCL
 /// collectVariableInfo - Find variables for each lexical scope.
 void
 DwarfDebug::collectVariableInfo(const MachineFunction *MF,
@@ -1204,20 +1074,11 @@ DwarfDebug::collectVariableInfo(const MachineFunction *MF,
       AbsVar->setMInsn(MInsn);
 
     // Simplify ranges that are fully coalesced.
-#if defined(AMD_OPENCL) || 1
-    if (shouldCoalesceDbgValue(History, MInsn))
-#else
     if (History.size() <= 1 || (History.size() == 2 &&
-                                MInsn->isIdenticalTo(History.back())))
-#endif
-    {
+                                MInsn->isIdenticalTo(History.back()))) {
       RegVar->setMInsn(MInsn);
       continue;
     }
-
-#if defined(AMD_OPENCL) || 1
-    recordDebugLocsForVariable(History, RegVar, Scope);
-#else
 
     // handle multiple DBG_VALUE instructions describing one variable.
     RegVar->setDotDebugLocOffset(DotDebugLocEntries.size());
@@ -1242,7 +1103,7 @@ DwarfDebug::collectVariableInfo(const MachineFunction *MF,
         SLabel = FunctionEndSym;
       else {
         const MachineInstr *End = HI[1];
-        DEBUG(dbgs() << "DotDebugLoc Pair:\n" 
+        DEBUG(dbgs() << "DotDebugLoc Pair:\n"
               << "\t" << *Begin << "\t" << *End << "\n");
         if (End->isDebugValue())
           SLabel = getLabelBeforeInsn(End);
@@ -1254,12 +1115,12 @@ DwarfDebug::collectVariableInfo(const MachineFunction *MF,
         }
       }
 
+
       // The value is valid until the next DBG_VALUE or clobber.
       DotDebugLocEntries.push_back(getDebugLocEntry(Asm, FLabel, SLabel,
                                                     Begin));
     }
     DotDebugLocEntries.push_back(DotDebugLocEntry());
-#endif
   }
 
   // Collect info for variables that were optimized out.
@@ -1273,6 +1134,7 @@ DwarfDebug::collectVariableInfo(const MachineFunction *MF,
       addScopeVariable(Scope, new DbgVariable(DV, NULL));
   }
 }
+
 
 /// getLabelBeforeInsn - Return Label preceding the instruction.
 const MCSymbol *DwarfDebug::getLabelBeforeInsn(const MachineInstr *MI) {

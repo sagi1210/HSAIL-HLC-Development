@@ -948,7 +948,6 @@ SDValue SelectionDAG::getZExtOrTrunc(SDValue Op, DebugLoc DL, EVT VT) {
     getNode(ISD::TRUNCATE, DL, VT, Op);
 }
 
-#if defined(AMD_OPENCL) || 1
 SDValue SelectionDAG::getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT) {
   if (VT.bitsLE(Op.getValueType()))
     return getNode(ISD::TRUNCATE, SL, VT, Op);
@@ -956,7 +955,6 @@ SDValue SelectionDAG::getBoolExtOrTrunc(SDValue Op, DebugLoc SL, EVT VT) {
   TargetLowering::BooleanContent BType = TLI.getBooleanContents(VT.isVector());
   return getNode(TLI.getExtendForContent(BType), SL, VT, Op);
 }
-#endif
 
 SDValue SelectionDAG::getZeroExtendInReg(SDValue Op, DebugLoc DL, EVT VT) {
   assert(!VT.isVector() &&

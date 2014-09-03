@@ -894,9 +894,6 @@ private:
 protected:
   /// MMO - Memory reference information.
   MachineMemOperand *MMO;
-#if defined(AMD_OPENCL) || 1
-  unsigned memoryScope;
-#endif
 
 public:
   MemSDNode(unsigned Opc, DebugLoc dl, SDVTList VTs, EVT MemoryVT,
@@ -935,11 +932,7 @@ public:
   SynchronizationScope getSynchScope() const {
     return SynchronizationScope((SubclassData >> 12) & 1);
   }
-#if defined(AMD_OPENCL) || 1
-  unsigned getMemoryScope() const {
-    return memoryScope;
-  }
-#endif
+
   /// Returns the SrcValue and offset that describes the location of the access
   const Value *getSrcValue() const { return MMO->getValue(); }
   int64_t getSrcValueOffset() const { return MMO->getOffset(); }
@@ -1009,11 +1002,7 @@ public:
 class AtomicSDNode : public MemSDNode {
   SDUse Ops[4];
 
-  void InitAtomic(AtomicOrdering Ordering, SynchronizationScope SynchScope
-#if defined(AMD_OPENCL) || 1
-          , unsigned MemoryScope
-#endif
-          ) {
+  void InitAtomic(AtomicOrdering Ordering, SynchronizationScope SynchScope) {
     // This must match encodeMemSDNodeFlags() in SelectionDAG.cpp.
     assert((Ordering & 15) == Ordering &&
            "Ordering may not require more than 4 bits!");
@@ -1021,9 +1010,6 @@ class AtomicSDNode : public MemSDNode {
            "SynchScope may not require more than 1 bit!");
     SubclassData |= Ordering << 8;
     SubclassData |= SynchScope << 12;
-#if defined(AMD_OPENCL) || 1
-    memoryScope = MemoryScope;
-#endif
     assert(getOrdering() == Ordering && "Ordering encoding error!");
     assert(getSynchScope() == SynchScope && "Synch-scope encoding error!");
   }
@@ -1040,51 +1026,25 @@ public:
   AtomicSDNode(unsigned Opc, DebugLoc dl, SDVTList VTL, EVT MemVT,
                SDValue Chain, SDValue Ptr,
                SDValue Cmp, SDValue Swp, MachineMemOperand *MMO,
-               AtomicOrdering Ordering, SynchronizationScope SynchScope
-#if defined(AMD_OPENCL) || 1
-               // Default value for MemoryScope is required when the AtomicSDNode
-               // is created from Targets like X86 which do not need memory scope
-               , unsigned MemoryScope = 0
-#endif
-               )
+               AtomicOrdering Ordering, SynchronizationScope SynchScope)
     : MemSDNode(Opc, dl, VTL, MemVT, MMO) {
-    InitAtomic(Ordering, SynchScope
-#if defined(AMD_OPENCL) || 1
-            , MemoryScope
-#endif
-            );
+    InitAtomic(Ordering, SynchScope);
     InitOperands(Ops, Chain, Ptr, Cmp, Swp);
   }
   AtomicSDNode(unsigned Opc, DebugLoc dl, SDVTList VTL, EVT MemVT,
                SDValue Chain, SDValue Ptr,
                SDValue Val, MachineMemOperand *MMO,
-               AtomicOrdering Ordering, SynchronizationScope SynchScope
-#if defined(AMD_OPENCL) || 1
-               , unsigned MemoryScope = 0
-#endif
-               )
+               AtomicOrdering Ordering, SynchronizationScope SynchScope)
     : MemSDNode(Opc, dl, VTL, MemVT, MMO) {
-    InitAtomic(Ordering, SynchScope
-#if defined(AMD_OPENCL) || 1
-            , MemoryScope
-#endif
-            );
+    InitAtomic(Ordering, SynchScope);
     InitOperands(Ops, Chain, Ptr, Val);
   }
   AtomicSDNode(unsigned Opc, DebugLoc dl, SDVTList VTL, EVT MemVT,
                SDValue Chain, SDValue Ptr,
                MachineMemOperand *MMO,
-               AtomicOrdering Ordering, SynchronizationScope SynchScope
-#if defined(AMD_OPENCL) || 1
-               , unsigned MemoryScope = 0
-#endif
-               )
+               AtomicOrdering Ordering, SynchronizationScope SynchScope)
     : MemSDNode(Opc, dl, VTL, MemVT, MMO) {
-    InitAtomic(Ordering, SynchScope
-#if defined(AMD_OPENCL) || 1
-            , MemoryScope
-#endif
-            );
+    InitAtomic(Ordering, SynchScope);
     InitOperands(Ops, Chain, Ptr);
   }
 

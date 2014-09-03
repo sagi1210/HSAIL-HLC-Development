@@ -25,9 +25,7 @@
 #include "llvm/Support/IRReader.h"
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/Path.h"
-#if defined(AMD_OPENCL) || 1
 #include "llvm/AMDResolveLinker.h"
-#endif // AMD_OPENCL
 #include <memory>
 
 using namespace llvm;
@@ -53,7 +51,6 @@ Verbose("v", cl::desc("Print information about actions taken"));
 static cl::opt<bool>
 DumpAsm("d", cl::desc("Print assembly as linked"), cl::Hidden);
 
-#if defined(AMD_OPENCL) || 1
 static cl::opt<bool>
 PreLinkOpt("prelink-opt", cl::desc("Enable pre-link optimizations"));
 
@@ -63,8 +60,6 @@ EnableWholeProgram("whole", cl::desc("Enable whole program mode"));
 static cl::list<std::string> Libraries("l", cl::Prefix,
                                        cl::desc("Specify libraries to link to"),
                                        cl::value_desc("library prefix"));
-
-#endif // AMD_OPENCL
 
 
 // LoadFile - Read the specified bitcode file in and return it.  This routine
@@ -132,7 +127,6 @@ int main(int argc, char **argv) {
   // TODO: Iterate over the -l list and link in any modules containing
   // global symbols that have not been resolved so far.
 
-#if defined(AMD_OPENCL) || 1
 
   // Link unresolved symbols from libraries
   std::vector<Module*> Libs;
@@ -150,20 +144,6 @@ int main(int argc, char **argv) {
   }
 
   if (Libs.size() > 0) {
-    // The first member in the list of libraries is assumed to be
-    // representative of the target device.
-// D2_OPENCL_HSA
-#if 0
-    fixUpModule(Composite.get(), Libs[0]->getTargetTriple(),
-               Libs[0]->getDataLayout());
-
-    if (PreLinkOpt) {
-      AMDPrelinkOpt(Composite.get(), EnableWholeProgram, true,
-                 true, NULL /*UseNative*/,
-                 false);
-    }
-#endif
-
     std::string ErrorMsg;
     if (resolveLink(Composite.get(), Libs, &ErrorMsg)) {
       SMDiagnostic Err(InputFilenames[BaseArg], SourceMgr::DK_Error, ErrorMsg);
@@ -171,8 +151,6 @@ int main(int argc, char **argv) {
       return 1;
     }
   }
-
-#endif // AMD_OPENCL
 
 
   if (DumpAsm) errs() << "Here's the assembly:\n" << *Composite;

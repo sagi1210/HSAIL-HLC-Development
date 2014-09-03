@@ -349,7 +349,6 @@ namespace llvm {
     /// return base type size.
     uint64_t getOriginalTypeSize() const;
 
-#if defined(AMD_OPENCL) || 1
     // Index 10 onwards are used for ObjC debug info, but in our
     // world, we are not interested in ObjC. For lack of a better
     // "DIPointerType", we will repurpose index 10 to store the
@@ -360,7 +359,6 @@ namespace llvm {
     unsigned getAddressSpace() const {
       return getUnsignedField(10);
     }
-#endif
 
     /// getObjCProperty - Return property node, if this ivar is 
     /// associated with one.

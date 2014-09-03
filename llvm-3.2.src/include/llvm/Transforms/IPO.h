@@ -197,7 +197,6 @@ ModulePass *createMetaRenamerPass();
 /// manager.
 ModulePass *createBarrierNoopPass();
 
-#if defined(AMD_OPENCL) || 1
 //===----------------------------------------------------------------------===//
 /// createAMDInlineAllPass - Return a new pass object that inlines all
 /// functions. And if isWhole is true (whole program mode), it will also
@@ -206,8 +205,6 @@ ModulePass *createBarrierNoopPass();
 Pass *createAMDInlineAllPass(bool isWhole=false);
 ModulePass *createAMDSymbolLinkagePass(bool isWhole=false,
                                        std::set<std::string> *reqFuns = NULL);
-
-#endif
 
 
 } // End llvm namespace

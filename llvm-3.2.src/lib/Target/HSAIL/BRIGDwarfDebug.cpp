@@ -70,20 +70,6 @@ bool BRIGDwarfDebug::addCurrentFnArgument(const MachineFunction *MF,
   return rv;
 }
 
-// recordDebugLocsForVariable - records debug locations for variable
-void BRIGDwarfDebug::recordDebugLocsForVariable(const SmallVectorImpl<const MachineInstr*> &History,
-                                                DbgVariable *RegVar, LexicalScope *Scope) {
-  if (RegVar->getVariable().getTag() == dwarf::DW_TAG_arg_variable 
-      && LScopes.isCurrentFunctionScope(Scope)) {
-    // function parameters should have received proper location offset 
-    // during the preceding addCurrentFnArgument() call
-    assert(RegVar->getDotDebugLocOffset() != ~0U && "Wrong location offset for function argument");
-    return;
-  }
-  // bypass other types variables to default implementation
-  DwarfDebug::recordDebugLocsForVariable(History, RegVar, Scope);
-}
-
 #ifdef BRIG_DWARF_DEMANGLE_PRIVATE_VARIABLES
 namespace {
 

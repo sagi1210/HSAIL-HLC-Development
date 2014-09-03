@@ -621,18 +621,14 @@ public:
     return false;
   }
 
-#if defined(AMD_OPENCL) || 1
   /// Schedule this instruction based entirely on it's Sethi-Ullman number,
   /// without raising or lowering it's priority based on use or def numbers.
   /// What this really says is that the instruction has some effect on execution
   /// that is not modeled in the DAG. (For instance, a multi-thread execution 
-  /// barrier.) On the GPU AMDIL backend, moving these instructions too far up
-  /// or down in the execution can artificially constrain the scheduling in the 
-  /// shared compiler.
+  /// barrier.) 
   virtual bool shouldScheduleWithNormalPriority(SDNode* instruction) const {
     return false;
   }
-#endif
 
   /// ReverseBranchCondition - Reverses the branch condition of the specified
   /// condition list, returning false on success and true if it cannot be

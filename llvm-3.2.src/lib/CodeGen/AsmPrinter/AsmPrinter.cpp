@@ -187,14 +187,6 @@ bool AsmPrinter::doInitialization(Module &M) {
     OutStreamer.AddBlankLine();
   }
 
-  if (MAI->doesSupportDebugInformation())
-#if defined(AMD_OPENCL) || 1
-    DD = CreateDwarfDebug(M);
-#else
-    DD = new DwarfDebug(this, &M);
-#endif
-
-
   switch (MAI->getExceptionHandlingType()) {
   case ExceptionHandling::None:
     return false;
@@ -212,13 +204,6 @@ bool AsmPrinter::doInitialization(Module &M) {
 
   llvm_unreachable("Unknown exception type.");
 }
-#if defined(AMD_OPENCL) || 1
-// This function will be used by HSAIL target to use BrigDwarfDebug
-// in the place of DwarfDebug
-DwarfDebug *AsmPrinter::CreateDwarfDebug(Module &M) {
-    return new DwarfDebug(this,&M);
-}
-#endif
 
 void AsmPrinter::EmitLinkage(unsigned Linkage, MCSymbol *GVSym) const {
   switch ((GlobalValue::LinkageTypes)Linkage) {
@@ -801,14 +786,6 @@ getDebugValueLocation(const MachineInstr *MI) const {
   // Target specific DBG_VALUE instructions are handled by each target.
   return MachineLocation();
 }
-//jgolds
-#if 1 | defined(AMD_OPENCL)
-/// getDebugResourceLocation - Get resource id information encoded in
-/// target flags.
-bool AsmPrinter::getDebugResourceID(const Value *V, uint32_t& RID) const {
-  return false;
-}
-#endif
 
 /// EmitDwarfRegOp - Emit dwarf register operation.
 void AsmPrinter::EmitDwarfRegOp(const MachineLocation &MLoc) const {
@@ -955,10 +932,8 @@ bool AsmPrinter::doFinalization(Module &M) {
     if (const MCSection *S = MAI->getNonexecutableStackSection(OutContext))
       OutStreamer.SwitchSection(S);
 
-#if 1 || AMD_OPENCL
   // LLVM Bug 9761. Nothing should be emitted after EmitEndOfAsmFile()
   OutStreamer.Finish();
-#endif
 
   // Allow the target to emit any magic that it wants at the end of the file,
   // after everything else has gone out.
@@ -967,11 +942,6 @@ bool AsmPrinter::doFinalization(Module &M) {
   delete Mang; Mang = 0;
   MMI = 0;
 
-#if 1 || AMD_OPENCL
-#if 0
-  OutStreamer.Finish();
-#endif
-#endif
   return false;
 }
 
@@ -2099,11 +2069,7 @@ static void emitBasicBlockLoopComments(const MachineBasicBlock &MBB,
 /// EmitBasicBlockStart - This method prints the label for the specified
 /// MachineBasicBlock, an alignment (if present) and a comment describing
 /// it if appropriate.
-#if defined(AMD_OPENCL) || 1
 void AsmPrinter::EmitBasicBlockStart(const MachineBasicBlock *MBB) {
-#else
-void AsmPrinter::EmitBasicBlockStart(const MachineBasicBlock *MBB) const {
-#endif
   // Emit an alignment directive for this block, if needed.
   if (unsigned Align = MBB->getAlignment())
     EmitAlignment(Align);

@@ -41,11 +41,9 @@ enum ActionType {
   GenTgtIntrinsic,
   GenEDInfo,
   PrintEnums,
-  PrintSets
-#if defined(AMD_OPENCL) || 1
-  ,GenBrigWriter
-  ,GenHSAILVecMap
-#endif
+  PrintSets,
+  GenBrigWriter,
+  GenHSAILVecMap
 };
 
 namespace {
@@ -87,12 +85,10 @@ namespace {
                                "Print enum values for a class"),
                     clEnumValN(PrintSets, "print-sets",
                                "Print expanded sets for testing DAG exprs"),
-#if defined(AMD_OPENCL) || 1
                     clEnumValN(GenBrigWriter, "gen-brig-writer",
                                "Generate BRIG writer"),
                     clEnumValN(GenHSAILVecMap, "gen-hsail-vec-map",
                                "Generate HSAIL scalar to vector map"),
-#endif
                     clEnumValEnd));
 
   cl::opt<std::string>
@@ -172,14 +168,12 @@ bool LLVMTableGenMain(raw_ostream &OS, RecordKeeper &Records) {
     }
     break;
   }
-#if defined(AMD_OPENCL) || 1
   case GenBrigWriter:
     EmitBrigWriter(Records, OS);
     break;
   case GenHSAILVecMap:
     EmitHSAILVecMap(Records,OS);
     break;
-#endif
   }
 
   return false;

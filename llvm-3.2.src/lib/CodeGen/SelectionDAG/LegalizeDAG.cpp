@@ -607,7 +607,6 @@ PerformInsertVectorEltInMemory(SDValue Vec, SDValue Val, SDValue Idx,
                          false, false, 0);
   // Load the updated vector.
   return DAG.getLoad(VT, dl, Ch, StackPtr,
-// D2_OPENCL
                      MachinePointerInfo::getFixedStack(SPFI), false, false,
                      false, 0);
 }

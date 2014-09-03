@@ -159,8 +159,6 @@ public:
 protected:
 
 
-  virtual DwarfDebug* CreateDwarfDebug(Module& M);
-
   virtual void emitMacroFunc(const MachineInstr *MI, raw_ostream &O);
 
   HSAILTargetMachine *mTM;

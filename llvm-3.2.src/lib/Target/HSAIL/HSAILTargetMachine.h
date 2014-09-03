@@ -184,14 +184,6 @@ public:
   HSAILPassConfig(HSAILTargetMachine *TM, PassManagerBase &PM)
     : TargetPassConfig(TM, PM)
   {
-// D2_OPENCL_HSA
-#if 0
-    setEnableRetToEnd(true);
-    setDisableTailMergeAcrossLoop(true);
-    setLsrCheckRegRecalc(true);
-    setLsrIgnoreAddRecCost(true);
-    setLsrCheckLoserOnTie(true);
-#endif
   }
 
   HSAILTargetMachine &getHSAILTargetMachine() const {

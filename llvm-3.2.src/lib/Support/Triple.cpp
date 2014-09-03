@@ -41,12 +41,9 @@ const char *Triple::getArchTypeName(ArchType Kind) {
   case nvptx:   return "nvptx";
   case nvptx64: return "nvptx64";
   case le32:    return "le32";
-  case amdil:   return "amdil";
-#if defined(AMD_OPENCL) || 1
-  case amdil64: return "amdil64";
   case hsail:   return "hsail";
   case hsail_64:return "hsail64";
-#endif
+  case amdil:	return "amdil";
   case spir:    return "spir";
   case spir64:  return "spir64";
   }
@@ -89,12 +86,9 @@ const char *Triple::getArchTypePrefix(ArchType Kind) {
   case nvptx:   return "nvptx";
   case nvptx64: return "nvptx";
   case le32:    return "le32";
-  case amdil:   return "amdil";
-#if defined(AMD_OPENCL) || 1
-  case amdil64: return "amdil";
   case hsail:   return "hsail";
   case hsail_64:return "hsail64";
-#endif
+  case amdil:	return "amdil";
   case spir:    return "spir";
   case spir64:  return "spir";
   }
@@ -157,7 +151,6 @@ const char *Triple::getEnvironmentTypeName(EnvironmentType Kind) {
   case MachO: return "macho";
   case Android: return "android";
   case ELF: return "elf";
-  case AMDOpenCL: return "amdopencl";
   }
 
   llvm_unreachable("Invalid EnvironmentType!");
@@ -188,12 +181,9 @@ Triple::ArchType Triple::getArchTypeForLLVMName(StringRef Name) {
     .Case("nvptx", nvptx)
     .Case("nvptx64", nvptx64)
     .Case("le32", le32)
-    .Case("amdil", amdil)
-#if defined(AMD_OPENCL) || 1
-    .Case("amdil64", amdil64)
     .Case("hsail", hsail)
     .Case("hsail64", hsail_64)
-#endif
+    .Case("amdil", amdil)
     .Case("spir", spir)
     .Case("spir64", spir64)
     .Default(UnknownArch);
@@ -219,12 +209,9 @@ const char *Triple::getArchNameForAssembler() {
     .Case("nvptx", "nvptx")
     .Case("nvptx64", "nvptx64")
     .Case("le32", "le32")
-    .Case("amdil", "amdil")
-#if defined(AMD_OPENCL) || 1
-    .Case("amdil64", "amdil64")
     .Case("hsail", "hsail")
     .Case("hsail64", "hsail_64")
-#endif
+    .Case("amdil", "amdil")
     .Case("spir", "spir")
     .Case("spir64", "spir64")
     .Default(NULL);
@@ -260,12 +247,9 @@ static Triple::ArchType parseArch(StringRef ArchName) {
     .Case("nvptx", Triple::nvptx)
     .Case("nvptx64", Triple::nvptx64)
     .Case("le32", Triple::le32)
-    .Case("amdil", Triple::amdil)
-#if defined(AMD_OPENCL) || 1
-    .Case("amdil64", Triple::amdil64)
     .Case("hsail", Triple::hsail)
     .Case("hsail64", Triple::hsail_64)
-#endif
+    .Case("amdil", Triple::amdil)
     .Case("spir", Triple::spir)
     .Case("spir64", Triple::spir64)
     .Default(Triple::UnknownArch);
@@ -319,7 +303,6 @@ static Triple::EnvironmentType parseEnvironment(StringRef EnvironmentName) {
     .StartsWith("macho", Triple::MachO)
     .StartsWith("android", Triple::Android)
     .StartsWith("elf", Triple::ELF)
-    .StartsWith("amdopencl", Triple::AMDOpenCL)
     .Default(Triple::UnknownEnvironment);
 }
 
@@ -332,7 +315,7 @@ Triple::Triple(const Twine &Str)
       Arch(parseArch(getArchName())),
       Vendor(parseVendor(getVendorName())),
       OS(parseOS(getOSName())),
-      Environment(parseEnvironment(getEnvironmentName())){
+      Environment(parseEnvironment(getEnvironmentName())) {
 }
 
 /// \brief Construct a triple from string representations of the architecture,
@@ -708,10 +691,7 @@ static unsigned getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::hsail:
     return 32;
 
-#if defined(AMD_OPENCL) || 1
-  case llvm::Triple::amdil64:
   case llvm::Triple::hsail_64:
-#endif
   case llvm::Triple::mips64:
   case llvm::Triple::mips64el:
   case llvm::Triple::nvptx64:
@@ -761,16 +741,11 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::thumb:
   case Triple::x86:
   case Triple::xcore:
-#if defined(AMD_OPENCL) || 1
   case Triple::hsail:
-#endif
     // Already 32-bit.
     break;
 
-#if defined(AMD_OPENCL) || 1
-  case Triple::amdil64:   T.setArch(Triple::amdil); break;
   case Triple::hsail_64:  T.setArch(Triple::hsail); break;
-#endif
   case Triple::mips64:    T.setArch(Triple::mips);    break;
   case Triple::mips64el:  T.setArch(Triple::mipsel);  break;
   case Triple::nvptx64:   T.setArch(Triple::nvptx);   break;
@@ -800,10 +775,7 @@ Triple Triple::get64BitArchVariant() const {
     break;
 
   case Triple::spir64:
-#if defined(AMD_OPENCL) || 1
-  case Triple::amdil64:
   case Triple::hsail_64:
-#endif
   case Triple::mips64:
   case Triple::mips64el:
   case Triple::nvptx64:
@@ -813,10 +785,7 @@ Triple Triple::get64BitArchVariant() const {
     // Already 64-bit.
     break;
 
-  case Triple::amdil:   T.setArch(Triple::amdil64);   break;
-#if defined(AMD_OPENCL) || 1
   case Triple::hsail:   T.setArch(Triple::hsail_64);  break;
-#endif
   case Triple::mips:    T.setArch(Triple::mips64);    break;
   case Triple::mipsel:  T.setArch(Triple::mips64el);  break;
   case Triple::nvptx:   T.setArch(Triple::nvptx64);   break;

@@ -104,17 +104,6 @@ HSAILTargetLowering::HSAILTargetLowering(HSAILTargetMachine &TM)
   addRegisterClass(MVT::f64, &HSAIL::GPR64RegClass);
   addRegisterClass(MVT::i1,  &HSAIL::CRRegClass);
 
-// D2_OPENCL_HSA - Currently Atomics are NOT supported
-#if 0
-  setOperationAction(ISD::ATOMIC_LOAD, MVT::i32, Custom);
-  setOperationAction(ISD::ATOMIC_LOAD, MVT::i64, Custom);
-  setOperationAction(ISD::ATOMIC_LOAD, MVT::f32, Custom);
-  setOperationAction(ISD::ATOMIC_LOAD, MVT::f64, Custom);
-  setOperationAction(ISD::ATOMIC_STORE, MVT::i32, Custom);
-  setOperationAction(ISD::ATOMIC_STORE, MVT::i64, Custom);
-  setOperationAction(ISD::ATOMIC_STORE, MVT::f32, Custom);
-  setOperationAction(ISD::ATOMIC_STORE, MVT::f64, Custom);
-#endif
   setOperationAction(ISD::BSWAP, MVT::i16, Expand);
   setOperationAction(ISD::BSWAP, MVT::i32, Custom);
   setOperationAction(ISD::BSWAP, MVT::i64, Expand);
@@ -1681,59 +1670,6 @@ HSAILTargetLowering::LowerROTR(SDValue Op, SelectionDAG &DAG) const {
            DAG.getConstant(HSAILIntrinsic::HSAIL_bitalign_b32, MVT::i32),
            src0, src0, src1);  
 }
-
-// D2_OPENCL_HSA - Currently Atomics are NOT supported
-#if 0
-SDValue
-HSAILTargetLowering::LowerATOMIC_STORE(SDValue Op, SelectionDAG &DAG) const {
-  // HSAIL doesnt support SequentiallyConsistent,
-  // lower an atomic store with SequentiallyConsistent memory order
-  // to Release atomic store and Acquire memfence
-  DebugLoc dl = Op.getDebugLoc();
-  SDNode *Node = Op.getNode();
-  MemSDNode *Mn = dyn_cast<MemSDNode>(Node);
-
-  if (Mn->getOrdering() != SequentiallyConsistent) return Op;
-  unsigned brigMemoryOrder = Brig::BRIG_MEMORY_ORDER_SC_ACQUIRE;
-  unsigned brigMemoryScope = Mn->getAddressSpace() == HSAILAS::GROUP_ADDRESS ?
-      Brig::BRIG_MEMORY_SCOPE_WORKGROUP : Mn->getMemoryScope();
-
-  SDValue ResNode = DAG.getAtomic(ISD::ATOMIC_STORE, dl,
-                                  cast<AtomicSDNode>(Node)->getMemoryVT(),
-                                  Node->getOperand(0), Node->getOperand(1),
-                                  Node->getOperand(2),
-                                  cast<AtomicSDNode>(Node)->getMemOperand(),
-                                  Release,
-                                  cast<AtomicSDNode>(Node)->getSynchScope(),
-                                  brigMemoryScope);
-  return generateFenceIntrinsic(ResNode, dl, Mn->getAddressSpace(),
-          brigMemoryOrder, brigMemoryScope, DAG);
-}
-
-SDValue
-HSAILTargetLowering::LowerATOMIC_LOAD(SDValue Op, SelectionDAG &DAG) const {
- // HSAIL doesnt support SequentiallyConsistent,
- // lower an atomic load with SequentiallyConsistent memory order
- // to a Release memfence and Acquire atomic load
-  DebugLoc dl = Op.getDebugLoc();
-  SDNode *Node = Op.getNode();
-  MemSDNode *Mn = dyn_cast<MemSDNode>(Node);
-
-  if (Mn->getOrdering() != SequentiallyConsistent) return Op;
-  unsigned brigMemoryOrder = Brig::BRIG_MEMORY_ORDER_SC_RELEASE;
-  unsigned brigMemoryScope = Mn->getAddressSpace() == HSAILAS::GROUP_ADDRESS ?
-      Brig::BRIG_MEMORY_SCOPE_WORKGROUP : Mn->getMemoryScope();
-
-  SDValue Chain = generateFenceIntrinsic(Op.getOperand(0), dl,
-          Mn->getAddressSpace(), brigMemoryOrder, brigMemoryScope, DAG);
-
-  return DAG.getAtomic(ISD::ATOMIC_LOAD, dl,
-          cast<AtomicSDNode>(Node)->getMemoryVT(), Op.getValueType(), Chain,
-          Node->getOperand(1), cast<AtomicSDNode>(Node)->getMemOperand(),
-          Acquire, cast<AtomicSDNode>(Node)->getSynchScope(),
-          brigMemoryScope);
-}
-#endif
 
 SDValue
 HSAILTargetLowering::LowerBSWAP(SDValue Op, SelectionDAG &DAG) const {

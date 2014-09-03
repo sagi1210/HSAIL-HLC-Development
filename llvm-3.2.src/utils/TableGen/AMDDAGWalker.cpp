@@ -1,10 +1,4 @@
-#if defined(AMD_OPENCL) || 1
-
 #include "AMDDAGWalker.h"
-
-#ifdef ANDROID
-#include <stdio.h>
-#endif
 
 bool IsSubclassOf( std::string sSuperclassName, DefInit * def ) {
   std::vector<Record*> superClasses = def->getDef()->getSuperClasses();
@@ -191,14 +185,12 @@ void DAGWalker::ProcessDef( DefInit * def ) {
         }
         break;
       default:
-        printf("PATTERN DAG HAS INCORRECT FORMAT \n");
         exit(1);
   }
   break;
 
   default:
     {
-      printf("PATTERN DAG HAS INCORRECT FORMAT \n");
       exit(1);
     }
   }
@@ -223,4 +215,3 @@ void DAGWalker::WalkDAG( DagInit * dag, int& nNumOperands ) {
   }
 }
 
-#endif // AMD_OPENCL

@@ -44,9 +44,7 @@ void llvm::initializeIPO(PassRegistry &Registry) {
   initializeStripDebugDeclarePass(Registry);
   initializeStripDeadDebugInfoPass(Registry);
   initializeStripNonDebugSymbolsPass(Registry);
-#if 1 || defined(AMD_OPENCL)
   initializeAMDSymbolLinkagePass(Registry);
-#endif // 1 || defined(AMD_OPENCL)
 }
 
 void LLVMInitializeIPO(LLVMPassRegistryRef R) {

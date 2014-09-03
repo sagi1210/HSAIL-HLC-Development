@@ -156,14 +156,11 @@ DefaultDataLayout("default-data-layout",
           cl::desc("data layout string to use if not specified by module"),
           cl::value_desc("layout-string"), cl::init(""));
 
-// D2_OPENCL_HSA
-#if defined(AMD_OPENCL) || 1
 static cl::opt<bool>
 EnableWholeProgram("whole", cl::desc("Enable whole program mode"));
 
 static cl::opt<bool>
 EnableGPUOpt("gpu", cl::desc("Enable optimization for GPU"));
-#endif
 
 // ---------- Define Printers for module and function passes ------------
 namespace {
@@ -453,7 +450,6 @@ static void AddOptimizationPasses(PassManagerBase &MPM,FunctionPassManager &FPM,
   }
 
 
-//D2_OPENCL_HSA - Add these passes too for HSAIL
   MPM.add(createAMDSymbolLinkagePass(EnableWholeProgram));
   MPM.add(createAlwaysInlinerPass());
   MPM.add(createGlobalOptimizerPass());     // Optimize out global vars
@@ -724,15 +720,10 @@ int main(int argc, char **argv) {
       StandardLinkOpts = false;
     }
 
-#if defined(AMD_OPENCL) || 1
-// D2_OPENCL_HSA- Always add
-//  if (OptLevelO0) {
     Passes.add(createAMDSymbolLinkagePass(EnableWholeProgram));
     Passes.add(createAlwaysInlinerPass());
     Passes.add(createGlobalOptimizerPass());     // Optimize out global vars
     Passes.add(createGlobalDCEPass());         // Remove dead fns and globals.
-//  }
-#endif
 
     if (OptLevelO1 && OptLevelO1.getPosition() < PassList.getPosition(i)) {
       AddOptimizationPasses(Passes, *FPasses, 1, 0);

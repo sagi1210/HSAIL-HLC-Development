@@ -233,6 +233,8 @@ void initializeScalarEvolutionPass(PassRegistry&);
 void initializeSimpleInlinerPass(PassRegistry&);
 void initializeRegisterCoalescerPass(PassRegistry&);
 void initializeSimplifyLibCallsPass(PassRegistry&);
+void initializeKernelSymbolsAnalysisGroup(PassRegistry&);
+void initializeAMDKernelSymbolsPass(PassRegistry&);
 void initializeSingleLoopExtractorPass(PassRegistry&);
 void initializeSinkingPass(PassRegistry&);
 void initializeSlotIndexesPass(PassRegistry&);
@@ -258,10 +260,6 @@ void initializeUnifyFunctionExitNodesPass(PassRegistry&);
 void initializeUnreachableBlockElimPass(PassRegistry&);
 void initializeUnreachableMachineBlockElimPass(PassRegistry&);
 void initializeVerifierPass(PassRegistry&);
-#if 1 || defined(SPIR_OPENCL)
-void initializeSPIRVerifierPass(PassRegistry&);
-void initializeSPIRLoaderPass(PassRegistry&);
-#endif
 void initializeVirtRegMapPass(PassRegistry&);
 void initializeVirtRegRewriterPass(PassRegistry&);
 void initializeInstSimplifierPass(PassRegistry&);
@@ -271,75 +269,9 @@ void initializeLoopVectorizePass(PassRegistry&);
 void initializeBBVectorizePass(PassRegistry&);
 void initializeMachineFunctionPrinterPassPass(PassRegistry&);
 
-#if 1 || defined(AMD_OPENCL)
-void initializeAMDDbgmovePass(PassRegistry&);
-void initializeAMDX86AdapterPass(PassRegistry&);
-void initializeAMDGenerateDevEnqMetadataPass(PassRegistry&);
-void initializeAMDLowerEnqueueKernelPass(PassRegistry&);
-void initializeAMDExternalPassPass(PassRegistry&);
-void initializeLivenessAnalysisPass(PassRegistry&);
-void initializeAMDLivenessPrinterPass(PassRegistry&);
-void initializeAMDSimplifyCallPass(PassRegistry&);
+void initializeHSAILDAGToDAGISelPass(PassRegistry&);
 void initializeAMDSymbolLinkagePass(PassRegistry&);
 void initializeAMDInlineAllPass(PassRegistry&);
-void initializeMachinePostDominatorTreePass(PassRegistry&);
-void initializeAMDILCFGPreparePass(PassRegistry&);
-void initializeAMDILCFGPerformPass(PassRegistry&);
-void initializeAMDExportKernelNaturePass(PassRegistry&);
-void initializeVectorCoarseningPass(PassRegistry&);
-void initializeAMDSimplifyLibCallsPass(PassRegistry&);
-void initializeAMDUseNativeCallsPass(PassRegistry&);
-void initializeOpenCLSymbolsAnalysisGroup(PassRegistry&);
-void initializeAMDOpenCLSymbolsPass(PassRegistry&);
-void initializeAMDIL7XXIOExpansionPass(PassRegistry&);
-void initializeAMDILEGIOExpansionPass(PassRegistry&);
-void initializeAMDILSIIOExpansionPass(PassRegistry&);
-void initializeAMDILCIIOExpansionPass(PassRegistry&);
-void initializeAMDILPointerManagerPass(PassRegistry&);
-void initializeAMDILEGPointerManagerPass(PassRegistry&);
-void initializeAMDILSIPointerManagerPass(PassRegistry&);
-void initializeAMDILCIPointerManagerPass(PassRegistry&);
-void initializeAMDILMachinePeepholePass(PassRegistry&);
-void initializeAMDILMachineEBBPass(PassRegistry&);
-void initializeAMDILPeepholeOptPass(PassRegistry&);
-void initializeAMDPeepholeOptPass(PassRegistry&);
-void initializeAMDFenceInfoAnalysisPass(PassRegistry&);
-void initializeAMDAliasAnalysisPass(PassRegistry&);
-void initializeAMDRemoveNoaliasPass(PassRegistry&);
-#if 1 || defined (AMD_OPENCL_MEMCOMBINE)
-void initializeVectorElementAliasAnalysisPass(PassRegistry&);
-void initializeAlignmentAnalysisAnalysisGroup(PassRegistry&);
-void initializeAMDAlignmentAnalysisPass(PassRegistry&);
-void initializeMemCombinePass(PassRegistry&);
-void initializeScalarReplArrayElemPass(PassRegistry&);
-void initializeMachineInstrCountPass(PassRegistry&);
-void initializeOpenCLIRTransformPass(PassRegistry&);
-#endif
-void initializeAMDLocalArrayUsagePass(PassRegistry&);
-void initializeAMDEDGToIA64TranslatorPass(PassRegistry&);
-void initializeAMDLowerAtomicsPass(PassRegistry&);
-void initializeAMDLowerPipeBuiltinsPass(PassRegistry&);
-void initializeAMDLowerToPreciseBuiltinsPass(PassRegistry&);
-void initializeAMDILCreateKernelStubPass(PassRegistry&);
-
-void initializeAMDPrintfRuntimeBinding(PassRegistry&);
-void initializeHSAILPrintfRuntimeBindingKernArgPass(PassRegistry&);
-void initializeHSAILPrintfRuntimeBindingMetadataPass(PassRegistry&);
-
-void initializeHSAILUniformOperationsPass(PassRegistry&);
-void initializeHSAILControlDependencyAnalysisPass(PassRegistry&);
-void initializeHSAILOptimizeMemoryOpsPass(PassRegistry&);
-void initializeHSAILResizeLocalPointerPass(PassRegistry&);
-void initializeHSAILDAGToDAGISelPass(PassRegistry&);
-void initializeHSAILPropagateImageOperandsPass(PassRegistry&);
-void initializeHSAILEarlyCFGOptsPass(PassRegistry&);
-void initializeHSAILSyntaxCleanupPassPass(PassRegistry&);
-void initializeHSAILGlobalOffsetInsertionPassPass(PassRegistry&);
-void initializeHSAILFixSpecialIntrinsicsPass(PassRegistry&);
-void initializeHSAILLowerSPIRSamplersPass(PassRegistry&);
-void initializeHSAILNullPtrInsertionPass(PassRegistry&);
-void initializeHSAILInsertKernelIndexMetadataPass(PassRegistry&);
-#endif
 }
 
 #endif

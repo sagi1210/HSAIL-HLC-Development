@@ -124,7 +124,6 @@ static tool_output_file *GetOutputStream(const char *TargetName,
   }
 
   // Decide if we need "binary" output.
-// D2_OPENCL_HSA
   bool Binary = true;
   switch (FileType) {
   case TargetMachine::CGFT_AssemblyFile:

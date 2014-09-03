@@ -30,9 +30,11 @@ void BRIGDwarfStreamer::InitSections() {
   SwitchSection(codeSection);
 }
 
+#if 0
 MCStreamer::MCStreamerKind BRIGDwarfStreamer::getStreamerKind() const {
   return MCStreamer::BRIGDwarfStreamer;
 }
+#endif
 
 void BRIGDwarfStreamer::Finish() {
   MCELFStreamer::Finish();

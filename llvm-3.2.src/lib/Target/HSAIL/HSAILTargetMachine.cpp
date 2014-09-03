@@ -182,10 +182,6 @@ HSAILTargetMachine::HSAILTargetMachine(const Target &T, StringRef TT,
      //
      setMCUseLoc(false);
 
-// D2_OPENCL_HSA
-#if 0
-     setRequiresStructuredCFG(false);
-#endif
 }
 
 bool HSAILTargetMachine::addPassesToEmitFile(PassManagerBase &PM,
@@ -211,40 +207,15 @@ void HSAILPassConfig::addIRPasses() {
   // AddrSpaceCast optimization and lowering. Add dead code elimination
   // to eliminate dead instructions (AddrSpaceCast, etc.).
 
-// D2_OPENCL_HSA
-//  addPass(createHSAILAddrSpaceCastPass());
-//  addPass(createDeadCodeEliminationPass());
+    addPass(createDeadCodeEliminationPass());
 
-//  TargetPassConfig::addIRPasses();
+    TargetPassConfig::addIRPasses();
 }
 
 bool HSAILPassConfig::addPreISel(){
   HSAILTargetMachine &HSATM = getTM<HSAILTargetMachine>();
 
-// D2_OPENCL_HSA
-#if 0
-  if (CodeGenOpt::None != HSATM.getOptLevel()) {
-    addPass(createVectorCoarseningPass(4));
-  }
-
-  addPass(createHSAILLowerSPIRSamplersPass());
-  if ( !EnableExperimentalFeatures ) {
-    addPass(createHSAILPropagateImageOperandsPass());
-  }
-  addPass(createHSAILSyntaxCleanupPass());
-  addPass(createHSAILPrintfRuntimeBindingKernArg(HSATM));
-  addPass(createHSAILGlobalOffsetInsertionPass(HSATM));
-
-  if (HSATM.getOptLevel()!= CodeGenOpt::None && !DisableHSAILCFGOpts) {
     addPass(createLCSSAPass()); // Required by early CFG opts
-    addPass(createHSAILEarlyCFGOpts());
-    if (HSATM.Options.PrintMachineCode) {
-      addPass(createMachineFunctionPrinterPass(errs(), "After HSAILEarlyCFGOpts"));
-    }
-  }
-  addPass(createHSAILInsertKernelIndexMetadataPass());
-  addPass(createHSAILNullPtrInsertionPass());
-#endif
 
   return true;
 }
@@ -254,20 +225,8 @@ bool HSAILPassConfig::addInstSelector() {
 	//return HSAILTargetMachine::addInstSelector(*PM,HSATM.Options,HSATM.getOptLevel());
     //mOptLevel = OptLevel;
   // Install an instruction selector.
-// D2_OPENCL_HSA
-//  addPass(createHSAILPrintfRuntimeBindingMetadata(HSATM));
 
   addPass(createHSAILISelDag(HSATM, HSATM.getOptLevel()));
-
-// D2_OPENCL_HSA
-#if 0
-  if (EnableUniformOps) {
-    addPass(createHSAILUniformOperations(HSATM));
-  }
-
-  addPass(createHSAILOptimizeMemoryOps(HSATM));
-  addPass(createHSAILResizeLocalPointer(HSATM));
-#endif
 
   return false;
 }
