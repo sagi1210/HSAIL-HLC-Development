@@ -4,8 +4,8 @@ import os
 import sys
 
 # Variables configured at build time.
-llvm_source_root = "/home/amd/Prakash/Git/LLVM-To-HSAIL-Test-Compiler/llvm-3.2.src"
-llvm_obj_root = "/home/amd/Prakash/Git/LLVM-To-HSAIL-Test-Compiler/llvm-3.2.src/build"
+llvm_source_root = "/home/amd/Prakash/THSAIL/llvm-3.2.src"
+llvm_obj_root = "/home/amd/Prakash/THSAIL/llvm-3.2.src/build"
 
 # Make sure we can find the lit package.
 sys.path.insert(0, os.path.join(llvm_source_root, 'utils', 'lit'))
